@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art para Roblox GUI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --border: #2a2a3a;
+            --accent: #7c3aed;
+            --accent2: #06b6d4;
+            --text: #e2e2f0;
+            --muted: #6b6b8a;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Syne', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: linear-gradient(rgba(124, 58, 237, .06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124, 58, 237, .06) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .tag {
+            display: inline-block;
+            font-family: 'Space Mono', monospace;
+            font-size: .7rem;
+            color: var(--accent2);
+            border: 1px solid var(--accent2);
+            padding: .2rem .7rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 800;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 40%, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            margin-top: .5rem;
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: .6rem;
+            margin-bottom: .8rem;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: .85rem 1.1rem;
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: .78rem;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        input[type="text"] {
+            flex: 2;
+            min-width: 250px;
+        }
+
+        input[type="number"] {
+            width: 80px;
+            text-align: center;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        input::placeholder {
+            color: var(--muted);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: .6rem;
+            margin-bottom: 1.2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: .75rem 1.3rem;
+            font-family: 'Syne', sans-serif;
+            font-weight: 700;
+            font-size: .82rem;
+            cursor: pointer;
+            transition: opacity .2s, transform .1s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            opacity: .85;
+        }
+
+        button:active {
+            transform: scale(.97);
+        }
+
+        button.secondary {
+            background: var(--accent2);
+        }
+
+        button.success {
+            background: #10b981;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: .72rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        select {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            font-size: .72rem;
+            padding: .3rem .5rem;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+
+        .preview-area {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .preview-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .preview-label {
+            font-family: 'Space Mono', monospace;
+            font-size: .65rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .1em;
+        }
+
+        canvas {
+            image-rendering: pixelated;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .pixel-text-preview {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 6px;
+            line-height: 1;
+            padding: .5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            white-space: pre;
+            overflow: auto;
+            max-width: 100%;
+            max-height: 300px;
+            letter-spacing: 0;
+        }
+
+        .code-output {
+            background: #0a0a0f;
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .code-title {
+            font-family: 'Space Mono', monospace;
+            font-size: .75rem;
+            color: var(--accent2);
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .roblox-instructions {
+            background: #1a1a2e;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: .7rem;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .roblox-instructions strong {
+            color: var(--accent2);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: #000;
+            color: #0f0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: .7rem;
+            line-height: 1.2;
+            letter-spacing: 0;
+            resize: vertical;
+            outline: none;
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .8rem;
+            color: var(--muted);
+            font-size: .9rem;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .placeholder svg {
+            opacity: .4;
+        }
+
+        .loader {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        .error-msg {
+            display: none;
+            padding: 1.5rem;
+            color: #f87171;
+            font-family: 'Space Mono', monospace;
+            font-size: .75rem;
+            text-align: center;
+            line-height: 1.8;
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: #10b981;
+            color: #fff;
+            padding: .8rem 1.2rem;
+            border-radius: 10px;
+            font-family: 'Space Mono', monospace;
+            font-size: .75rem;
+            z-index: 999;
+            animation: slideIn .3s ease;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            .input-row {
+                flex-direction: column;
+            }
+            input[type="number"] {
+                width: 100%;
+            }
+            .btn-row {
+                flex-direction: column;
+            }
+            .option-group {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="tag">Roblox GUI Tool</div>
+            <h1>Pixel Art → Roblox GUI</h1>
+            <p class="subtitle">Converta imagens em texto pixelado para usar em TextLabel do Roblox</p>
+        </header>
+
+        <div class="input-row">
+            <input type="text" id="url-input" placeholder="https://exemplo.com/imagem.png" value="https://picsum.photos/seed/cat/200/200" />
+            <button onclick="loadAndConvert()">🔄 Converter</button>
+        </div>
+
+        <div class="btn-row">
+            <label style="color: var(--muted); font-family: 'Space Mono', monospace; font-size: .75rem;">
+                Largura (caracteres):
+                <input type="number" id="char-width" value="40" min="10" max="100" />
+            </label>
+            <div class="option-group">
+                Bloco:
+                <select id="block-type">
+                    <option value="██">██ (sólido)</option>
+                    <option value="▓▓">▓▓ (médio)</option>
+                    <option value="░░">░░ (claro)</option>
+                    <option value="##">## (hash)</option>
+                    <option value="@@">@@ (arroba)</option>
+                </select>
+            </div>
+            <button class="secondary" onclick="copyToClipboard()">📋 Copiar Código</button>
+            <button class="success" onclick="downloadText()">💾 Baixar .txt</button>
+        </div>
+
+        <!-- Preview Area -->
+        <div class="card" id="card">
+            <div class="placeholder" id="placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="3" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                </svg>
+                <span>Cole uma URL de imagem e clique em Converter</span>
+            </div>
+            <div class="loader" id="loader"></div>
+            <div class="preview-area" id="preview-area" style="display: none;">
+                <div class="preview-box">
+                    <span class="preview-label">Original</span>
+                    <canvas id="original-canvas"></canvas>
+                </div>
+                <div class="preview-box">
+                    <span class="preview-label">Pixel Art</span>
+                    <canvas id="pixel-canvas"></canvas>
+                </div>
+                <div class="preview-box">
+                    <span class="preview-label">Prévia Texto</span>
+                    <div class="pixel-text-preview" id="text-preview"></div>
+                </div>
+            </div>
+            <div class="error-msg" id="error-msg"></div>
+        </div>
+
+        <!-- Código gerado -->
+        <div class="code-output" id="code-output" style="display: none;">
+            <div class="code-header">
+                <span class="code-title">📝 Código para Roblox</span>
+                <span style="font-family: 'Space Mono', monospace; font-size: .65rem; color: var(--muted);">
+                    Cole no TextLabel.Text
+                </span>
+            </div>
+            <textarea id="code-textarea" readonly placeholder="O código pixelado aparecerá aqui..."></textarea>
+        </div>
+
+        <!-- Instruções -->
+        <div class="roblox-instructions" id="instructions" style="display: none;">
+            <strong>🎮 Como usar no Roblox:</strong><br>
+            1. Crie uma <strong>ScreenGui</strong> dentro do StarterGui<br>
+            2. Adicione um <strong>TextLabel</strong><br>
+            3. Configure a fonte: <strong>Font = "Code"</strong> ou <strong>"RobotoMono"</strong><br>
+            4. Ajuste: <strong>TextScaled = false</strong> e <strong>TextSize = 10</strong><br>
+            5. Cole o texto gerado no campo <strong>Text</strong><br>
+            6. Ajuste o tamanho do TextLabel para caber a arte<br>
+            7. Defina <strong>BackgroundTransparency = 1</strong> e <strong>TextColor3 = 255,255,255</strong>
+        </div>
+    </div>
+
+    <div class="success-toast" id="toast"></div>
+
+    <script>
+        let generatedText = '';
+        let currentImageData = null;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 2000);
+        }
+
+        function showError(msg) {
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('error-msg').innerHTML = msg;
+            document.getElementById('error-msg').style.display = 'block';
+        }
+
+        async function loadAndConvert() {
+            const url = document.getElementById('url-input').value.trim();
+            if (!url) return;
+
+            // Reset
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('preview-area').style.display = 'none';
+            document.getElementById('code-output').style.display = 'none';
+            document.getElementById('instructions').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('error-msg').style.display = 'none';
+
+            try {
+                // Tenta carregar via proxy CORS
+                const img = await loadImageWithProxy(url);
+                await convertToPixelText(img);
+            } catch (err) {
+                showError('❌ Erro ao carregar imagem.<br>Tente outra URL ou verifique o link.');
+                console.error(err);
+            }
+        }
+
+        async function loadImageWithProxy(url) {
+            const proxies = [
+                (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+                (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+            ];
+
+            for (let i = 0; i < proxies.length; i++) {
+                try {
+                    const response = await fetch(proxies[i](url), { mode: 'cors' });
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        const img = await loadImageElement(blobUrl);
+                        URL.revokeObjectURL(blobUrl);
+                        return img;
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            // Fallback direto
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = url;
+            });
+            return img;
+        }
+
+        function loadImageElement(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = src;
+            });
+        }
+
+        async function convertToPixelText(img) {
+            const charWidth = parseInt(document.getElementById('char-width').value) || 40;
+            const blockType = document.getElementById('block-type').value;
+
+            // Calcular altura proporcional
+            const aspectRatio = img.naturalHeight / img.naturalWidth;
+            // Cada "bloco" de texto tem aproximadamente 2x largura que altura em fontes monoespaçadas
+            const charHeight = Math.floor(charWidth * aspectRatio / 2);
+
+            // Criar canvas para downscale
+            const smallCanvas = document.createElement('canvas');
+            smallCanvas.width = charWidth;
+            smallCanvas.height = charHeight;
+            const smallCtx = smallCanvas.getContext('2d');
+            smallCtx.drawImage(img, 0, 0, charWidth, charHeight);
+            const smallImageData = smallCtx.getImageData(0, 0, charWidth, charHeight);
+            currentImageData = smallImageData;
+
+            // Mostrar preview do canvas pixelado
+            const pixelCanvas = document.getElementById('pixel-canvas');
+            pixelCanvas.width = charWidth * 4;
+            pixelCanvas.height = charHeight * 4;
+            const pixelCtx = pixelCanvas.getContext('2d');
+            pixelCtx.imageSmoothingEnabled = false;
+            pixelCtx.drawImage(smallCanvas, 0, 0, charWidth * 4, charHeight * 4);
+
+            // Mostrar canvas original
+            const originalCanvas = document.getElementById('original-canvas');
+            const origMaxWidth = 200;
+            const origScale = Math.min(1, origMaxWidth / img.naturalWidth);
+            originalCanvas.width = Math.floor(img.naturalWidth * origScale);
+            originalCanvas.height = Math.floor(img.naturalHeight * origScale);
+            const origCtx = originalCanvas.getContext('2d');
+            origCtx.drawImage(img, 0, 0, originalCanvas.width, originalCanvas.height);
+
+            // Gerar texto com blocos coloridos (usando emojis ou caracteres)
+            const data = smallImageData.data;
+            let textResult = '';
+            const colorMap = {}; // Para estatísticas
+
+            for (let y = 0; y < charHeight; y++) {
+                let line = '';
+                for (let x = 0; x < charWidth; x++) {
+                    const i = (y * charWidth + x) * 4;
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+                    const a = data[i + 3];
+
+                    if (a < 128) {
+                        // Pixel transparente = espaço
+                        line += '  ';
+                    } else {
+                        // Mapeia para caractere baseado no brilho
+                        const brightness = (r + g + b) / 3;
+                        let char;
+                        if (brightness > 200) char = '██';
+                        else if (brightness > 150) char = '▓▓';
+                        else if (brightness > 100) char = '▒▒';
+                        else if (brightness > 50) char = '░░';
+                        else char = '  ';
+
+                        // Se o usuário escolheu um bloco específico, usa ele
+                        if (blockType && brightness > 50) {
+                            char = blockType;
+                        }
+                        line += char;
+                    }
+                }
+                textResult += line + '\n';
+            }
+
+            generatedText = textResult;
+
+            // Atualizar UI
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('preview-area').style.display = 'flex';
+            document.getElementById('code-output').style.display = 'block';
+            document.getElementById('instructions').style.display = 'block';
+
+            const textPreview = document.getElementById('text-preview');
+            textPreview.textContent = textResult;
+            textPreview.style.fontSize = Math.max(2, Math.min(8, 200 / charWidth)) + 'px';
+
+            const textarea = document.getElementById('code-textarea');
+            textarea.value = textResult;
+            textarea.style.fontSize = Math.max(6, Math.min(14, 600 / charWidth)) + 'px';
+        }
+
+        function copyToClipboard() {
+            if (!generatedText) {
+                showToast('⚠️ Gere uma pixel art primeiro!');
+                return;
+            }
+            navigator.clipboard.writeText(generatedText).then(() => {
+                showToast('✅ Copiado! Cole no TextLabel do Roblox');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.getElementById('code-textarea');
+                textarea.select();
+                document.execCommand('copy');
+                showToast('✅ Copiado!');
+            });
+        }
+
+        function downloadText() {
+            if (!generatedText) {
+                showToast('⚠️ Gere uma pixel art primeiro!');
+                return;
+            }
+            const blob = new Blob([generatedText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pixel_art_roblox.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('💾 Arquivo salvo!');
+        }
+
+        // Event Listeners
+        document.getElementById('url-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') loadAndConvert();
+        });
+
+        // Carrega exemplo automático
+        window.addEventListener('load', () => {
+            // Não carrega automático, deixa o usuário decidir
+        });
+    </script>
+</body>
+</html>
