@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pixel Art Roblox - OTIMIZADO</title>
+    <title>Pixel Art Roblox - Hastebin Link</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
         .container {
-            max-width: 1600px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         h1 {
@@ -47,7 +47,7 @@
             margin-bottom: 15px;
             flex-wrap: wrap;
         }
-        input, select, button {
+        input, button {
             background: #1a1a2e;
             border: 1px solid #7c3aed;
             color: white;
@@ -58,18 +58,14 @@
         }
         input {
             flex: 1;
-            min-width: 200px;
+            min-width: 250px;
         }
         button {
             background: #7c3aed;
             cursor: pointer;
-            transition: all 0.2s;
             font-weight: bold;
         }
-        button:hover {
-            opacity: 0.8;
-            transform: scale(0.98);
-        }
+        button:hover { opacity: 0.8; transform: scale(0.98); }
         .res-group {
             display: flex;
             gap: 10px;
@@ -108,16 +104,39 @@
             background: #000;
             border-radius: 8px;
         }
-        .code-area {
+        .link-area {
             background: #0a0a0f;
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid #7c3aed;
             margin-top: 20px;
+            border: 2px solid #10b981;
+        }
+        .link-title {
+            font-size: 14px;
+            color: #10b981;
+            margin-bottom: 10px;
+        }
+        .link-box {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .link-box input {
+            flex: 1;
+            background: #000;
+            color: #0f0;
+            font-size: 12px;
+        }
+        .roblox-code {
+            background: #0a0a0f;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid #06b6d4;
         }
         textarea {
             width: 100%;
-            min-height: 200px;
+            min-height: 250px;
             background: #000;
             color: #0f0;
             border: 1px solid #333;
@@ -127,43 +146,15 @@
             font-size: 11px;
             resize: vertical;
         }
-        .roblox-simulator {
-            background: rgba(0,0,0,0.8);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            border: 2px solid #06b6d4;
-        }
-        .simulator-title {
-            font-size: 18px;
-            color: #06b6d4;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        .pixel-grid {
+        .stats {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 200px;
-            background: #000;
+            gap: 20px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
             border-radius: 8px;
-            overflow: auto;
-            padding: 20px;
-            max-height: 500px;
-        }
-        .pixel-row {
-            display: flex;
-        }
-        .pixel {
-            width: 4px;
-            height: 4px;
-        }
-        .warning {
-            background: rgba(245,158,11,0.2);
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
+            font-size: 12px;
+            flex-wrap: wrap;
         }
         .toast {
             position: fixed;
@@ -193,40 +184,35 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        .stats {
-            display: flex;
-            gap: 20px;
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            font-size: 12px;
-            flex-wrap: wrap;
-        }
-        .button-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
         .btn-success { background: #10b981; }
         .btn-warning { background: #f59e0b; }
         .btn-info { background: #06b6d4; }
-        .btn-danger { background: #ef4444; }
-        .hidden { display: none; }
+        .pixel-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0;
+            max-height: 300px;
+            overflow: auto;
+        }
+        .pixel-row {
+            display: flex;
+        }
+        .pixel {
+            width: 3px;
+            height: 3px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎨 PIXEL ART ROBLOX - OTIMIZADO</h1>
-        <p class="subtitle">Processar → Upload → Testar → Sem travamentos</p>
+        <h1>🎨 PIXEL ART ROBLOX</h1>
+        <p class="subtitle">Imagem → Pixel Art → Hastebin → Link → Roblox</p>
 
         <div class="controls">
             <div class="input-group">
                 <input type="text" id="imageUrl" placeholder="URL da imagem" value="https://picsum.photos/id/100/128/128">
                 <button onclick="processImage()" class="btn-info">🔄 PROCESSAR</button>
-                <button onclick="uploadToHastebin()" class="btn-warning">📤 HASTEBIN</button>
-                <button onclick="testInRoblox()" class="btn-success">🎮 TESTAR</button>
             </div>
             
             <div class="res-group">
@@ -235,12 +221,6 @@
                 <button class="res-btn active" data-res="64">64x64</button>
                 <button class="res-btn" data-res="128">128x128</button>
                 <button class="res-btn" data-res="256">256x256</button>
-            </div>
-            
-            <div class="input-group">
-                <input type="text" id="hastebinLink" placeholder="Link do Hastebin" readonly>
-                <button onclick="copyLink()">📋 COPIAR LINK</button>
-                <button onclick="downloadLua()">💾 BAIXAR</button>
             </div>
         </div>
 
@@ -255,21 +235,23 @@
             </div>
         </div>
 
-        <div class="roblox-simulator" id="simulatorArea" style="display: none;">
-            <div class="simulator-title">🎮 PRÉVIA ROBLOX (Miniatura)</div>
-            <div id="pixelGrid" class="pixel-grid"></div>
-            <div class="button-group">
-                <button onclick="copyRobloxCode()" class="btn-info">📋 COPIAR SCRIPT</button>
-                <button onclick="downloadRobloxScript()" class="btn-success">💾 BAIXAR</button>
+        <div class="link-area" id="linkArea" style="display: none;">
+            <div class="link-title">🔗 LINK DO HASTEBIN (TABELA PIXEL ART)</div>
+            <div class="link-box">
+                <input type="text" id="hastebinLink" readonly placeholder="Clique em Publicar">
+                <button onclick="publishToHastebin()" class="btn-warning">📤 PUBLICAR</button>
+                <button onclick="copyLink()" class="btn-info">📋 COPIAR LINK</button>
             </div>
+            <div class="stats" id="stats"></div>
         </div>
 
-        <div class="code-area" id="codeArea" style="display: none;">
-            <div class="stats" id="stats"></div>
-            <div id="warningMsg" class="warning hidden">
-                ⚠️ ARQUIVO GRANDE! Código salvo apenas no Hastebin. Clique em "BAIXAR" para salvar.
+        <div class="roblox-code" id="robloxCodeArea" style="display: none;">
+            <div class="preview-title">📝 SCRIPT ROBLOX (copiar e colar)</div>
+            <textarea id="robloxScript" readonly></textarea>
+            <div class="input-group" style="margin-top: 10px;">
+                <button onclick="copyRobloxScript()" class="btn-success">📋 COPIAR SCRIPT</button>
+                <button onclick="downloadScript()" class="btn-info">💾 BAIXAR .LUA</button>
             </div>
-            <textarea id="luaCode" readonly placeholder="Código gerado..."></textarea>
         </div>
     </div>
 
@@ -280,9 +262,8 @@
         let currentImage = null;
         let currentPixelData = null;
         let currentResolution = 64;
-        let currentLuaCode = '';
         let currentHastebinUrl = '';
-        let isLargeFile = false;
+        let currentLuaTable = '';
 
         function showToast(msg) {
             const toast = document.getElementById('toast');
@@ -306,71 +287,33 @@
 
             document.getElementById('loading').style.display = 'block';
             document.getElementById('previewArea').style.display = 'none';
-            document.getElementById('codeArea').style.display = 'none';
-            document.getElementById('simulatorArea').style.display = 'none';
+            document.getElementById('linkArea').style.display = 'none';
+            document.getElementById('robloxCodeArea').style.display = 'none';
 
             try {
                 const img = await loadImage(url);
                 currentImage = img;
                 const result = await convertToPixelArt(img);
                 currentPixelData = result.pixelData;
-                currentLuaCode = result.luaCode;
-                
-                const sizeKB = Math.ceil(currentLuaCode.length / 1024);
-                isLargeFile = sizeKB > 50 || currentResolution >= 128;
+                currentLuaTable = result.luaTable;
                 
                 document.getElementById('previewArea').style.display = 'grid';
+                document.getElementById('linkArea').style.display = 'block';
                 
-                if (!isLargeFile) {
-                    document.getElementById('codeArea').style.display = 'block';
-                    document.getElementById('luaCode').value = currentLuaCode;
-                    document.getElementById('warningMsg').classList.add('hidden');
-                } else {
-                    document.getElementById('codeArea').style.display = 'block';
-                    document.getElementById('luaCode').value = '// Arquivo muito grande (' + sizeKB + ' KB)\n// Clique em "PUBLICAR" para salvar no Hastebin\n// Depois clique em "BAIXAR" para salvar no dispositivo';
-                    document.getElementById('warningMsg').classList.remove('hidden');
-                }
-                
+                const sizeKB = Math.ceil(currentLuaTable.length / 1024);
                 document.getElementById('stats').innerHTML = `
                     <span>📐 ${result.width}x${result.height}</span>
                     <span>🎨 ${result.totalPixels} pixels</span>
                     <span>🌈 ${result.uniqueColors} cores</span>
                     <span>💾 ${sizeKB} KB</span>
+                    <span>⚠️ Código NÃO mostrado para não travar</span>
                 `;
                 
-                const previewSize = Math.min(200, Math.max(50, 400 / Math.max(result.width, result.height)));
-                renderMiniPreview(currentPixelData, previewSize);
-                
-                showToast(`✅ ${result.width}x${result.height} gerado!`);
+                showToast(`✅ ${result.width}x${result.height} gerado! Publique no Hastebin.`);
             } catch (error) {
                 showToast('❌ ERRO: ' + error.message);
             }
             document.getElementById('loading').style.display = 'none';
-        }
-
-        function renderMiniPreview(pixelData, pixelSize) {
-            const container = document.getElementById('pixelGrid');
-            container.innerHTML = '';
-            
-            const height = Math.min(pixelData.length, 64);
-            const width = Math.min(pixelData[0].length, 64);
-            
-            for (let y = 0; y < height; y++) {
-                const row = document.createElement('div');
-                row.className = 'pixel-row';
-                for (let x = 0; x < width; x++) {
-                    const pixel = pixelData[y][x];
-                    const r = pixel[0], g = pixel[1], b = pixel[2], a = pixel[3];
-                    
-                    const div = document.createElement('div');
-                    div.style.width = '4px';
-                    div.style.height = '4px';
-                    div.style.backgroundColor = a > 0 ? `rgb(${r}, ${g}, ${b})` : 'transparent';
-                    row.appendChild(div);
-                }
-                container.appendChild(row);
-            }
-            document.getElementById('simulatorArea').style.display = 'block';
         }
 
         function loadImage(url) {
@@ -412,20 +355,20 @@
                 }
             }
 
-            let luaCode = `-- Pixel Art Roblox\n-- Dimensao: ${width}x${height}\n\nlocal pixelData = {\n`;
+            let luaTable = `-- Pixel Art Roblox\n-- Dimensao: ${width}x${height}\n\nlocal pixelData = {\n`;
             for (let y = 0; y < height; y++) {
-                luaCode += `\t[${y}] = {\n`;
+                luaTable += `\t[${y}] = {\n`;
                 for (let x = 0; x < width; x++) {
                     const p = pixelData[y][x];
-                    luaCode += `\t\t[${x}] = { ${p[0]}, ${p[1]}, ${p[2]}, ${p[3]} }`;
-                    if (x < width - 1) luaCode += `,`;
-                    luaCode += `\n`;
+                    luaTable += `\t\t[${x}] = { ${p[0]}, ${p[1]}, ${p[2]}, ${p[3]} }`;
+                    if (x < width - 1) luaTable += `,`;
+                    luaTable += `\n`;
                 }
-                luaCode += `\t}`;
-                if (y < height - 1) luaCode += `,`;
-                luaCode += `\n`;
+                luaTable += `\t}`;
+                if (y < height - 1) luaTable += `,`;
+                luaTable += `\n`;
             }
-            luaCode += `}\n\nreturn pixelData`;
+            luaTable += `}\n\nreturn pixelData`;
 
             const originalCanvas = document.getElementById('originalCanvas');
             const origCtx = originalCanvas.getContext('2d');
@@ -442,7 +385,7 @@
 
             return {
                 pixelData: pixelData,
-                luaCode: luaCode,
+                luaTable: luaTable,
                 width: width,
                 height: height,
                 totalPixels: width * height,
@@ -450,71 +393,60 @@
             };
         }
 
-        async function uploadToHastebin() {
-            if (!currentLuaCode && !currentPixelData) {
+        async function publishToHastebin() {
+            if (!currentLuaTable) {
                 showToast('❌ PROCESS UMA IMAGEM PRIMEIRO!');
                 return;
             }
 
             document.getElementById('loading').style.display = 'block';
             
-            let codeToUpload = currentLuaCode;
-            if (!codeToUpload && currentPixelData) {
-                const result = await convertToPixelArt(currentImage);
-                codeToUpload = result.luaCode;
-            }
-            
             try {
                 const response = await fetch('https://hastebin.com/documents', {
                     method: 'POST',
-                    body: codeToUpload
+                    body: currentLuaTable
                 });
                 const data = await response.json();
                 currentHastebinUrl = `https://hastebin.com/raw/${data.key}`;
                 document.getElementById('hastebinLink').value = currentHastebinUrl;
-                showToast('✅ PUBLICADO! Link salvo.');
+                
+                generateRobloxScript();
+                showToast('✅ PUBLICADO! Link gerado.');
             } catch (error) {
-                showToast('❌ FALHA');
+                showToast('❌ FALHA NO UPLOAD');
             }
             
             document.getElementById('loading').style.display = 'none';
         }
 
-        function testInRoblox() {
-            if (!currentPixelData) {
-                showToast('❌ PROCESS UMA IMAGEM PRIMEIRO!');
-                return;
-            }
-            renderMiniPreview(currentPixelData, 4);
-            showToast('🎮 PRÉVIA ATUALIZADA!');
-        }
-
         function generateRobloxScript() {
-            if (!currentPixelData) return '-- Processe uma imagem primeiro';
+            if (!currentHastebinUrl) return;
             
-            let dataTable = '{\n';
-            for (let y = 0; y < Math.min(currentPixelData.length, 64); y++) {
-                dataTable += `\t[${y}] = {\n`;
-                for (let x = 0; x < Math.min(currentPixelData[0].length, 64); x++) {
-                    const p = currentPixelData[y][x];
-                    dataTable += `\t\t[${x}] = { ${p[0]}, ${p[1]}, ${p[2]}, ${p[3]} }`;
-                    if (x < Math.min(currentPixelData[0].length, 64) - 1) dataTable += `,`;
-                    dataTable += `\n`;
-                }
-                dataTable += `\t}`;
-                if (y < Math.min(currentPixelData.length, 64) - 1) dataTable += `,`;
-                dataTable += `\n`;
-            }
-            dataTable += `}`;
-            
-            return `-- SCRIPT ROBLOX COMPLETO
+            const script = `-- SCRIPT ROBLOX COMPLETO
+-- COLE EM StarterPlayerScripts
+
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 
-local pixelData = ${dataTable}
+local HASTEBIN_URL = "${currentHastebinUrl}"
 
-local function createGUI()
+local function fetchPixelData()
+    local success, result = pcall(function()
+        return HttpService:GetAsync(HASTEBIN_URL)
+    end)
+    if success and result then
+        local func = loadstring(result)
+        if func then
+            return func()
+        end
+    end
+    return nil
+end
+
+local function createGUI(pixelData)
     local player = Players.LocalPlayer
     local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "PixelArtGUI"
     screenGui.Parent = player:WaitForChild("PlayerGui")
     
     local height = #pixelData
@@ -535,33 +467,25 @@ local function createGUI()
                 local frame = Instance.new("Frame")
                 frame.Size = UDim2.new(0, pixelSize, 0, pixelSize)
                 frame.Position = UDim2.new(0, x * pixelSize, 0, y * pixelSize)
-                frame.BackgroundColor3 = Color3.fromRGB(r,g,b)
+                frame.BackgroundColor3 = Color3.fromRGB(r, g, b)
                 frame.BorderSizePixel = 0
                 frame.Parent = container
             end
         end
     end
+    
+    print(string.format("✅ Pixel Art carregada: %dx%d", width, height))
 end
 
-createGUI()`;
-        }
-
-        function copyRobloxCode() {
-            const code = generateRobloxScript();
-            navigator.clipboard.writeText(code);
-            showToast('✅ SCRIPT COPIADO!');
-        }
-
-        function downloadRobloxScript() {
-            const code = generateRobloxScript();
-            const blob = new Blob([code], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `roblox_pixelart.lua`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('💾 SCRIPT BAIXADO!');
+local pixelData = fetchPixelData()
+if pixelData then
+    createGUI(pixelData)
+else
+    warn("❌ Falha ao carregar pixel art")
+end`;
+            
+            document.getElementById('robloxScript').value = script;
+            document.getElementById('robloxCodeArea').style.display = 'block';
         }
 
         function copyLink() {
@@ -573,26 +497,30 @@ createGUI()`;
             showToast('📋 LINK COPIADO!');
         }
 
-        function downloadLua() {
-            if (!currentLuaCode && !currentPixelData) {
-                showToast('❌ NADA PARA BAIXAR');
+        function copyRobloxScript() {
+            const script = document.getElementById('robloxScript').value;
+            if (!script) {
+                showToast('❌ PUBLIQUE PRIMEIRO!');
                 return;
             }
-            
-            let content = currentLuaCode;
-            if (!content && currentPixelData) {
-                const result = convertToPixelArt(currentImage);
-                content = result.luaCode;
+            navigator.clipboard.writeText(script);
+            showToast('✅ SCRIPT COPIADO! Cole no Roblox Studio');
+        }
+
+        function downloadScript() {
+            const script = document.getElementById('robloxScript').value;
+            if (!script) {
+                showToast('❌ PUBLIQUE PRIMEIRO!');
+                return;
             }
-            
-            const blob = new Blob([content], { type: 'text/plain' });
+            const blob = new Blob([script], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pixel_art_${currentResolution}x${currentResolution}.lua`;
+            a.download = `pixel_art_roblox.lua`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('💾 ARQUIVO BAIXADO!');
+            showToast('💾 SCRIPT BAIXADO!');
         }
 
         window.addEventListener('load', () => {
