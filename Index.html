@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PixelArt API → Roblox</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;700;900&display=swap');
+  :root {
+    --bg:#07090f;--surface:#0e1120;--border:#1e2540;
+    --accent:#5b21b6;--cyan:#00d4ff;--green:#00ff88;
+    --red:#ff4466;--yellow:#ffcc00;--text:#c8d0e8;--muted:#4a5270;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;min-height:100vh;padding:24px 16px}
+  .wrap{max-width:1400px;margin:0 auto}
+  header{text-align:center;margin-bottom:32px}
+  header h1{font-family:'Exo 2',sans-serif;font-weight:900;font-size:clamp(1.6rem,4vw,2.8rem);background:linear-gradient(90deg,#fff 0%,var(--cyan) 40%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px}
+  header p{color:var(--muted);font-size:13px;margin-top:6px}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+  .panel-label{font-size:11px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  input[type=text]{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:8px;font-family:'Share Tech Mono',monospace;font-size:13px;outline:none;transition:border-color .2s}
+  input[type=text]:focus{border-color:var(--accent)}
+  button{background:var(--accent);border:none;color:#fff;padding:11px 18px;border-radius:8px;font-family:'Share Tech Mono',monospace;font-size:13px;cursor:pointer;white-space:nowrap;transition:opacity .15s,transform .1s}
+  button:hover{opacity:.82}
+  button:active{transform:scale(.97)}
+  .btn-cyan{background:var(--cyan);color:#000}
+  .btn-green{background:var(--green);color:#000}
+  .btn-yellow{background:var(--yellow);color:#000}
+  .res-row{display:flex;gap:8px;flex-wrap:wrap}
+  .res-btn{background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:6px;font-size:12px;cursor:pointer}
+  .res-btn.active{background:var(--cyan);border-color:var(--cyan);color:#000}
+  .previews{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+  @media(max-width:640px){.previews{grid-template-columns:1fr}}
+  .preview-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px}
+  .preview-box label{display:block;font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:10px;text-align:center}
+  canvas{width:100%;image-rendering:pixelated;border-radius:6px;background:#000;display:block}
+  #cSim{width:100%;image-rendering:pixelated;border-radius:8px;background:#000;display:block}
+  .stats{display:flex;flex-wrap:wrap;gap:14px;padding:12px 14px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--muted);margin-bottom:14px}
+  .stats span b{color:var(--cyan)}
+  textarea{width:100%;min-height:160px;background:#000;color:var(--green);border:1px solid var(--border);border-radius:8px;padding:14px;font-family:'Share Tech Mono',monospace;font-size:11px;resize:vertical;outline:none}
+  .hb-status{font-size:12px;padding:8px 14px;border-radius:6px;background:var(--bg);border:1px solid var(--border)}
+  .hb-ok{border-color:var(--green)!important;color:var(--green)!important}
+  .hb-err{border-color:var(--red)!important;color:var(--red)!important}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--cyan);border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-left:6px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--green);color:var(--green);padding:12px 20px;border-radius:8px;font-size:13px;display:none;z-index:9999;box-shadow:0 4px 24px #00ff8820}
+  .toast.err{border-color:var(--red);color:var(--red)}
+  .hidden{display:none!important}
+  .api-endpoint{background:var(--bg);border-radius:8px;padding:12px;margin-top:12px;font-size:12px;border:1px solid var(--border)}
+  .api-endpoint code{color:var(--cyan);background:#000;padding:4px 8px;border-radius:4px;display:inline-block;margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>PIXEL ART → ROBLOX</h1>
+    <p>imagem → pixel art comprimida → API direta → script roblox</p>
+  </header>
+
+  <div class="panel">
+    <div class="panel-label">IMAGEM</div>
+    <div class="row">
+      <input type="text" id="imgUrl" placeholder="URL da imagem" value="https://picsum.photos/id/100/256/256">
+      <label style="background:var(--accent);border:none;color:#fff;padding:11px 18px;border-radius:8px;font-family:'Share Tech Mono',monospace;font-size:13px;cursor:pointer;white-space:nowrap;" for="fileInput">📁 ARQUIVO</label>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+      <button class="btn-cyan" id="processBtn">▶ PROCESSAR</button>
+    </div>
+    <div class="res-row" id="resBtns">
+      <button class="res-btn" data-r="16">16×16</button>
+      <button class="res-btn" data-r="32">32×32</button>
+      <button class="res-btn active" data-r="64">64×64</button>
+      <button class="res-btn" data-r="128">128×128</button>
+    </div>
+  </div>
+
+  <div id="previewArea" class="previews hidden">
+    <div class="preview-box">
+      <label>ORIGINAL</label>
+      <canvas id="cOrig"></canvas>
+    </div>
+    <div class="preview-box">
+      <label>PIXEL ART</label>
+      <canvas id="cPixel"></canvas>
+    </div>
+  </div>
+
+  <div id="simArea" class="panel hidden">
+    <div class="panel-label">PRÉVIA ROBLOX</div>
+    <div class="stats" id="stats"></div>
+    <canvas id="cSim"></canvas>
+  </div>
+
+  <div class="panel" id="apiPanel">
+    <div class="panel-label">API PARA ROBLOX</div>
+    <div class="api-endpoint">
+      <strong>🔗 Endpoint JSON:</strong><br>
+      <code id="apiUrlDisplay">https://seudominio.com/api/pixelart?url=IMAGEM_URL&w=64&h=64</code>
+      <button id="copyApiBtn" style="margin-top:8px;padding:6px 12px;font-size:11px">📋 COPIAR URL</button>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn-green" id="copyScriptBtn">📋 COPIAR SCRIPT LUAU</button>
+      <button id="downloadLuaBtn">💾 BAIXAR .LUA</button>
+    </div>
+    <textarea id="codeOut" readonly style="margin-top:14px"></textarea>
+  </div>
+
+  <div class="panel hidden" id="hastebinPanel">
+    <div class="panel-label">HOST ALTERNATIVO (HASTEBIN)</div>
+    <div class="row" style="align-items:center">
+      <span id="hbStatus" class="hb-status hidden"></span>
+      <input type="text" id="hbLink" placeholder="link raw hastebin" readonly>
+      <button onclick="copyHbLink()">COPIAR LINK</button>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toastEl"></div>
+
+<script>
+let res = 64;
+let pixelData = null;
+let rawLuaTable = '';
+let hastebinRaw = '';
+let offscreenCanvas = null;
+let currentApiBase = window.location.origin;
+
+const apiUrlDisplay = document.getElementById('apiUrlDisplay');
+apiUrlDisplay.textContent = `${currentApiBase}/api/pixelart?url=IMAGEM_URL&w=64&h=64`;
+
+document.getElementById('resBtns').addEventListener('click', e => {
+  const btn = e.target.closest('.res-btn');
+  if (!btn) return;
+  document.querySelectorAll('.res-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  res = parseInt(btn.dataset.r);
+  if (pixelData) processImage();
+});
+
+document.getElementById('copyApiBtn').onclick = () => {
+  navigator.clipboard.writeText(apiUrlDisplay.textContent);
+  toast('✓ URL da API copiada');
+};
+
+document.getElementById('copyScriptBtn').onclick = () => {
+  if (!pixelData) { toast('Processe uma imagem primeiro', true); return; }
+  const script = generateRobloxScript();
+  navigator.clipboard.writeText(script);
+  toast('✓ Script Luau copiado');
+};
+
+document.getElementById('downloadLuaBtn').onclick = () => {
+  if (!pixelData) { toast('Processe uma imagem primeiro', true); return; }
+  const script = generateRobloxScript();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([script], { type: 'text/plain' }));
+  a.download = `pixelart_${res}x${res}.lua`;
+  a.click();
+  toast('✓ Arquivo baixado');
+};
+
+document.getElementById('processBtn').onclick = processImage;
+document.getElementById('fileInput').onchange = loadFile;
+
+function toast(msg, err) {
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.className = 'toast' + (err ? ' err' : '');
+  el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.style.display = 'none', 3500);
+}
+
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function loadImgDirect(url) {
+  return new Promise((ok, fail) => {
+    const i = new Image();
+    i.onload = () => ok(i);
+    i.onerror = () => fail(new Error('falha ao carregar arquivo'));
+    i.src = url;
+  });
+}
+
+async function loadImg(url) {
+  const proxies = [
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+    u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+    u => u,
+  ];
+  for (const proxy of proxies) {
+    try {
+      const proxyUrl = proxy(url);
+      const resp = await fetch(proxyUrl);
+      if (!resp.ok) continue;
+      const blob = await resp.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const img = await new Promise((ok, fail) => {
+        const i = new Image();
+        i.onload = () => ok(i);
+        i.onerror = () => fail();
+        i.src = blobUrl;
+      });
+      return img;
+    } catch(_) {}
+  }
+  throw new Error('não foi possível carregar a imagem');
+}
+
+function loadFile(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  document.getElementById('imgUrl').value = '';
+  document.getElementById('imgUrl').placeholder = file.name;
+  document.getElementById('imgUrl')._blobUrl = url;
+  processImageFromUrl(url);
+}
+
+async function processImage() {
+  const input = document.getElementById('imgUrl');
+  const url = input._blobUrl || input.value.trim();
+  if (!url) { toast('insira uma URL ou selecione um arquivo', true); return; }
+  await processImageFromUrl(url);
+}
+
+async function processImageFromUrl(url) {
+  hide('previewArea'); hide('simArea');
+  hastebinRaw = '';
+  document.getElementById('hbLink').value = '';
+  hide('hbStatus');
+  toast('carregando imagem...');
+
+  try {
+    const img = url.startsWith('blob:') ? await loadImgDirect(url) : await loadImg(url);
+
+    offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = res;
+    offscreenCanvas.height = res;
+    const octx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+    octx.drawImage(img, 0, 0, res, res);
+    const imgData = octx.getImageData(0, 0, res, res).data;
+
+    pixelData = [];
+    const colors = new Set();
+    for (let y = 0; y < res; y++) {
+      pixelData[y] = [];
+      for (let x = 0; x < res; x++) {
+        const i = (y * res + x) * 4;
+        const r = imgData[i], g = imgData[i+1], b = imgData[i+2], a = imgData[i+3];
+        pixelData[y][x] = [r,g,b,a];
+        if (a > 0) colors.add(`${r},${g},${b}`);
+      }
+    }
+
+    rawLuaTable = buildCompressed(pixelData);
+
+    const cOrig = document.getElementById('cOrig');
+    cOrig.width = 400; cOrig.height = 400;
+    cOrig.getContext('2d').drawImage(img, 0, 0, 400, 400);
+
+    const cPix = document.getElementById('cPixel');
+    cPix.width = 400; cPix.height = 400;
+    const pctx = cPix.getContext('2d');
+    pctx.imageSmoothingEnabled = false;
+    pctx.drawImage(offscreenCanvas, 0, 0, 400, 400);
+
+    show('previewArea');
+
+    document.getElementById('stats').innerHTML =
+      `<span><b>${res}×${res}</b></span>` +
+      `<span>pixels: <b>${res*res}</b></span>` +
+      `<span>cores: <b>${colors.size}</b></span>` +
+      `<span>tamanho JSON: <b>${Math.ceil(rawLuaTable.length/1024)} KB</b></span>`;
+
+    renderCanvasSim(pixelData);
+    show('simArea');
+
+    const script = generateRobloxScript();
+    document.getElementById('codeOut').value = script;
+    
+    toast(`✓ ${res}×${res} processado`);
+    await uploadHastebin();
+  } catch(e) {
+    toast(e.message, true);
+  }
+}
+
+function buildCompressed(pd) {
+  const h = pd.length, w = pd[0].length;
+  const paletteMap = {};
+  const palette = [];
+  const indices = [];
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const [r,g,b,a] = pd[y][x];
+      const key = a > 0 ? `${r},${g},${b}` : 'T';
+      if (!(key in paletteMap)) {
+        paletteMap[key] = palette.length;
+        palette.push(a > 0 ? [r,g,b] : null);
+      }
+      indices.push(paletteMap[key]);
+    }
+  }
+
+  return JSON.stringify({ w, h, p: palette, i: indices });
+}
+
+function renderCanvasSim(pd) {
+  const h = pd.length, w = pd[0].length;
+  const MAX = 512;
+  const scale = Math.max(1, Math.floor(MAX / Math.max(w, h)));
+  const cw = w * scale, ch = h * scale;
+
+  const c = document.getElementById('cSim');
+  c.width = cw; c.height = ch;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const [r,g,b,a] = pd[y][x];
+      if (a > 0) {
+        ctx.fillStyle = `rgb(${r},${g},${b})`;
+        ctx.fillRect(x*scale, y*scale, scale, scale);
+      }
+    }
+  }
+}
+
+function generateRobloxScript() {
+  if (!pixelData || !rawLuaTable) {
+    return '-- Processe uma imagem primeiro';
+  }
+  
+  const compressed = rawLuaTable;
+  const escaped = compressed.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  
+  return `--[[
+  PIXEL ART LOADER - Script gerado automaticamente
+  Uso: Execute no Roblox com qualquer executor (Delta/Synapse/Krnl)
+--]]
+
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+local data = HttpService:JSONDecode("${escaped}")
+
+local W, H, PS = data.w, data.h, 4
+local palette = data.p
+local indices = data.i
+
+local function request(url)
+    local methods = {
+        syn and syn.request,
+        http_request,
+        request,
+        function(u) return game:HttpGet(u) end
+    }
+    for _, method in pairs(methods) do
+        if method then
+            local success, result = pcall(function()
+                if method == game.HttpGet then
+                    return method(url)
+                else
+                    local resp = method({Url = url, Method = "GET"})
+                    return resp.Body
+                end
+            end)
+            if success and result then
+                return result
+            end
+        end
+    end
+    error("Nenhum método HTTP disponivel")
+end
+
+local function createPixelArtGUI()
+    local player = Players.LocalPlayer
+    local sg = Instance.new("ScreenGui")
+    sg.Name = "PixelArtGUI"
+    sg.ResetOnSpawn = false
+    sg.Parent = player:WaitForChild("PlayerGui")
+
+    local container = Instance.new("Frame")
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(0, W * PS, 0, H * PS)
+    container.Position = UDim2.new(0.5, -(W * PS / 2), 0.5, -(H * PS / 2))
+    container.Parent = sg
+
+    local count = 0
+    local BATCH = 500
+    
+    for i = 1, #indices do
+        local ci = indices[i] + 1
+        local c = palette[ci]
+        if c ~= nil then
+            local x = (i - 1) % W
+            local y = math.floor((i - 1) / W)
+            local f = Instance.new("Frame")
+            f.Size = UDim2.new(0, PS, 0, PS)
+            f.Position = UDim2.new(0, x * PS, 0, y * PS)
+            f.BackgroundColor3 = Color3.fromRGB(c[1], c[2], c[3])
+            f.BorderSizePixel = 0
+            f.Parent = container
+            count = count + 1
+        end
+        if i % BATCH == 0 then
+            task.wait()
+        end
+    end
+    
+    print(string.format("PixelArt carregado: %dx%d (%d frames)", W, H, count))
+    return sg
+end
+
+createPixelArtGUI()
+print("PixelArt carregado com sucesso!")`;
+}
+
+async function uploadHastebin() {
+  if (!rawLuaTable) return;
+
+  const status = document.getElementById('hbStatus');
+  status.className = 'hb-status';
+  status.innerHTML = 'enviando<span class="spinner"></span>';
+  show('hbStatus');
+  show('hastebinPanel');
+
+  const APIS = [
+    { post: 'https://hastebin.com/documents',   raw: k => `https://hastebin.com/raw/${k}` },
+    { post: 'https://haste.zneix.eu/documents', raw: k => `https://haste.zneix.eu/raw/${k}` },
+    { post: 'https://www.toptal.com/developers/hastebin/documents', raw: k => `https://www.toptal.com/developers/hastebin/raw/${k}` },
+  ];
+
+  let ok = false;
+  for (const api of APIS) {
+    try {
+      const r = await fetch(api.post, { method: 'POST', body: rawLuaTable });
+      if (!r.ok) continue;
+      const d = await r.json();
+      if (!d.key) continue;
+      hastebinRaw = api.raw(d.key);
+      document.getElementById('hbLink').value = hastebinRaw;
+      status.className = 'hb-status hb-ok';
+      status.textContent = '✓ publicado no hastebin';
+      ok = true;
+      break;
+    } catch(_) {}
+  }
+
+  if (!ok) {
+    status.className = 'hb-status hb-err';
+    status.textContent = '✗ falha no hastebin (use a API direta)';
+  }
+}
+
+function copyHbLink() {
+  if (!hastebinRaw) { toast('ainda não publicado', true); return; }
+  navigator.clipboard.writeText(hastebinRaw);
+  toast('✓ link copiado');
+}
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const defaultUrl = 'https://picsum.photos/id/100/256/256';
+    document.getElementById('imgUrl').value = defaultUrl;
+    processImageFromUrl(defaultUrl);
+  }, 400);
+});
+</script>
+</body>
+</html>
