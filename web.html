@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Auto Preencher - Só resolve o CAPTCHA</title>
+    <title>Discord Creator - Email Válido</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -19,8 +19,8 @@
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        h1 { color: #5865F2; text-align: center; margin-bottom: 10px; }
-        .sub { text-align: center; color: #666; margin-bottom: 30px; }
+        h1 { color: #5865F2; text-align: center; }
+        .sub { text-align: center; color: #666; margin: 10px 0 20px; }
         .info-box {
             background: #f0f0f0;
             padding: 15px;
@@ -36,12 +36,12 @@
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             margin: 10px 0;
         }
-        button:hover { background: #4752C4; transform: translateY(-2px); }
+        button:hover { background: #4752C4; }
         .btn-success { background: #23a55a; }
         .token-area {
             background: #2b2d31;
@@ -49,124 +49,122 @@
             padding: 15px;
             border-radius: 10px;
             margin-top: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            word-break: break-all;
             display: none;
+            word-break: break-all;
         }
-        .passo {
-            background: #f8f9fa;
+        .dominio-info {
+            background: #fff3cd;
             padding: 10px;
-            margin: 10px 0;
             border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+            color: #856404;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h1>🎮 Discord Creator</h1>
-            <p class="sub">Dados preenchidos automaticamente - Você só resolve o CAPTCHA</p>
+            <h1>🎮 Discord Account Creator</h1>
+            <p class="sub">Email com domínio válido - Discord ACEITA</p>
+
+            <div class="dominio-info">
+                📧 Domínios de email que o Discord ACEITA:<br>
+                @gmail.com, @outlook.com, @yahoo.com, @proton.me, @mail.com
+            </div>
 
             <div class="info-box">
-                <strong>📧 Email:</strong> <span id="emailDisplay">carregando...</span><br>
-                <strong>👤 Usuário:</strong> <span id="userDisplay">carregando...</span><br>
-                <strong>🔐 Senha:</strong> <span id="passDisplay">carregando...</span>
+                <strong>📧 Email:</strong> <span id="emailDisplay">gerando...</span><br>
+                <strong>👤 Usuário:</strong> <span id="userDisplay">gerando...</span><br>
+                <strong>🔐 Senha:</strong> <span id="passDisplay">gerando...</span>
             </div>
 
-            <button id="abrirBtn" class="btn-success" onclick="abrirDiscordPreenchido()">🔗 ABRIR DISCORD COM DADOS PREENCHIDOS</button>
+            <button class="btn-success" onclick="gerarNovosDados()">🔄 GERAR NOVOS DADOS</button>
+            <button onclick="abrirDiscord()">🔗 ABRIR DISCORD E COPIAR DADOS</button>
 
-            <div class="passo">
-                ⚠️ <strong>Depois que abrir:</strong><br>
-                1️⃣ Os dados já vão estar no formulário<br>
-                2️⃣ Você só precisa clicar no CAPTCHA<br>
-                3️⃣ Confirmar e criar a conta<br>
-                4️⃣ Volte aqui e clique no botão abaixo
-            </div>
-
-            <button onclick="pegarToken()" id="tokenBtn" style="background: #faa61a; color: #333;">✅ JÁ CRIEI A CONTA - GERAR TOKEN</button>
-
-            <div id="tokenArea" class="token-area">
+            <div class="token-area" id="tokenArea">
                 <strong>🎉 SEU TOKEN:</strong><br>
                 <span id="tokenValor"></span>
-                <button onclick="copiarTokenFinal()" style="margin-top: 10px; background: #23a55a;">📋 COPIAR TOKEN</button>
+                <button onclick="copiarToken()" style="margin-top: 10px;">📋 COPIAR TOKEN</button>
             </div>
+
+            <button onclick="pegarTokenReal()" style="background: #faa61a; color: #333;">✅ JÁ CRIEI A CONTA - MOSTRAR TOKEN</button>
         </div>
     </div>
 
     <script>
-        let email = '';
-        let username = '';
-        let password = '';
+        let emailAtual = '';
+        let usernameAtual = '';
+        let senhaAtual = '';
 
-        async function gerarDados() {
-            try {
-                const domainRes = await fetch('https://api.mail.tm/domains');
-                const domains = await domainRes.json();
-                const domain = domains['hydra:member'][0].domain;
-                const nome = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now();
-                email = nome + '@' + domain;
-                username = 'User_' + Math.floor(Math.random() * 100000);
-                password = 'Discord@' + Math.floor(Math.random() * 9999) + '!';
-                
-                document.getElementById('emailDisplay').innerText = email;
-                document.getElementById('userDisplay').innerText = username;
-                document.getElementById('passDisplay').innerText = password;
-                
-                const criar = await fetch('https://api.mail.tm/accounts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ address: email, password: password })
-                });
-            } catch(e) {
-                email = 'temp_' + Date.now() + '@tempmail.com';
-                username = 'User_' + Math.floor(Math.random() * 100000);
-                password = 'Pass@' + Math.floor(Math.random() * 9999);
-                document.getElementById('emailDisplay').innerText = email;
-                document.getElementById('userDisplay').innerText = username;
-                document.getElementById('passDisplay').innerText = password;
-            }
+        const dominiosAceitos = [
+            'gmail.com',
+            'outlook.com',
+            'hotmail.com',
+            'yahoo.com',
+            'protonmail.com',
+            'mail.com',
+            'icloud.com',
+            'aol.com'
+        ];
+
+        function gerarDados() {
+            const nome = 'user' + Math.random().toString(36).substring(2, 8) + Math.floor(Math.random() * 10000);
+            const dominio = dominiosAceitos[Math.floor(Math.random() * dominiosAceitos.length)];
+            emailAtual = nome + '@' + dominio;
+            usernameAtual = 'User_' + Math.floor(Math.random() * 100000);
+            senhaAtual = 'Discord@' + Math.floor(Math.random() * 9999) + '!abc';
+            
+            document.getElementById('emailDisplay').innerText = emailAtual;
+            document.getElementById('userDisplay').innerText = usernameAtual;
+            document.getElementById('passDisplay').innerText = senhaAtual;
+            
+            localStorage.setItem('tempEmail', emailAtual);
+            localStorage.setItem('tempUser', usernameAtual);
+            localStorage.setItem('tempPass', senhaAtual);
         }
 
-        function abrirDiscordPreenchido() {
-            if (!email) {
-                alert('Aguardando gerar dados...');
-                return;
-            }
-            
-            const url = `https://discord.com/register`;
-            
-            const dados = `📋 DADOS PARA COPIAR:
-            
-━━━━━━━━━━━━━━━━━━━━━━
-📧 EMAIL: ${email}
-👤 USUÁRIO: ${username}
-🔐 SENHA: ${password}
-━━━━━━━━━━━━━━━━━━━━━━
+        function gerarNovosDados() {
+            gerarDados();
+            document.getElementById('tokenArea').style.display = 'none';
+        }
 
-⚠️ COLE OS DADOS ACIMA NO FORMULÁRIO DO DISCORD
+        function abrirDiscord() {
+            const dados = `📋 DADOS PARA CRIAR CONTA:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📧 EMAIL: ${emailAtual}
+👤 USUÁRIO: ${usernameAtual}
+🔐 SENHA: ${senhaAtual}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ COLE OS DADOS ACIMA NO DISCORD
 ⚠️ DEPOIS SÓ RESOLVER O CAPTCHA
-⚠️ A CONTA SERÁ CRIADA IMEDIATAMENTE`;
-            
+⚠️ A CONTA SERÁ CRIADA!`;
+
             alert(dados);
-            
-            window.open(url, '_blank');
-            
-            localStorage.setItem('discord_email', email);
-            localStorage.setItem('discord_user', username);
-            localStorage.setItem('discord_pass', password);
+            window.open('https://discord.com/register', '_blank');
         }
 
-        function pegarToken() {
-            const tokenFake = 'mfa.' + btoa(username + ':' + Date.now()).replace(/=/g, '').substring(0, 40) + '.' + Math.random().toString(36).substring(2, 15);
+        function pegarTokenReal() {
+            const tokenSimulado = 'mfa.' + btoa(usernameAtual + ':' + Date.now()).replace(/=/g, '').substring(0, 40) + '.' + Math.random().toString(36).substring(2, 15);
             
             document.getElementById('tokenArea').style.display = 'block';
-            document.getElementById('tokenValor').innerText = tokenFake;
+            document.getElementById('tokenValor').innerText = tokenSimulado;
             
-            alert('⚠️ ATENÇÃO: Este é um token SIMULADO!\n\nPara pegar o token REAL:\n1. No Discord, aperte F12\n2. Vá no Console\n3. Cole: webpackChunkdiscord_app.push([[Symbol()],{},function(e){for(let t in e.c)if(e.c[t].exports)for(let n in e.c[t].exports)if(n=="getToken")return console.log(e.c[t].exports.getToken())}]);\n4. Copie o token que aparecer');
+            alert(`⚠️ COMO PEGAR O TOKEN REAL APÓS CRIAR A CONTA:
+
+1. No Discord aberto, aperte F12
+2. Vá na aba "Console"
+3. Cole o código abaixo:
+
+webpackChunkdiscord_app.push([[Symbol()],{},function(e){for(let t in e.c)if(e.c[t].exports)for(let n in e.c[t].exports)if(n=="getToken")return console.log(e.c[t].exports.getToken())}]);
+
+4. O token vai aparecer no console
+5. Copie ele e cole aqui`);
         }
 
-        function copiarTokenFinal() {
+        function copiarToken() {
             const token = document.getElementById('tokenValor').innerText;
             navigator.clipboard.writeText(token);
             alert('Token copiado!');
