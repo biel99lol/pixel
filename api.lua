@@ -1,4 +1,4 @@
--- api.lua - PixelArt API
+-- api.lua - Retorna link do Hastebin igual ao site
 return function(imageUrl, w, h)
     w = w or 64
     h = h or 64
@@ -41,10 +41,21 @@ return function(imageUrl, w, h)
         end
     end
     
-    return {
+    local jsonData = HttpService:JSONEncode({
         w = w,
         h = h,
         p = palette,
         i = indices
-    }
+    })
+    
+    local hasteResponse = http.request({
+        Url = "https://hastebin.com/documents",
+        Method = "POST",
+        Body = jsonData
+    })
+    
+    local hasteData = HttpService:JSONDecode(hasteResponse.Body)
+    local hasteLink = "https://hastebin.com/raw/" .. hasteData.key
+    
+    return hasteLink
 end
