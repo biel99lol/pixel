@@ -4,48 +4,20 @@ return function(imageUrl, w, h)
     
     local HttpService = game:GetService("HttpService")
     
-    local function safeReq(url, method, headers, body)
-        local fn = (syn and syn.request) or (http and http.request) or request or http_request or (fluxus and fluxus.request)
-        if not fn then return nil end
-        local ok, r = pcall(fn, {Url = url, Method = method or "GET", Headers = headers or {}, Body = body or ""})
-        return ok and r or nil
+    local siteUrl = "https://biel99lol.github.io/pixel/Index.html?url=" .. 
+                    HttpService:UrlEncode(imageUrl) .. 
+                    "&w=" .. w .. 
+                    "&h=" .. h
+    
+    local function request(url)
+        local fn = (syn and syn.request) or (http and http.request) or request
+        local resp = fn({Url = url, Method = "GET"})
+        return resp.Body
     end
     
-    local proxy = "https://api.allorigins.win/raw?url=" .. HttpService:UrlEncode(imageUrl)
-    local imgResponse = safeReq(proxy, "GET")
-    if not imgResponse then error("Falha ao baixar imagem") end
-    local imgData = imgResponse.Body
+    local html = request(siteUrl)
     
-    local palette = {}
-    local indices = {}
-    local paletteMap = {}
+    local hasteLink = string.match(html, "https://hastebin%.com/raw/[a-zA-Z0-9]+")
     
-    for y = 0, h - 1 do
-        for x = 0, w - 1 do
-            local pos = (y * w + x) * 4
-            local r = string.byte(imgData, pos + 1) or 0
-            local g = string.byte(imgData, pos + 2) or 0
-            local b = string.byte(imgData, pos + 3) or 0
-            
-            local key = string.format("%d,%d,%d", r, g, b)
-            if not paletteMap[key] then
-                paletteMap[key] = #palette
-                table.insert(palette, {r, g, b})
-            end
-            table.insert(indices, paletteMap[key])
-        end
-    end
-    
-    local jsonData = HttpService:JSONEncode({
-        w = w,
-        h = h,
-        p = palette,
-        i = indices
-    })
-    
-    local hasteResponse = safeReq("https://hastebin.com/documents", "POST", {["Content-Type"] = "application/json"}, jsonData)
-    if not hasteResponse then error("Falha ao enviar para hastebin") end
-    local hasteData = HttpService:JSONDecode(hasteResponse.Body)
-    
-    return "https://hastebin.com/raw/" .. hasteData.key
+    return hasteLink or error("Link nao encontrado")
 end
