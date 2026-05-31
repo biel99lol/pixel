@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Navegador Multi-Telas - DPI e Configurações</title>
+    <title>Auto Click + Automação Multi-Telas</title>
     <style>
         * {
             margin: 0;
@@ -77,6 +77,11 @@
             color: #1e1e2f;
         }
 
+        .automation-btn {
+            background: #eb459e;
+            color: white;
+        }
+
         /* Botões de atalho */
         .shortcuts {
             display: flex;
@@ -97,7 +102,7 @@
             white-space: nowrap;
         }
 
-        /* Container de abas (browsers) */
+        /* Container de abas */
         .tabs-container {
             background: #1a1a2a;
             display: flex;
@@ -143,7 +148,7 @@
             margin: 5px;
         }
 
-        /* Área de conteúdo (browsers) */
+        /* Área de conteúdo */
         .content-area {
             flex: 1;
             position: relative;
@@ -198,7 +203,179 @@
             border: none;
         }
 
-        /* Modal de configurações */
+        /* Painel de Automação */
+        .automation-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: #1e1e2f;
+            z-index: 10001;
+            transition: right 0.3s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+            color: white;
+        }
+
+        .automation-panel.open {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 15px;
+            background: #2a2a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a3a4a;
+        }
+
+        .panel-header h3 {
+            color: #eb459e;
+        }
+
+        .close-panel {
+            background: #ed4245;
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #5865F2;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-btn.record {
+            background: #eb459e;
+        }
+
+        .action-btn.stop {
+            background: #ed4245;
+        }
+
+        .action-btn.play {
+            background: #23a55a;
+        }
+
+        .sequence-list {
+            background: #0f0f1a;
+            border-radius: 10px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .sequence-item {
+            background: #2a2a3a;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sequence-item button {
+            background: #ed4245;
+            border: none;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .config-group {
+            margin-bottom: 15px;
+        }
+
+        .config-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .config-group input, .config-group select {
+            width: 100%;
+            padding: 8px;
+            background: #0f0f1a;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+
+        /* Explorer DOM */
+        .dom-explorer {
+            position: fixed;
+            left: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: #1e1e2f;
+            z-index: 10001;
+            transition: left 0.3s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+            color: white;
+        }
+
+        .dom-explorer.open {
+            left: 0;
+        }
+
+        .dom-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .dom-node {
+            padding-left: 15px;
+            margin: 2px 0;
+            cursor: pointer;
+        }
+
+        .dom-node:hover {
+            background: #2a2a3a;
+        }
+
+        .dom-tag {
+            color: #eb459e;
+        }
+
+        .dom-attr {
+            color: #faa61a;
+        }
+
+        /* Modal Configurações DPI */
         .modal {
             display: none;
             position: fixed;
@@ -219,37 +396,6 @@
             width: 90%;
             max-width: 400px;
             color: white;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 15px;
-            color: #5865F2;
-        }
-
-        .modal-content label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        .modal-content input, .modal-content select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 10px;
-            border: none;
-            background: #0f0f1a;
-            color: white;
-        }
-
-        .modal-content button {
-            margin-top: 15px;
-            background: #23a55a;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
         }
 
         .toast {
@@ -281,6 +427,8 @@
     <button id="globalBackBtn" class="nav-btn">◀</button>
     <button id="globalForwardBtn" class="nav-btn">▶</button>
     <button id="globalReloadBtn" class="nav-btn">🔄</button>
+    <button id="automationPanelBtn" class="nav-btn automation-btn">🤖 Automação</button>
+    <button id="domExplorerBtn" class="nav-btn" style="background:#23a55a;">🔍 Explorer</button>
     <button id="settingsBtn" class="nav-btn settings-btn">⚙️ DPI</button>
 </div>
 
@@ -298,7 +446,70 @@
 <button id="newTabBtn" class="new-tab">+ NOVA ABA (Browser)</button>
 <div class="content-area" id="contentArea"></div>
 
-<!-- Modal Configurações DPI -->
+<!-- Painel de Automação -->
+<div id="automationPanel" class="automation-panel">
+    <div class="panel-header">
+        <h3>🤖 Central de Automação</h3>
+        <button class="close-panel" onclick="closeAutomationPanel()">Fechar</button>
+    </div>
+    <div class="panel-content">
+        <div class="action-buttons">
+            <button id="recordBtn" class="action-btn record">🔴 Gravar Cliques</button>
+            <button id="stopRecordBtn" class="action-btn stop" disabled>⏹️ Parar</button>
+            <button id="playSequenceBtn" class="action-btn play">▶️ Executar Sequência</button>
+            <button id="clearSequenceBtn" class="action-btn">🗑️ Limpar</button>
+        </div>
+        
+        <h4>📋 Sequência Gravada:</h4>
+        <div id="sequenceList" class="sequence-list"></div>
+        
+        <h4>⚙️ Configurações de Execução:</h4>
+        <div class="config-group">
+            <label>Velocidade (ms entre ações):</label>
+            <input type="number" id="delaySpeed" value="500" min="50" max="5000">
+        </div>
+        <div class="config-group">
+            <label>Repetições:</label>
+            <select id="repeatCount">
+                <option value="1">1 vez</option>
+                <option value="2">2 vezes</option>
+                <option value="3">3 vezes</option>
+                <option value="5">5 vezes</option>
+                <option value="10">10 vezes</option>
+                <option value="0">Infinito</option>
+            </select>
+        </div>
+        
+        <h4>➕ Adicionar Ação Manual:</h4>
+        <div class="action-buttons">
+            <button id="addClickBtn" class="action-btn">🖱️ Clique</button>
+            <button id="addHoldBtn" class="action-btn">⏸️ Segurar (1s)</button>
+            <button id="addTypeBtn" class="action-btn">⌨️ Digitar</button>
+            <button id="addWaitBtn" class="action-btn">⏰ Esperar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Explorer DOM -->
+<div id="domExplorer" class="dom-explorer">
+    <div class="panel-header">
+        <h3>🔍 Explorer DOM / Seletores</h3>
+        <button class="close-panel" onclick="closeDomExplorer()">Fechar</button>
+    </div>
+    <div class="panel-content">
+        <div class="config-group">
+            <label>🎯 Selecionar elemento (Clique no elemento da página)</label>
+            <button id="pickElementBtn" class="action-btn" style="width:100%;">👆 Modo Seleção</button>
+        </div>
+        <div id="selectedElement" style="background:#0f0f1a; padding:10px; border-radius:5px; margin-bottom:10px; font-size:11px; word-break:break-all;">
+            Nenhum elemento selecionado
+        </div>
+        <h4>📂 Estrutura DOM:</h4>
+        <div id="domTree" class="dom-content"></div>
+    </div>
+</div>
+
+<!-- Modal Configurações -->
 <div id="settingsModal" class="modal">
     <div class="modal-content">
         <h3>⚙️ Configurações de DPI / Zoom</h3>
@@ -322,15 +533,344 @@
 </div>
 
 <script>
+    // ==================== VARIÁVEIS GLOBAIS ====================
     let browsers = [];
     let activeBrowserId = null;
     let browserCounter = 0;
+    
+    // Automação
+    let sequence = [];
+    let isRecording = false;
+    let isPlaying = false;
+    let pickMode = false;
+    let selectedSelector = null;
+    
+    // Configurações
     let settings = {
         dpi: 100,
         zoom: 100,
         nightMode: 'off'
     };
-
+    
+    // ==================== FUNÇÕES DE AUTOMAÇÃO ====================
+    
+    function getCurrentIframe() {
+        const browser = browsers.find(b => b.id === activeBrowserId);
+        if (!browser) return null;
+        return document.getElementById(browser.iframeId);
+    }
+    
+    function getIframeDocument() {
+        const iframe = getCurrentIframe();
+        if (!iframe) return null;
+        try {
+            return iframe.contentDocument || iframe.contentWindow.document;
+        } catch(e) {
+            return null;
+        }
+    }
+    
+    function getElementBySelector(selector) {
+        const doc = getIframeDocument();
+        if (!doc) return null;
+        return doc.querySelector(selector);
+    }
+    
+    function simulateClick(element) {
+        if (!element) return false;
+        const rect = element.getBoundingClientRect();
+        const iframe = getCurrentIframe();
+        const clickEvent = new MouseEvent('click', {
+            view: iframe?.contentWindow,
+            bubbles: true,
+            cancelable: true,
+            clientX: rect.left + rect.width/2,
+            clientY: rect.top + rect.height/2
+        });
+        element.dispatchEvent(clickEvent);
+        
+        // Evento de toque para mobile
+        const touchEvent = new TouchEvent('touchstart', {
+            bubbles: true,
+            touches: [new Touch({identifier: 0, target: element, clientX: rect.left + rect.width/2, clientY: rect.top + rect.height/2})]
+        });
+        element.dispatchEvent(touchEvent);
+        
+        return true;
+    }
+    
+    function simulateHold(element, duration = 1000) {
+        if (!element) return Promise.resolve(false);
+        const rect = element.getBoundingClientRect();
+        const iframe = getCurrentIframe();
+        
+        const touchStart = new TouchEvent('touchstart', {
+            bubbles: true,
+            touches: [new Touch({identifier: 0, target: element, clientX: rect.left + rect.width/2, clientY: rect.top + rect.height/2})]
+        });
+        element.dispatchEvent(touchStart);
+        
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const touchEnd = new TouchEvent('touchend', { bubbles: true });
+                element.dispatchEvent(touchEnd);
+                resolve(true);
+            }, duration);
+        });
+    }
+    
+    function simulateType(element, text) {
+        if (!element) return false;
+        element.focus();
+        element.value = text;
+        const inputEvent = new Event('input', { bubbles: true });
+        element.dispatchEvent(inputEvent);
+        const changeEvent = new Event('change', { bubbles: true });
+        element.dispatchEvent(changeEvent);
+        return true;
+    }
+    
+    async function executeSequence() {
+        if (isPlaying) {
+            mostrarToast('⚠️ Automação já está em execução!', '#faa61a');
+            return;
+        }
+        
+        if (sequence.length === 0) {
+            mostrarToast('⚠️ Nenhuma ação na sequência! Grave ou adicione ações.', '#faa61a');
+            return;
+        }
+        
+        isPlaying = true;
+        const repeat = parseInt(document.getElementById('repeatCount').value);
+        const delay = parseInt(document.getElementById('delaySpeed').value);
+        const maxRepeat = repeat === 0 ? Infinity : repeat;
+        let currentRepeat = 0;
+        
+        mostrarToast(`🎬 Iniciando automação com ${sequence.length} ações...`, '#23a55a');
+        
+        while (currentRepeat < maxRepeat && isPlaying) {
+            for (let action of sequence) {
+                if (!isPlaying) break;
+                
+                const element = action.selector ? getElementBySelector(action.selector) : null;
+                
+                switch(action.type) {
+                    case 'click':
+                        if (element) simulateClick(element);
+                        else mostrarToast(`⚠️ Elemento não encontrado: ${action.selector}`, '#ed4245');
+                        break;
+                    case 'hold':
+                        if (element) await simulateHold(element, action.duration || 1000);
+                        break;
+                    case 'type':
+                        if (element) simulateType(element, action.text);
+                        break;
+                    case 'wait':
+                        await new Promise(resolve => setTimeout(resolve, action.duration || 1000));
+                        break;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            currentRepeat++;
+            if (repeat !== 0) mostrarToast(`🔄 Execução ${currentRepeat}/${repeat} concluída`, '#5865F2');
+        }
+        
+        isPlaying = false;
+        mostrarToast('✅ Automação finalizada!', '#23a55a');
+    }
+    
+    function addAction(type, data = {}) {
+        const selector = selectedSelector || prompt('Digite o seletor CSS do elemento (ex: #id, .classe, button)', 'body');
+        if (!selector && type !== 'wait') {
+            mostrarToast('⚠️ Seletor necessário para esta ação!', '#ed4245');
+            return false;
+        }
+        
+        const action = {
+            type: type,
+            selector: selector,
+            timestamp: Date.now()
+        };
+        
+        if (type === 'hold') action.duration = data.duration || 1000;
+        if (type === 'type') action.text = data.text || prompt('Digite o texto a ser inserido:', '');
+        if (type === 'wait') action.duration = data.duration || parseInt(prompt('Tempo de espera (ms):', '1000'));
+        
+        if (type === 'type' && !action.text) return false;
+        
+        sequence.push(action);
+        updateSequenceDisplay();
+        mostrarToast(`✅ Ação "${type}" adicionada à sequência`, '#23a55a');
+        return true;
+    }
+    
+    function updateSequenceDisplay() {
+        const container = document.getElementById('sequenceList');
+        container.innerHTML = '';
+        sequence.forEach((action, index) => {
+            const div = document.createElement('div');
+            div.className = 'sequence-item';
+            let text = '';
+            switch(action.type) {
+                case 'click': text = `🖱️ Clique em: ${action.selector}`; break;
+                case 'hold': text = `⏸️ Segurar em: ${action.selector} (${action.duration}ms)`; break;
+                case 'type': text = `⌨️ Digitar "${action.text}" em: ${action.selector}`; break;
+                case 'wait': text = `⏰ Aguardar: ${action.duration}ms`; break;
+            }
+            div.innerHTML = `<span>${index+1}. ${text}</span><button onclick="removeAction(${index})">✕</button>`;
+            container.appendChild(div);
+        });
+    }
+    
+    function removeAction(index) {
+        sequence.splice(index, 1);
+        updateSequenceDisplay();
+        mostrarToast('Ação removida', '#5865F2');
+    }
+    
+    function clearSequence() {
+        sequence = [];
+        updateSequenceDisplay();
+        mostrarToast('Sequência limpa!', '#faa61a');
+    }
+    
+    // Gravação de ações
+    function startRecording() {
+        isRecording = true;
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.addEventListener('click', recordClick);
+            doc.addEventListener('touchstart', recordTouch);
+        }
+        document.getElementById('recordBtn').disabled = true;
+        document.getElementById('stopRecordBtn').disabled = false;
+        mostrarToast('🔴 Gravação iniciada! Clique nos elementos para gravar ações.', '#eb459e');
+    }
+    
+    function stopRecording() {
+        isRecording = false;
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.removeEventListener('click', recordClick);
+            doc.removeEventListener('touchstart', recordTouch);
+        }
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+        mostrarToast('⏹️ Gravação finalizada.', '#5865F2');
+    }
+    
+    function recordClick(event) {
+        if (!isRecording) return;
+        event.stopPropagation();
+        let target = event.target;
+        let selector = getUniqueSelector(target);
+        addAction('click', { selector: selector });
+    }
+    
+    function recordTouch(event) {
+        if (!isRecording) return;
+        event.stopPropagation();
+        let target = event.target;
+        let selector = getUniqueSelector(target);
+        addAction('click', { selector: selector });
+    }
+    
+    function getUniqueSelector(element) {
+        if (!element) return 'body';
+        if (element.id) return `#${element.id}`;
+        if (element.className && typeof element.className === 'string') {
+            const classes = element.className.split(' ').filter(c => c).join('.');
+            if (classes) return `${element.tagName.toLowerCase()}.${classes}`;
+        }
+        let parent = element.parentElement;
+        if (parent) {
+            const siblings = Array.from(parent.children);
+            const index = siblings.indexOf(element) + 1;
+            return `${getUniqueSelector(parent)} > ${element.tagName.toLowerCase()}:nth-child(${index})`;
+        }
+        return element.tagName.toLowerCase();
+    }
+    
+    // Modo pick element
+    function startPickMode() {
+        pickMode = true;
+        mostrarToast('🎯 Modo seleção ativado! Clique em qualquer elemento da página.', '#faa61a');
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.body.style.cursor = 'crosshair';
+            doc.addEventListener('click', pickElement);
+        }
+    }
+    
+    function pickElement(event) {
+        if (!pickMode) return;
+        event.preventDefault();
+        event.stopPropagation();
+        let target = event.target;
+        let selector = getUniqueSelector(target);
+        selectedSelector = selector;
+        document.getElementById('selectedElement').innerHTML = `
+            <strong>✅ Selecionado:</strong><br>
+            Seletor: <code style="color:#23a55a">${selector}</code><br>
+            Tag: ${target.tagName}<br>
+            Texto: ${target.innerText?.substring(0, 50) || '...'}
+        `;
+        pickMode = false;
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.body.style.cursor = '';
+            doc.removeEventListener('click', pickElement);
+        }
+        mostrarToast('✅ Elemento selecionado! Use nas ações de automação.', '#23a55a');
+    }
+    
+    // Explorer DOM
+    function updateDomTree() {
+        const doc = getIframeDocument();
+        if (!doc) {
+            document.getElementById('domTree').innerHTML = '<div>Não foi possível acessar o DOM</div>';
+            return;
+        }
+        const tree = generateDomTree(doc.body, 0);
+        document.getElementById('domTree').innerHTML = tree;
+    }
+    
+    function generateDomTree(element, level) {
+        if (!element || element.nodeType !== 1) return '';
+        let html = `<div class="dom-node" style="margin-left:${level*15}px" onclick="selectFromTree('${getUniqueSelector(element)}')">`;
+        html += `<span class="dom-tag">&lt;${element.tagName.toLowerCase()}</span>`;
+        if (element.id) html += `<span class="dom-attr"> id="${element.id}"</span>`;
+        if (element.className && typeof element.className === 'string' && element.className) {
+            html += `<span class="dom-attr"> class="${element.className}"</span>`;
+        }
+        html += `<span class="dom-tag">&gt;</span>`;
+        if (element.children.length === 0 && element.innerText?.length < 50) {
+            html += ` ${element.innerText?.substring(0, 30)}`;
+        }
+        html += `</div>`;
+        for (let child of element.children) {
+            html += generateDomTree(child, level + 1);
+        }
+        return html;
+    }
+    
+    function selectFromTree(selector) {
+        selectedSelector = selector;
+        document.getElementById('selectedElement').innerHTML = `
+            <strong>✅ Selecionado do Explorer:</strong><br>
+            Seletor: <code style="color:#23a55a">${selector}</code>
+        `;
+        mostrarToast('Elemento selecionado do DOM Explorer', '#23a55a');
+    }
+    
+    // ==================== FUNÇÕES DO BROWSER ====================
+    
     function mostrarToast(msg, cor = '#23a55a') {
         const old = document.querySelector('.toast');
         if (old) old.remove();
@@ -341,13 +881,13 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2500);
     }
-
+    
     function aplicarDPI() {
         document.body.style.zoom = settings.dpi + '%';
         document.getElementById('dpiValue').innerText = settings.dpi + '%';
         document.getElementById('dpiSlider').value = settings.dpi;
     }
-
+    
     function aplicarZoomNoBrowser(browserId) {
         const browser = browsers.find(b => b.id === browserId);
         if (browser) {
@@ -360,17 +900,15 @@
             }
         }
     }
-
+    
     function aplicarZoomGlobal() {
         browsers.forEach(b => aplicarZoomNoBrowser(b.id));
         document.getElementById('zoomValue').innerText = settings.zoom + '%';
         document.getElementById('zoomSlider').value = settings.zoom;
     }
-
+    
     function aplicarModoNoturno() {
         if (settings.nightMode === 'on') {
-            document.body.style.background = '#000';
-            document.body.style.backgroundColor = '#000';
             const style = document.createElement('style');
             style.id = 'nightModeStyle';
             style.textContent = 'iframe { filter: invert(1) hue-rotate(180deg); }';
@@ -380,15 +918,7 @@
             if (style) style.remove();
         }
     }
-
-    function salvarSettings() {
-        localStorage.setItem('browser_settings', JSON.stringify(settings));
-        aplicarDPI();
-        aplicarZoomGlobal();
-        aplicarModoNoturno();
-        mostrarToast('✅ Configurações salvas!', '#23a55a');
-    }
-
+    
     function criarNovaBrowser(url = null) {
         const browserId = 'browser_' + (++browserCounter);
         const iframeId = 'iframe_' + browserId;
@@ -405,7 +935,7 @@
                 <button class="browser-forward" data-browser="${browserId}">▶</button>
                 <button class="browser-reload" data-browser="${browserId}">🔄</button>
             </div>
-            <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com/webhp?igu=1'}"></iframe>
+            <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com/webhp?igu=1'}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
         `;
         
         document.getElementById('contentArea').appendChild(browserDiv);
@@ -431,6 +961,7 @@
         tabDiv.addEventListener('click', (e) => {
             if (e.target.classList.contains('close-tab')) return;
             ativarBrowser(browserId);
+            setTimeout(() => updateDomTree(), 500);
         });
         
         const closeBtn = tabDiv.querySelector('.close-tab');
@@ -458,16 +989,14 @@
             const b = browsers.find(b => b.id === browserId);
             if (b) b.url = newUrl;
             try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
-            mostrarToast('🔍 Carregando: ' + newUrl);
+            setTimeout(() => updateDomTree(), 1000);
         });
         
-        backBtn.addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) { mostrarToast('Não foi possível voltar', '#ed4245'); } });
-        forwardBtn.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) { mostrarToast('Não foi possível avançar', '#ed4245'); } });
-        reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; mostrarToast('🔄 Recarregando'); });
+        backBtn.addEventListener('click', () => { try { iframe.contentWindow.history.back(); setTimeout(() => updateDomTree(), 500); } catch(e) {} });
+        forwardBtn.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); setTimeout(() => updateDomTree(), 500); } catch(e) {} });
+        reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; setTimeout(() => updateDomTree(), 1000); });
         
-        urlInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') goBtn.click();
-        });
+        urlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') goBtn.click(); });
         
         iframe.addEventListener('load', () => {
             try {
@@ -476,15 +1005,17 @@
                 const b = browsers.find(b => b.id === browserId);
                 if (b) b.url = currentUrl;
                 try { tabDiv.querySelector('span').textContent = new URL(currentUrl).hostname; } catch(e) {}
+                setTimeout(() => updateDomTree(), 500);
             } catch(e) {}
             aplicarZoomNoBrowser(browserId);
         });
         
         ativarBrowser(browserId);
         aplicarZoomNoBrowser(browserId);
+        setTimeout(() => updateDomTree(), 1000);
         return browserId;
     }
-
+    
     function ativarBrowser(browserId) {
         activeBrowserId = browserId;
         browsers.forEach(b => {
@@ -507,9 +1038,10 @@
             } catch(e) {
                 document.getElementById('globalUrlInput').value = browser.url;
             }
+            setTimeout(() => updateDomTree(), 500);
         }
     }
-
+    
     function fecharBrowser(browserId) {
         const index = browsers.findIndex(b => b.id === browserId);
         if (index === -1) return;
@@ -527,19 +1059,41 @@
             const nextIndex = index > 0 ? index - 1 : 0;
             ativarBrowser(browsers[nextIndex].id);
         }
-        mostrarToast('Browser fechado', '#5865F2');
     }
-
+    
     function acaoGlobal(tipo) {
         if (!activeBrowserId) return;
         const browser = browsers.find(b => b.id === activeBrowserId);
         if (!browser) return;
         const iframe = document.getElementById(browser.iframeId);
-        if (tipo === 'back') { try { iframe.contentWindow.history.back(); } catch(e) { mostrarToast('Erro', '#ed4245'); } }
-        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); } catch(e) { mostrarToast('Erro', '#ed4245'); } }
-        else if (tipo === 'reload') { iframe.src = iframe.src; mostrarToast('🔄 Recarregado'); }
+        if (tipo === 'back') { try { iframe.contentWindow.history.back(); setTimeout(() => updateDomTree(), 500); } catch(e) {} }
+        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); setTimeout(() => updateDomTree(), 500); } catch(e) {} }
+        else if (tipo === 'reload') { iframe.src = iframe.src; setTimeout(() => updateDomTree(), 1000); }
     }
-
+    
+    // ==================== INICIALIZAÇÃO ====================
+    
+    function openAutomationPanel() {
+        document.getElementById('automationPanel').classList.add('open');
+    }
+    
+    function closeAutomationPanel() {
+        document.getElementById('automationPanel').classList.remove('open');
+        if (isRecording) stopRecording();
+        if (pickMode) pickMode = false;
+    }
+    
+    function openDomExplorer() {
+        document.getElementById('domExplorer').classList.add('open');
+        updateDomTree();
+    }
+    
+    function closeDomExplorer() {
+        document.getElementById('domExplorer').classList.remove('open');
+        if (pickMode) pickMode = false;
+    }
+    
+    // Event Listeners
     document.getElementById('globalGoBtn').addEventListener('click', () => {
         if (!activeBrowserId) return;
         let url = document.getElementById('globalUrlInput').value;
@@ -554,7 +1108,7 @@
             browser.url = url;
             const tab = document.getElementById(browser.tabId);
             try { tab.querySelector('span').textContent = new URL(url).hostname; } catch(e) {}
-            mostrarToast('🔍 Carregando: ' + url);
+            setTimeout(() => updateDomTree(), 1000);
         }
     });
     
@@ -566,6 +1120,19 @@
     document.getElementById('globalForwardBtn').addEventListener('click', () => acaoGlobal('forward'));
     document.getElementById('globalReloadBtn').addEventListener('click', () => acaoGlobal('reload'));
     document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser('https://www.google.com/webhp?igu=1'));
+    document.getElementById('automationPanelBtn').addEventListener('click', openAutomationPanel);
+    document.getElementById('domExplorerBtn').addEventListener('click', openDomExplorer);
+    
+    // Automação botões
+    document.getElementById('recordBtn').addEventListener('click', startRecording);
+    document.getElementById('stopRecordBtn').addEventListener('click', stopRecording);
+    document.getElementById('playSequenceBtn').addEventListener('click', executeSequence);
+    document.getElementById('clearSequenceBtn').addEventListener('click', clearSequence);
+    document.getElementById('addClickBtn').addEventListener('click', () => addAction('click'));
+    document.getElementById('addHoldBtn').addEventListener('click', () => addAction('hold'));
+    document.getElementById('addTypeBtn').addEventListener('click', () => addAction('type'));
+    document.getElementById('addWaitBtn').addEventListener('click', () => addAction('wait'));
+    document.getElementById('pickElementBtn').addEventListener('click', startPickMode);
     
     document.querySelectorAll('.shortcuts button').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -576,12 +1143,13 @@
                     const iframe = document.getElementById(browser.iframeId);
                     iframe.src = url;
                     browser.url = url;
-                    mostrarToast('🌐 Carregando atalho: ' + url);
+                    setTimeout(() => updateDomTree(), 1000);
                 }
             }
         });
     });
     
+    // Modal Configurações
     const modal = document.getElementById('settingsModal');
     document.getElementById('settingsBtn').addEventListener('click', () => {
         document.getElementById('dpiSlider').value = settings.dpi;
@@ -595,7 +1163,10 @@
         settings.dpi = parseInt(document.getElementById('dpiSlider').value);
         settings.zoom = parseInt(document.getElementById('zoomSlider').value);
         settings.nightMode = document.getElementById('nightMode').value;
-        salvarSettings();
+        aplicarDPI();
+        aplicarZoomGlobal();
+        aplicarModoNoturno();
+        mostrarToast('✅ Configurações salvas!', '#23a55a');
         modal.style.display = 'none';
     });
     
@@ -606,6 +1177,7 @@
         document.getElementById('zoomValue').innerText = e.target.value + '%';
     });
     
+    // Carregar configurações salvas
     const saved = localStorage.getItem('browser_settings');
     if (saved) {
         try {
@@ -619,8 +1191,9 @@
     aplicarZoomGlobal();
     aplicarModoNoturno();
     
+    // Iniciar
     criarNovaBrowser('https://www.google.com/webhp?igu=1');
-    mostrarToast('✅ Navegador Multi-Browsers pronto! Várias abas, DPI, zoom, VSPhone, Temp Mail.', '#23a55a');
+    mostrarToast('✅ Sistema de Automação + Explorer DOM ativado! Grave cliques e execute sequências.', '#eb459e');
 </script>
 </body>
 </html>
