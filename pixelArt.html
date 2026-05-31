@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Art Roblox - COMPLETO COM TESTE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff, #7c3aed, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .controls {
+            background: rgba(0,0,0,0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #7c3aed;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        input, select, button {
+            background: #1a1a2e;
+            border: 1px solid #7c3aed;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        input {
+            flex: 1;
+            min-width: 200px;
+        }
+        button {
+            background: #7c3aed;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        button:hover {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+        .res-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .res-btn {
+            background: #2a2a3a;
+            border-color: #444;
+        }
+        .res-btn.active {
+            background: #06b6d4;
+            border-color: #06b6d4;
+        }
+        .preview-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .preview-card {
+            background: rgba(0,0,0,0.6);
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #333;
+        }
+        .preview-title {
+            font-size: 12px;
+            color: #06b6d4;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        canvas {
+            width: 100%;
+            image-rendering: pixelated;
+            background: #000;
+            border-radius: 8px;
+        }
+        .code-area {
+            background: #0a0a0f;
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid #7c3aed;
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            background: #000;
+            color: #0f0;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 11px;
+            resize: vertical;
+        }
+        .roblox-simulator {
+            background: rgba(0,0,0,0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid #06b6d4;
+        }
+        .simulator-title {
+            font-size: 18px;
+            color: #06b6d4;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .pixel-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 400px;
+            background: #000;
+            border-radius: 8px;
+            overflow: auto;
+            padding: 20px;
+        }
+        .pixel-row {
+            display: flex;
+        }
+        .pixel {
+            width: 4px;
+            height: 4px;
+        }
+        .warning {
+            background: rgba(245,158,11,0.2);
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 3px solid #2a2a3a;
+            border-top-color: #7c3aed;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .btn-success {
+            background: #10b981;
+        }
+        .btn-warning {
+            background: #f59e0b;
+        }
+        .btn-info {
+            background: #06b6d4;
+        }
+        .btn-danger {
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 PIXEL ART ROBLOX - COMPLETO</h1>
+        <p class="subtitle">Processar → Upload → Testar → Copiar → Roblox</p>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" id="imageUrl" placeholder="URL da imagem" value="https://picsum.photos/id/100/256/256">
+                <button onclick="processImage()" class="btn-info">🔄 PROCESSAR</button>
+                <button onclick="uploadToHastebin()" class="btn-warning">📤 HASTEBIN</button>
+                <button onclick="testInRoblox()" class="btn-success">🎮 TESTAR NO ROBLOX</button>
+            </div>
+            
+            <div class="res-group">
+                <button class="res-btn" data-res="16">16x16</button>
+                <button class="res-btn" data-res="32">32x32</button>
+                <button class="res-btn active" data-res="64">64x64</button>
+                <button class="res-btn" data-res="128">128x128</button>
+                <button class="res-btn" data-res="256">256x256</button>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="hastebinLink" placeholder="Link do Hastebin" readonly>
+                <button onclick="copyLink()">📋 COPIAR LINK</button>
+                <button onclick="downloadLua()">💾 BAIXAR .LUA</button>
+            </div>
+        </div>
+
+        <div class="preview-area" id="previewArea" style="display: none;">
+            <div class="preview-card">
+                <div class="preview-title">📷 ORIGINAL</div>
+                <canvas id="originalCanvas" width="400" height="400"></canvas>
+            </div>
+            <div class="preview-card">
+                <div class="preview-title">🎨 PIXEL ART</div>
+                <canvas id="pixelCanvas" width="400" height="400"></canvas>
+            </div>
+        </div>
+
+        <div class="roblox-simulator" id="simulatorArea" style="display: none;">
+            <div class="simulator-title">🎮 PRÉVIA ROBLOX (como vai aparecer no jogo)</div>
+            <div id="pixelGrid" class="pixel-grid"></div>
+            <div class="button-group">
+                <button onclick="copyRobloxCode()" class="btn-info">📋 COPIAR SCRIPT ROBLOX</button>
+                <button onclick="downloadRobloxScript()" class="btn-success">💾 BAIXAR SCRIPT</button>
+            </div>
+        </div>
+
+        <div class="code-area" id="codeArea" style="display: none;">
+            <div class="stats" id="stats"></div>
+            <textarea id="luaCode" readonly placeholder="Código gerado..."></textarea>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="loading" id="loading"><div class="spinner"></div><p>PROCESSANDO...</p></div>
+
+    <script>
+        let currentImage = null;
+        let currentPixelData = null;
+        let currentResolution = 64;
+        let currentLuaCode = '';
+        let currentHastebinUrl = '';
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        document.querySelectorAll('.res-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.res-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentResolution = parseInt(btn.dataset.res);
+                if (currentImage) processImage();
+            });
+        });
+
+        async function processImage() {
+            const url = document.getElementById('imageUrl').value;
+            if (!url) { showToast('❌ INSIRA UMA URL'); return; }
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('previewArea').style.display = 'none';
+            document.getElementById('codeArea').style.display = 'none';
+            document.getElementById('simulatorArea').style.display = 'none';
+
+            try {
+                const img = await loadImage(url);
+                currentImage = img;
+                const result = await convertToPixelArt(img);
+                currentPixelData = result.pixelData;
+                currentLuaCode = result.luaCode;
+                
+                document.getElementById('previewArea').style.display = 'grid';
+                document.getElementById('codeArea').style.display = 'block';
+                document.getElementById('simulatorArea').style.display = 'block';
+                
+                const sizeKB = Math.ceil(currentLuaCode.length / 1024);
+                
+                document.getElementById('stats').innerHTML = `
+                    <span>📐 DIMENSÃO: ${result.width}x${result.height}</span>
+                    <span>🎨 PIXELS: ${result.totalPixels}</span>
+                    <span>🌈 CORES: ${result.uniqueColors}</span>
+                    <span>💾 TAMANHO: ${sizeKB} KB</span>
+                `;
+                
+                document.getElementById('luaCode').value = currentLuaCode;
+                renderPixelGrid(currentPixelData);
+                
+                showToast(`✅ PIXEL ART GERADA! ${result.width}x${result.height}`);
+            } catch (error) {
+                showToast('❌ ERRO: ' + error.message);
+            }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function renderPixelGrid(pixelData) {
+            const container = document.getElementById('pixelGrid');
+            container.innerHTML = '';
+            
+            const height = pixelData.length;
+            const width = pixelData[0].length;
+            
+            const scale = Math.min(2, Math.floor(400 / Math.max(width, height)));
+            const pixelSize = Math.max(2, Math.min(8, scale));
+            
+            for (let y = 0; y < height; y++) {
+                const row = document.createElement('div');
+                row.className = 'pixel-row';
+                for (let x = 0; x < width; x++) {
+                    const pixel = pixelData[y][x];
+                    const r = pixel[0];
+                    const g = pixel[1];
+                    const b = pixel[2];
+                    const a = pixel[3];
+                    
+                    const div = document.createElement('div');
+                    div.className = 'pixel';
+                    div.style.width = pixelSize + 'px';
+                    div.style.height = pixelSize + 'px';
+                    
+                    if (a > 0) {
+                        div.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+                    } else {
+                        div.style.backgroundColor = 'transparent';
+                    }
+                    row.appendChild(div);
+                }
+                container.appendChild(row);
+            }
+        }
+
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('FALHA AO CARREGAR'));
+                img.src = url;
+            });
+        }
+
+        async function convertToPixelArt(img) {
+            const width = currentResolution;
+            const height = currentResolution;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const pixels = imageData.data;
+
+            const pixelData = [];
+            const uniqueColorsSet = new Set();
+            
+            for (let y = 0; y < height; y++) {
+                pixelData[y] = [];
+                for (let x = 0; x < width; x++) {
+                    const idx = (y * width + x) * 4;
+                    const r = pixels[idx];
+                    const g = pixels[idx+1];
+                    const b = pixels[idx+2];
+                    const a = pixels[idx+3];
+                    pixelData[y][x] = [r, g, b, a];
+                    if (a > 0) uniqueColorsSet.add(`${r},${g},${b}`);
+                }
+            }
+
+            let luaCode = `-- Pixel Art Roblox\n-- Dimensao: ${width}x${height}\n\nlocal pixelData = {\n`;
+            for (let y = 0; y < height; y++) {
+                luaCode += `\t[${y}] = {\n`;
+                for (let x = 0; x < width; x++) {
+                    const p = pixelData[y][x];
+                    luaCode += `\t\t[${x}] = { ${p[0]}, ${p[1]}, ${p[2]}, ${p[3]} }`;
+                    if (x < width - 1) luaCode += `,`;
+                    luaCode += `\n`;
+                }
+                luaCode += `\t}`;
+                if (y < height - 1) luaCode += `,`;
+                luaCode += `\n`;
+            }
+            luaCode += `}\n\nreturn pixelData`;
+
+            const originalCanvas = document.getElementById('originalCanvas');
+            const origCtx = originalCanvas.getContext('2d');
+            originalCanvas.width = 400;
+            originalCanvas.height = 400;
+            origCtx.drawImage(img, 0, 0, 400, 400);
+
+            const pixelCanvas = document.getElementById('pixelCanvas');
+            const pixelCtx = pixelCanvas.getContext('2d');
+            pixelCanvas.width = 400;
+            pixelCanvas.height = 400;
+            pixelCtx.imageSmoothingEnabled = false;
+            pixelCtx.drawImage(canvas, 0, 0, 400, 400);
+
+            return {
+                pixelData: pixelData,
+                luaCode: luaCode,
+                width: width,
+                height: height,
+                totalPixels: width * height,
+                uniqueColors: uniqueColorsSet.size
+            };
+        }
+
+        async function uploadToHastebin() {
+            if (!currentLuaCode) {
+                showToast('❌ PROCESS UMA IMAGEM PRIMEIRO!');
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            
+            try {
+                const response = await fetch('https://hastebin.com/documents', {
+                    method: 'POST',
+                    body: currentLuaCode
+                });
+                const data = await response.json();
+                currentHastebinUrl = `https://hastebin.com/raw/${data.key}`;
+                document.getElementById('hastebinLink').value = currentHastebinUrl;
+                showToast('✅ PUBLICADO NO HASTEBIN!');
+            } catch (error) {
+                showToast('❌ FALHA NO UPLOAD');
+            }
+            
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function testInRoblox() {
+            if (!currentPixelData) {
+                showToast('❌ PROCESS UMA IMAGEM PRIMEIRO!');
+                return;
+            }
+            
+            renderPixelGrid(currentPixelData);
+            showToast('🎮 TESTE VISUAL ATUALIZADO!');
+            
+            const robloxScript = generateRobloxScript();
+            document.getElementById('luaCode').value = robloxScript;
+        }
+
+        function generateRobloxScript() {
+            if (!currentLuaCode) return '';
+            
+            return `-- SCRIPT ROBLOX COMPLETO
+-- COLE EM StarterPlayerScripts OU ScreenGui
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- DADOS DA PIXEL ART
+local pixelData = ${currentLuaCode.match(/local pixelData = ({[\s\S]*})/)?.[1] || '{}'}
+
+-- CRIAR GUI
+local function createPixelArtGUI()
+    local player = Players.LocalPlayer
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "PixelArtGUI"
+    screenGui.Parent = player:WaitForChild("PlayerGui")
+    
+    local height = #pixelData
+    local width = #pixelData[0]
+    local pixelSize = 4
+    
+    local container = Instance.new("Frame")
+    container.BackgroundTransparency = 1
+    container.Size = UDim2.new(0, width * pixelSize, 0, height * pixelSize)
+    container.Position = UDim2.new(0.5, -(width * pixelSize / 2), 0.5, -(height * pixelSize / 2))
+    container.Parent = screenGui
+    
+    local pixelCount = 0
+    
+    for y = 0, height - 1 do
+        for x = 0, width - 1 do
+            local pixel = pixelData[y][x]
+            local r,g,b,a = unpack(pixel)
+            
+            if a > 0 then
+                local frame = Instance.new("Frame")
+                frame.Size = UDim2.new(0, pixelSize, 0, pixelSize)
+                frame.Position = UDim2.new(0, x * pixelSize, 0, y * pixelSize)
+                frame.BackgroundColor3 = Color3.fromRGB(r,g,b)
+                frame.BackgroundTransparency = 0
+                frame.BorderSizePixel = 0
+                frame.Parent = container
+                pixelCount = pixelCount + 1
+            end
+        end
+    end
+    
+    print(string.format("✅ PIXEL ART CARREGADA! %dx%d - %d pixels", width, height, pixelCount))
+    return screenGui
+end
+
+-- EXECUTAR
+createPixelArtGUI()
+
+-- CONTROLES (opcional)
+local UserInputService = game:GetService("UserInputService")
+local gui = nil
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.P then
+        if gui and gui.Parent then
+            gui:Destroy()
+            gui = nil
+        else
+            gui = createPixelArtGUI()
+        end
+    end
+end)`;
+        }
+
+        function copyRobloxCode() {
+            const code = generateRobloxScript();
+            navigator.clipboard.writeText(code);
+            showToast('✅ SCRIPT ROBLOX COPIADO!');
+        }
+
+        function downloadRobloxScript() {
+            const code = generateRobloxScript();
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `roblox_pixelart_${currentResolution}x${currentResolution}.lua`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('💾 SCRIPT BAIXADO!');
+        }
+
+        function copyLink() {
+            if (!currentHastebinUrl) {
+                showToast('❌ PUBLIQUE NO HASTEBIN PRIMEIRO!');
+                return;
+            }
+            navigator.clipboard.writeText(currentHastebinUrl);
+            showToast('📋 LINK COPIADO!');
+        }
+
+        function downloadLua() {
+            if (!currentLuaCode) {
+                showToast('❌ NADA PARA BAIXAR');
+                return;
+            }
+            const blob = new Blob([currentLuaCode], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pixel_art_${currentResolution}x${currentResolution}.lua`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('💾 ARQUIVO BAIXADO!');
+        }
+
+        window.addEventListener('load', () => {
+            setTimeout(processImage, 500);
+        });
+    </script>
+</body>
+</html>
