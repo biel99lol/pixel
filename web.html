@@ -2,8 +2,9 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Creator - Email Válido</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Discord Creator Pro</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -15,162 +16,307 @@
         .container { max-width: 500px; margin: 0 auto; }
         .card {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 28px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
-        h1 { color: #5865F2; text-align: center; }
-        .sub { text-align: center; color: #666; margin: 10px 0 20px; }
-        .info-box {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 10px;
+        h1 { color: #5865F2; text-align: center; font-size: 26px; }
+        .sub { text-align: center; color: #666; margin: 5px 0 20px; font-size: 14px; }
+        .dados-box {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 16px;
             margin: 15px 0;
             font-family: monospace;
+            font-size: 13px;
+            text-align: center;
             word-break: break-all;
         }
         button {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             background: #5865F2;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 14px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            margin: 10px 0;
+            margin: 8px 0;
+            transition: all 0.2s;
         }
-        button:hover { background: #4752C4; }
+        button:active { transform: scale(0.97); opacity: 0.9; }
         .btn-success { background: #23a55a; }
-        .token-area {
-            background: #2b2d31;
-            color: #00ff00;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            display: none;
-            word-break: break-all;
-        }
-        .dominio-info {
-            background: #fff3cd;
-            padding: 10px;
-            border-radius: 8px;
+        .btn-warning { background: #faa61a; color: #333; }
+        .btn-danger { background: #ed4245; }
+        .status {
+            background: #e8f4fd;
+            padding: 12px;
+            border-radius: 14px;
             margin: 10px 0;
-            font-size: 12px;
-            color: #856404;
+            font-size: 13px;
+            text-align: center;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: #1e1e1e;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            text-align: center;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .badge {
+            background: #ed4245;
+            color: white;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 11px;
+            display: inline-block;
+            margin-left: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <h1>🎮 Discord Account Creator</h1>
-            <p class="sub">Email com domínio válido - Discord ACEITA</p>
+            <h1>🎮 Discord Creator Pro <span class="badge">APP</span></h1>
+            <p class="sub">Sistema automático com notificações</p>
 
-            <div class="dominio-info">
-                📧 Domínios de email que o Discord ACEITA:<br>
-                @gmail.com, @outlook.com, @yahoo.com, @proton.me, @mail.com
+            <div class="dados-box" id="dadosBox">
+                📧 <span id="email">Clique em "Nova Conta"</span><br>
+                👤 <span id="username">---</span><br>
+                🔐 <span id="password">---</span>
             </div>
 
-            <div class="info-box">
-                <strong>📧 Email:</strong> <span id="emailDisplay">gerando...</span><br>
-                <strong>👤 Usuário:</strong> <span id="userDisplay">gerando...</span><br>
-                <strong>🔐 Senha:</strong> <span id="passDisplay">gerando...</span>
+            <button id="btnNovaConta" class="btn-success">🔄 NOVA CONTA</button>
+            <button id="btnCopiarDados">📋 COPIAR DADOS</button>
+            <button id="btnAbrirDiscord">🔗 ABRIR DISCORD</button>
+            <button id="btnTestarNotificacao" class="btn-warning">🔔 TESTAR NOTIFICAÇÃO</button>
+
+            <div class="status" id="statusArea">
+                ✅ Sistema pronto. Clique em "Nova Conta"
             </div>
-
-            <button class="btn-success" onclick="gerarNovosDados()">🔄 GERAR NOVOS DADOS</button>
-            <button onclick="abrirDiscord()">🔗 ABRIR DISCORD E COPIAR DADOS</button>
-
-            <div class="token-area" id="tokenArea">
-                <strong>🎉 SEU TOKEN:</strong><br>
-                <span id="tokenValor"></span>
-                <button onclick="copiarToken()" style="margin-top: 10px;">📋 COPIAR TOKEN</button>
-            </div>
-
-            <button onclick="pegarTokenReal()" style="background: #faa61a; color: #333;">✅ JÁ CRIEI A CONTA - MOSTRAR TOKEN</button>
         </div>
     </div>
 
     <script>
-        let emailAtual = '';
-        let usernameAtual = '';
-        let senhaAtual = '';
+        let dadosAtuais = { email: '', username: '', password: '' };
+        let wakeLock = null;
 
-        const dominiosAceitos = [
-            'gmail.com',
-            'outlook.com',
-            'hotmail.com',
-            'yahoo.com',
-            'protonmail.com',
-            'mail.com',
-            'icloud.com',
-            'aol.com'
-        ];
-
-        function gerarDados() {
-            const nome = 'user' + Math.random().toString(36).substring(2, 8) + Math.floor(Math.random() * 10000);
-            const dominio = dominiosAceitos[Math.floor(Math.random() * dominiosAceitos.length)];
-            emailAtual = nome + '@' + dominio;
-            usernameAtual = 'User_' + Math.floor(Math.random() * 100000);
-            senhaAtual = 'Discord@' + Math.floor(Math.random() * 9999) + '!abc';
-            
-            document.getElementById('emailDisplay').innerText = emailAtual;
-            document.getElementById('userDisplay').innerText = usernameAtual;
-            document.getElementById('passDisplay').innerText = senhaAtual;
-            
-            localStorage.setItem('tempEmail', emailAtual);
-            localStorage.setItem('tempUser', usernameAtual);
-            localStorage.setItem('tempPass', senhaAtual);
+        function mostrarToast(mensagem, tipo = 'normal') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = mensagem;
+            if (tipo === 'sucesso') toast.style.background = '#23a55a';
+            if (tipo === 'erro') toast.style.background = '#ed4245';
+            if (tipo === 'alerta') toast.style.background = '#faa61a';
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         }
 
-        function gerarNovosDados() {
-            gerarDados();
-            document.getElementById('tokenArea').style.display = 'none';
+        function gerarDados() {
+            const timestamp = Date.now();
+            const random = Math.floor(Math.random() * 99999);
+            const dominios = ['gmail.com', 'outlook.com', 'protonmail.com', 'yahoo.com'];
+            const dominio = dominios[Math.floor(Math.random() * dominios.length)];
+            
+            dadosAtuais.email = `user${timestamp}${random}@${dominio}`;
+            dadosAtuais.username = `User_${Math.floor(Math.random() * 99999)}`;
+            dadosAtuais.password = `Disc@${Math.random().toString(36).substring(2, 10)}!${Math.floor(Math.random() * 999)}`;
+            
+            document.getElementById('email').innerText = dadosAtuais.email;
+            document.getElementById('username').innerText = dadosAtuais.username;
+            document.getElementById('password').innerText = dadosAtuais.password;
+            document.getElementById('statusArea').innerHTML = '✅ DADOS GERADOS! Clique em "Copiar Dados" e depois "Abrir Discord"';
+            
+            mostrarToast('🎉 Dados gerados com sucesso!', 'sucesso');
+            
+            if (Notification.permission === 'granted') {
+                new Notification('📧 Dados gerados!', {
+                    body: `Email: ${dadosAtuais.email}\nUsuário: ${dadosAtuais.username}`,
+                    icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
+                    vibrate: [200, 100, 200]
+                });
+            }
+            
+            localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
+            return dadosAtuais;
+        }
+
+        async function copiarDados() {
+            if (!dadosAtuais.email) {
+                mostrarToast('⚠️ Clique em "Nova Conta" primeiro!', 'alerta');
+                return;
+            }
+            
+            const texto = `${dadosAtuais.email}\n${dadosAtuais.username}\n${dadosAtuais.password}`;
+            
+            try {
+                await navigator.clipboard.writeText(texto);
+                mostrarToast('📋 Dados copiados para área de transferência!', 'sucesso');
+                document.getElementById('statusArea').innerHTML = '✅ Dados copiados! Agora clique em "Abrir Discord" e cole os campos.';
+                
+                if (Notification.permission === 'granted') {
+                    new Notification('✅ Dados copiados!', {
+                        body: 'Agora cole no Discord e resolva o CAPTCHA',
+                        icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
+                    });
+                }
+            } catch (err) {
+                mostrarToast('❌ Erro ao copiar. Copie manualmente.', 'erro');
+            }
         }
 
         function abrirDiscord() {
-            const dados = `📋 DADOS PARA CRIAR CONTA:
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📧 EMAIL: ${emailAtual}
-👤 USUÁRIO: ${usernameAtual}
-🔐 SENHA: ${senhaAtual}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-⚠️ COLE OS DADOS ACIMA NO DISCORD
-⚠️ DEPOIS SÓ RESOLVER O CAPTCHA
-⚠️ A CONTA SERÁ CRIADA!`;
-
-            alert(dados);
+            if (!dadosAtuais.email) {
+                mostrarToast('⚠️ Gere os dados primeiro!', 'alerta');
+                return;
+            }
+            
             window.open('https://discord.com/register', '_blank');
-        }
-
-        function pegarTokenReal() {
-            const tokenSimulado = 'mfa.' + btoa(usernameAtual + ':' + Date.now()).replace(/=/g, '').substring(0, 40) + '.' + Math.random().toString(36).substring(2, 15);
+            mostrarToast('🔗 Discord aberto! Cole os dados e resolva o CAPTCHA', 'sucesso');
+            document.getElementById('statusArea').innerHTML = '🔗 Discord aberto! Cole os dados e resolva o CAPTCHA.';
             
-            document.getElementById('tokenArea').style.display = 'block';
-            document.getElementById('tokenValor').innerText = tokenSimulado;
+            setTimeout(() => {
+                if (Notification.permission === 'granted') {
+                    new Notification('🔗 Discord aberto!', {
+                        body: 'Cole os dados e resolva o CAPTCHA para criar sua conta',
+                        icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
+                    });
+                }
+            }, 1000);
+        }
+
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake Lock ativado - app mantido ativo');
+                    
+                    wakeLock.addEventListener('release', () => {
+                        console.log('Wake Lock liberado');
+                    });
+                }
+            } catch (err) {
+                console.log('Wake Lock não suportado:', err);
+            }
+        }
+
+        function iniciarNotificacoes() {
+            if ('Notification' in window) {
+                if (Notification.permission === 'granted') {
+                    mostrarToast('🔔 Notificações ativadas!', 'sucesso');
+                } else if (Notification.permission !== 'denied') {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === 'granted') {
+                            mostrarToast('🔔 Notificações ativadas!', 'sucesso');
+                            new Notification('Discord Creator Pro', {
+                                body: 'App rodando em segundo plano. Notificações ativas!',
+                                icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        function carregarDadosSalvos() {
+            const salvos = localStorage.getItem('discord_dados');
+            if (salvos) {
+                try {
+                    dadosAtuais = JSON.parse(salvos);
+                    document.getElementById('email').innerText = dadosAtuais.email;
+                    document.getElementById('username').innerText = dadosAtuais.username;
+                    document.getElementById('password').innerText = dadosAtuais.password;
+                    mostrarToast('📀 Dados carregados da sessão anterior', 'sucesso');
+                } catch(e) {}
+            }
+        }
+
+        function manterAtivoBackground() {
+            let interval = setInterval(() => {
+                console.log('App rodando em segundo plano - ' + new Date().toLocaleTimeString());
+                if (Notification.permission === 'granted') {
+                    const agora = new Date();
+                    if (agora.getSeconds() === 0 || agora.getSeconds() === 30) {
+                        new Notification('🟢 Discord Creator Pro', {
+                            body: 'App ainda rodando normalmente. Clique em "Nova Conta" para gerar dados.',
+                            icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
+                            silent: true
+                        });
+                    }
+                }
+            }, 30000);
             
-            alert(`⚠️ COMO PEGAR O TOKEN REAL APÓS CRIAR A CONTA:
-
-1. No Discord aberto, aperte F12
-2. Vá na aba "Console"
-3. Cole o código abaixo:
-
-webpackChunkdiscord_app.push([[Symbol()],{},function(e){for(let t in e.c)if(e.c[t].exports)for(let n in e.c[t].exports)if(n=="getToken")return console.log(e.c[t].exports.getToken())}]);
-
-4. O token vai aparecer no console
-5. Copie ele e cole aqui`);
+            window.addEventListener('beforeunload', () => {
+                clearInterval(interval);
+            });
         }
 
-        function copiarToken() {
-            const token = document.getElementById('tokenValor').innerText;
-            navigator.clipboard.writeText(token);
-            alert('Token copiado!');
+        function registrarServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').then(() => {
+                    console.log('Service Worker registrado');
+                }).catch(err => {
+                    console.log('Service Worker falhou:', err);
+                });
+            }
         }
 
-        gerarDados();
+        document.getElementById('btnNovaConta').onclick = () => {
+            gerarDados();
+            requestWakeLock();
+        };
+        document.getElementById('btnCopiarDados').onclick = copiarDados;
+        document.getElementById('btnAbrirDiscord').onclick = abrirDiscord;
+        document.getElementById('btnTestarNotificacao').onclick = () => {
+            if (Notification.permission === 'granted') {
+                new Notification('🔔 TESTE DE NOTIFICAÇÃO', {
+                    body: 'O app está rodando em segundo plano corretamente!',
+                    icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
+                    vibrate: [200, 100, 200, 100, 200]
+                });
+                mostrarToast('🔔 Notificação enviada!', 'sucesso');
+            } else {
+                Notification.requestPermission().then(perm => {
+                    if (perm === 'granted') {
+                        new Notification('🔔 Notificações ativadas!', {
+                            body: 'Agora você receberá alertas do app.',
+                            icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
+                        });
+                        mostrarToast('🔔 Notificações ativadas!', 'sucesso');
+                    }
+                });
+            }
+        };
+
+        requestWakeLock();
+        iniciarNotificacoes();
+        carregarDadosSalvos();
+        manterAtivoBackground();
+        
+        if (!dadosAtuais.email) {
+            setTimeout(() => {
+                gerarDados();
+            }, 500);
+        }
+        
+        setInterval(() => {
+            if (document.hidden) {
+                console.log('App rodando em segundo plano');
+            }
+        }, 5000);
     </script>
 </body>
 </html>
