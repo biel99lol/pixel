@@ -404,3 +404,67 @@ window.addEventListener('load', () => setTimeout(processImage, 400));
 </script>
 </body>
 </html>
+
+if (window.location.pathname === '/api/pixelart') {
+    (async () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const imgUrl = urlParams.get('url');
+        const w = parseInt(urlParams.get('w')) || 64;
+        const h = parseInt(urlParams.get('h')) || 64;
+        
+        if (!imgUrl) {
+            document.write(JSON.stringify({ error: 'missing url param' }));
+            return;
+        }
+        
+        try {
+            const img = await loadImageFromUrl(imgUrl);
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const imgData = ctx.getImageData(0, 0, w, h).data;
+            
+            const paletteMap = {};
+            const palette = [];
+            const indices = [];
+            
+            for (let i = 0; i < imgData.length; i += 4) {
+                const r = imgData[i];
+                const g = imgData[i+1];
+                const b = imgData[i+2];
+                const a = imgData[i+3];
+                const key = a > 0 ? `${r},${g},${b}` : 'T';
+                
+                if (!(key in paletteMap)) {
+                    paletteMap[key] = palette.length;
+                    palette.push(a > 0 ? [r, g, b] : null);
+                }
+                indices.push(paletteMap[key]);
+            }
+            
+            const result = JSON.stringify({ w, h, p: palette, i: indices });
+            document.write(result);
+        } catch(e) {
+            document.write(JSON.stringify({ error: e.message }));
+        }
+    })();
+}
+
+function loadImageFromUrl(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error('Failed to load image'));
+        
+        fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`)
+            .then(res => res.blob())
+            .then(blob => {
+                img.src = URL.createObjectURL(blob);
+            })
+            .catch(() => {
+                img.src = url;
+            });
+    });
+}
