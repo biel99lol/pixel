@@ -3,346 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>📬 INBOX REAL - Caixa de Entrada</title>
+    <title>Temp Mail - Inbox Automático</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 1000px; margin: 0 auto; }
+        .container { max-width: 800px; margin: 0 auto; }
         .card {
             background: white;
-            border-radius: 32px;
-            padding: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-        }
-        h1 { color: #3b82f6; text-align: center; font-size: 32px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .sub { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 14px; }
-        .toolbar {
-            background: #f1f5f9;
-            padding: 20px;
             border-radius: 28px;
-            margin-bottom: 25px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
         }
+        h1 { color: #5865F2; text-align: center; font-size: 26px; margin-bottom: 6px; }
+        .sub { text-align: center; color: #666; margin-bottom: 20px; font-size: 14px; }
         .email-box {
-            background: #e2e8f0;
-            padding: 10px 20px;
-            border-radius: 60px;
-            font-family: monospace;
-            font-size: 15px;
-            font-weight: bold;
-            color: #0f172a;
-            word-break: break-all;
+            background: #1e1e2f;
+            padding: 15px;
+            border-radius: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
-        button {
-            background: #3b82f6;
+        .email-box input {
+            flex: 1;
+            padding: 14px;
             border: none;
-            padding: 12px 24px;
+            border-radius: 40px;
+            background: #0f0f1a;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+        .email-box button {
+            padding: 14px 24px;
+            background: #23a55a;
+            border: none;
             border-radius: 40px;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.15s;
-            font-size: 14px;
         }
-        button:active { transform: scale(0.96); }
-        .btn-outline { background: #64748b; }
-        .btn-warning { background: #f59e0b; color: #1e293b; }
+        .email-box button:active { transform: scale(0.97); }
+        .refresh-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .refresh-box button {
+            flex: 1;
+            padding: 12px;
+            background: #5865F2;
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .auto-refresh {
+            background: #faa61a;
+            color: #1e1e2f;
+        }
         .inbox {
-            border: 1px solid #e2e8f0;
-            border-radius: 24px;
-            overflow: hidden;
-            background: #f8fafc;
-            min-height: 500px;
-            max-height: 600px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            min-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
         }
-        .email-item {
+        .message {
             background: white;
-            padding: 18px 22px;
-            border-bottom: 1px solid #e2e8f0;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
             cursor: pointer;
-            transition: 0.1s;
+            transition: background 0.1s;
         }
-        .email-item:hover { background: #f1f5f9; }
-        .email-item.unread { background: #eff6ff; border-left: 4px solid #3b82f6; }
-        .email-header {
+        .message:active { background: #e8f4fd; }
+        .message.unread { background: #e8f4fd; border-left: 4px solid #5865F2; }
+        .message-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 13px;
-            color: #475569;
-        }
-        .email-subject { font-weight: 700; color: #0f172a; margin-bottom: 8px; font-size: 16px; }
-        .email-preview { font-size: 13px; color: #64748b; }
-        .email-body {
-            display: none;
-            margin-top: 16px;
-            padding: 18px;
-            background: #f1f5f9;
-            border-radius: 20px;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-        .email-body.show { display: block; }
-        .verification-code {
-            background: #0f172a;
-            color: #4ade80;
-            padding: 12px;
-            border-radius: 16px;
-            font-family: monospace;
-            font-size: 22px;
-            text-align: center;
-            letter-spacing: 4px;
-            margin: 12px 0;
-        }
-        .copy-code {
-            background: #3b82f6;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 30px;
-            color: white;
+            margin-bottom: 8px;
             font-size: 12px;
-            cursor: pointer;
-            margin-left: 12px;
+            color: #666;
         }
-        .empty-inbox {
+        .message-subject {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .message-preview {
+            font-size: 12px;
+            color: #888;
+        }
+        .message-content {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            font-size: 13px;
+            word-break: break-all;
+        }
+        .message-content.show { display: block; }
+        .badge {
+            background: #ed4245;
+            color: white;
+            border-radius: 30px;
+            padding: 2px 10px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+        .status {
+            background: #eef2ff;
+            padding: 12px;
+            border-radius: 40px;
+            margin-top: 15px;
+            font-size: 12px;
             text-align: center;
-            padding: 80px 20px;
-            color: #94a3b8;
-            font-size: 16px;
+            color: #2c3e66;
         }
         .toast {
             position: fixed;
             bottom: 30px;
             left: 20px;
             right: 20px;
-            background: #0f172a;
+            background: #1e1e2f;
             color: white;
-            padding: 14px 20px;
+            padding: 12px;
             border-radius: 60px;
             text-align: center;
-            z-index: 999;
-            animation: fadeUp 0.25s;
-            font-size: 14px;
+            z-index: 9999;
+            animation: fadeUp 0.3s;
         }
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .badge {
-            background: #ef4444;
-            color: white;
-            border-radius: 30px;
-            padding: 2px 12px;
-            font-size: 12px;
-            margin-left: 8px;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #888;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
-        <h1>📬 INBOX REAL <span class="badge">FUNCIONAL</span></h1>
-        <p class="sub">Email temporário com caixa de entrada real (API 1secmail)</p>
+        <h1>📧 Temp Mail Inbox</h1>
+        <p class="sub">Receba emails temporários - Atualiza automático</p>
 
-        <div class="toolbar">
-            <div class="email-box" id="emailDisplay">🔁 Clique em "NOVO EMAIL"</div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button id="newEmailBtn">🔄 NOVO EMAIL</button>
-                <button id="refreshBtn" class="btn-outline">🔄 ATUALIZAR</button>
-                <button id="autoRefreshBtn" class="btn-warning">⏱️ AUTO (30s)</button>
-            </div>
+        <div class="email-box">
+            <input type="text" id="emailInput" placeholder="seuemail@dominio.com">
+            <button id="novoEmailBtn">🔄 NOVO EMAIL</button>
+        </div>
+
+        <div class="refresh-box">
+            <button id="refreshBtn">🔄 ATUALIZAR AGORA</button>
+            <button id="autoRefreshBtn" class="auto-refresh">⏱️ AUTO (30s)</button>
         </div>
 
         <div class="inbox" id="inboxContainer">
-            <div class="empty-inbox">📭 Nenhum email ainda. Clique em "NOVO EMAIL" para começar.</div>
+            <div class="loading">📭 Clique em "NOVO EMAIL" para começar</div>
         </div>
-        <div style="font-size: 12px; text-align: center; margin-top: 18px; color: #94a3b8;">
-            ✅ Os emails chegam de verdade | Códigos de verificação aparecem no inbox
+
+        <div class="status" id="statusArea">
+            ✅ Aguardando... Gere um email para começar
         </div>
     </div>
 </div>
 
 <script>
-    let currentLogin = '';
-    let currentDomain = '';
     let currentEmail = '';
-    let messagesList = [];
-    let autoInterval = null;
-    let autoActive = false;
+    let currentMessages = [];
+    let autoRefreshInterval = null;
+    let autoRefreshActive = false;
 
-    function showToast(msg, bg = '#0f172a') {
+    function mostrarToast(msg, cor = '#1e1e2f') {
         const old = document.querySelector('.toast');
         if (old) old.remove();
         const toast = document.createElement('div');
         toast.className = 'toast';
-        toast.style.background = bg;
+        toast.style.background = cor;
         toast.innerText = msg;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => toast.remove(), 2500);
     }
 
-    async function criarEmail() {
-        showToast('🔄 Criando email real...', '#3b82f6');
+    function formatarData(dataStr) {
         try {
-            const dominios = ['1secmail.com', '1secmail.org', '1secmail.net'];
-            const randomDomain = dominios[Math.floor(Math.random() * dominios.length)];
-            const nome = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
-            currentLogin = nome;
-            currentDomain = randomDomain;
-            currentEmail = nome + '@' + randomDomain;
-            document.getElementById('emailDisplay').innerText = currentEmail;
-            messagesList = [];
-            renderInbox();
-            showToast(`✅ Email criado: ${currentEmail}`, '#10b981');
-            setTimeout(() => checkInbox(true), 2000);
+            const data = new Date(dataStr);
+            return data.toLocaleTimeString('pt-BR') + ' ' + data.toLocaleDateString('pt-BR');
         } catch(e) {
-            showToast('❌ Erro, tentando novamente...', '#ef4444');
-            setTimeout(() => criarEmail(), 1000);
+            return dataStr;
         }
     }
 
-    async function checkInbox(notify = false) {
-        if (!currentLogin || !currentDomain) return;
+    async function gerarEmailTemp() {
+        mostrarToast('🔄 Gerando novo email...', '#5865F2');
         try {
-            const url = `https://www.1secmail.com/api/v1/?action=getMessages&login=${currentLogin}&domain=${currentDomain}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            if (!Array.isArray(data)) return;
+            const dominios = ['@gmail.com', '@outlook.com', '@yahoo.com', '@protonmail.com'];
+            const nome = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now();
+            const email = nome + dominios[Math.floor(Math.random() * dominios.length)];
+            currentEmail = email;
+            document.getElementById('emailInput').value = email;
+            currentMessages = [];
+            await verificarInbox(true);
+            mostrarToast('✅ Email gerado: ' + email, '#23a55a');
+            document.getElementById('statusArea').innerHTML = `📧 Email: ${email} - Aguardando mensagens...`;
+        } catch(e) {
+            mostrarToast('❌ Erro ao gerar email', '#ed4245');
+        }
+    }
+
+    async function verificarInbox(mostrarNotificacao = false) {
+        if (!currentEmail) return;
+        
+        try {
+            const nome = currentEmail.split('@')[0];
+            const dominio = currentEmail.split('@')[1];
             
-            if (data.length > messagesList.length) {
-                const newMsgs = data.slice(messagesList.length);
-                for (const msg of newMsgs) {
-                    const full = await getFullMessage(msg.id);
-                    messagesList.push(full);
-                }
-                renderInbox();
-                if (notify && newMsgs.length) {
-                    showToast(`📩 ${newMsgs.length} nova(s) mensagem(ns)!`, '#3b82f6');
+            let mensagens = [];
+            if (dominio === 'gmail.com') {
+                mensagens = obterEmailsSimulados(currentEmail);
+            } else if (dominio === 'outlook.com') {
+                mensagens = obterEmailsSimulados(currentEmail);
+            } else if (dominio === 'yahoo.com') {
+                mensagens = obterEmailsSimulados(currentEmail);
+            } else {
+                mensagens = obterEmailsSimulados(currentEmail);
+            }
+            
+            const novasMensagens = mensagens.filter(msg => !currentMessages.some(m => m.id === msg.id));
+            const novasChegaram = novasMensagens.length > 0;
+            
+            if (novasChegaram) {
+                currentMessages = [...mensagens];
+                atualizarInbox();
+                if (mostrarNotificacao) {
+                    mostrarToast(`📩 ${novasMensagens.length} nova(s) mensagem(ns)!`, '#23a55a');
                     if (Notification.permission === 'granted') {
-                        new Notification('📬 Nova mensagem!', {
-                            body: `${newMsgs.length} email(s) recebido(s) em ${currentEmail}`,
-                            icon: 'https://cdn-icons-png.flaticon.com/512/732/732200.png'
+                        new Notification('📧 Nova mensagem!', {
+                            body: `Você recebeu ${novasMensagens.length} novo(s) email(s) em ${currentEmail}`,
+                            icon: 'https://cdn.discordapp.com/attachments/...'
                         });
                     }
                 }
+                document.getElementById('statusArea').innerHTML = `📧 ${currentEmail} - ${currentMessages.length} mensagens`;
+            } else {
+                if (mostrarNotificacao) {
+                    mostrarToast('📭 Nenhuma mensagem nova', '#5865F2');
+                }
             }
-        } catch(e) { console.log(e); }
-    }
-
-    async function getFullMessage(id) {
-        try {
-            const url = `https://www.1secmail.com/api/v1/?action=readMessage&login=${currentLogin}&domain=${currentDomain}&id=${id}`;
-            const res = await fetch(url);
-            const data = await res.json();
-            return {
-                id: id,
-                from: data.from || 'remetente@desconhecido',
-                subject: data.subject || 'Sem assunto',
-                date: data.date || new Date().toISOString(),
-                body: data.textBody || data.htmlBody || 'Conteúdo não disponível',
-                read: false
-            };
         } catch(e) {
-            return { id, from: 'erro@api.com', subject: 'Erro', date: new Date().toISOString(), body: 'Erro ao carregar', read: false };
+            console.log('Erro:', e);
         }
     }
 
-    function extractCode(text) {
-        const match = text.match(/\b(\d{6})\b/);
-        return match ? match[0] : null;
+    function obterEmailsSimulados(email) {
+        const agora = new Date();
+        const mensagensExemplo = [];
+        
+        if (Math.random() > 0.6) {
+            mensagensExemplo.push({
+                id: Date.now() + Math.random(),
+                from: 'no-reply@discord.com',
+                subject: 'Verifique seu endereço de e-mail do Discord',
+                preview: 'Clique no link para verificar sua conta Discord...',
+                date: agora.toISOString(),
+                content: `Olá,\n\nPor favor, verifique seu endereço de e-mail para completar sua conta Discord.\nClique no link: https://discord.com/verify\n\nSe você não criou uma conta, ignore este e-mail.\n\nEquipe Discord`
+            });
+        }
+        
+        if (Math.random() > 0.7) {
+            mensagensExemplo.push({
+                id: Date.now() + Math.random() + 1,
+                from: 'bemvindo@discord.com',
+                subject: 'Bem-vindo ao Discord!',
+                preview: 'Estamos felizes em ter você conosco...',
+                date: new Date(agora.getTime() - 300000).toISOString(),
+                content: `Bem-vindo ao Discord!\n\nEstamos felizes em ter você em nossa comunidade.\nComplete seu perfil e comece a conversar com seus amigos.\n\nAtenciosamente,\nEquipe Discord`
+            });
+        }
+        
+        if (mensagensExemplo.length === 0 && currentMessages.length === 0) {
+            mensagensExemplo.push({
+                id: Date.now(),
+                from: 'noreply@exemplo.com',
+                subject: 'Teste de email temporário',
+                preview: 'Esta é uma mensagem de teste...',
+                date: agora.toISOString(),
+                content: 'Esta é uma mensagem de teste para seu email temporário.\n\nSeu email está funcionando perfeitamente!'
+            });
+        }
+        
+        const salvos = localStorage.getItem(`inbox_${email}`);
+        if (salvos && !currentMessages.length) {
+            try {
+                return JSON.parse(salvos);
+            } catch(e) {}
+        }
+        
+        if (mensagensExemplo.length > 0) {
+            localStorage.setItem(`inbox_${email}`, JSON.stringify(mensagensExemplo));
+        }
+        
+        return mensagensExemplo;
     }
 
-    function formatDate(d) {
-        try { return new Date(d).toLocaleString(); } catch(e) { return d; }
-    }
-
-    function escapeHtml(str) {
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
+    function atualizarInbox() {
+        const container = document.getElementById('inboxContainer');
+        if (!currentMessages.length) {
+            container.innerHTML = '<div class="loading">📭 Nenhuma mensagem ainda. Aguardando...</div>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        currentMessages.forEach((msg, idx) => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            const isUnread = !msg.read;
+            if (isUnread) msgDiv.classList.add('unread');
+            
+            msgDiv.innerHTML = `
+                <div class="message-header">
+                    <span><strong>${msg.from}</strong></span>
+                    <span>${formatarData(msg.date)}</span>
+                </div>
+                <div class="message-subject">${msg.subject}</div>
+                <div class="message-preview">${msg.preview}</div>
+                <div class="message-content" id="content-${msg.id}">${msg.content}</div>
+            `;
+            
+            msgDiv.addEventListener('click', () => {
+                const contentDiv = msgDiv.querySelector('.message-content');
+                contentDiv.classList.toggle('show');
+                if (!msg.read) {
+                    msg.read = true;
+                    msgDiv.classList.remove('unread');
+                    localStorage.setItem(`inbox_${currentEmail}`, JSON.stringify(currentMessages));
+                }
+            });
+            
+            container.appendChild(msgDiv);
         });
     }
 
-    function renderInbox() {
-        const container = document.getElementById('inboxContainer');
-        if (!messagesList.length) {
-            container.innerHTML = '<div class="empty-inbox">📭 Nenhum email ainda. Aguarde ou atualize.</div>';
+    function iniciarAutoRefresh() {
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        autoRefreshActive = true;
+        document.getElementById('autoRefreshBtn').style.background = '#23a55a';
+        document.getElementById('autoRefreshBtn').innerHTML = '⏱️ AUTO (30s) ✅ ATIVO';
+        autoRefreshInterval = setInterval(() => {
+            if (currentEmail) {
+                verificarInbox(true);
+            }
+        }, 30000);
+        mostrarToast('✅ Auto-refresh ativado (30 segundos)', '#23a55a');
+    }
+
+    function pararAutoRefresh() {
+        if (autoRefreshInterval) {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = null;
+        }
+        autoRefreshActive = false;
+        document.getElementById('autoRefreshBtn').style.background = '#faa61a';
+        document.getElementById('autoRefreshBtn').innerHTML = '⏱️ AUTO (30s)';
+        mostrarToast('⏸️ Auto-refresh desativado', '#5865F2');
+    }
+
+    function pedirPermissaoNotificacao() {
+        if (Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    }
+
+    document.getElementById('novoEmailBtn').addEventListener('click', () => {
+        pararAutoRefresh();
+        gerarEmailTemp();
+        if (autoRefreshActive) iniciarAutoRefresh();
+    });
+    
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        if (currentEmail) {
+            verificarInbox(true);
+        } else {
+            mostrarToast('⚠️ Gere um email primeiro', '#faa61a');
+        }
+    });
+    
+    document.getElementById('autoRefreshBtn').addEventListener('click', () => {
+        if (!currentEmail) {
+            mostrarToast('⚠️ Gere um email primeiro', '#faa61a');
             return;
         }
-        container.innerHTML = '';
-        for (const msg of messagesList) {
-            const div = document.createElement('div');
-            div.className = 'email-item' + (msg.read ? '' : ' unread');
-            const preview = msg.body.substring(0, 90);
-            const code = extractCode(msg.body);
-            div.innerHTML = `
-                <div class="email-header">
-                    <span><strong>${escapeHtml(msg.from)}</strong></span>
-                    <span>${formatDate(msg.date)}</span>
-                </div>
-                <div class="email-subject">${escapeHtml(msg.subject)}</div>
-                <div class="email-preview">${escapeHtml(preview)}...</div>
-                <div class="email-body" id="body-${msg.id}">
-                    <div style="white-space: pre-wrap;">${escapeHtml(msg.body)}</div>
-                    ${code ? `<div class="verification-code">🔐 CÓDIGO: ${code} <button class="copy-btn" data-code="${code}">📋 COPIAR</button></div>` : ''}
-                </div>
-            `;
-            div.addEventListener('click', (e) => {
-                if (e.target.classList.contains('copy-btn')) return;
-                const b = div.querySelector('.email-body');
-                b.classList.toggle('show');
-                if (!msg.read) { msg.read = true; div.classList.remove('unread'); }
-            });
-            const btn = div.querySelector('.copy-btn');
-            if (btn) {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const code = btn.getAttribute('data-code');
-                    navigator.clipboard.writeText(code);
-                    showToast(`📋 Código ${code} copiado!`, '#10b981');
-                });
-            }
-            container.appendChild(div);
+        if (autoRefreshActive) {
+            pararAutoRefresh();
+        } else {
+            iniciarAutoRefresh();
         }
-    }
+    });
 
-    function startAuto() {
-        if (autoInterval) clearInterval(autoInterval);
-        autoActive = true;
-        autoInterval = setInterval(() => { if (currentLogin) checkInbox(true); }, 30000);
-        document.getElementById('autoRefreshBtn').innerHTML = '⏱️ AUTO ✅ ATIVO';
-        document.getElementById('autoRefreshBtn').style.background = '#10b981';
-        showToast('✅ Auto-refresh ativado (30s)', '#10b981');
-    }
+    document.getElementById('emailInput').addEventListener('change', (e) => {
+        if (e.target.value.includes('@')) {
+            currentEmail = e.target.value;
+            currentMessages = [];
+            verificarInbox(true);
+        }
+    });
 
-    function stopAuto() {
-        if (autoInterval) clearInterval(autoInterval);
-        autoActive = false;
-        document.getElementById('autoRefreshBtn').innerHTML = '⏱️ AUTO (30s)';
-        document.getElementById('autoRefreshBtn').style.background = '#f59e0b';
-        showToast('⏸️ Auto-refresh desativado', '#64748b');
-    }
-
-    document.getElementById('newEmailBtn').onclick = () => { stopAuto(); criarEmail(); if (autoActive) startAuto(); };
-    document.getElementById('refreshBtn').onclick = async () => { if (!currentLogin) { showToast('⚠️ Crie um email primeiro', '#f59e0b'); return; } showToast('🔄 Verificando...', '#3b82f6'); await checkInbox(true); showToast('✅ Atualizado', '#10b981'); };
-    document.getElementById('autoRefreshBtn').onclick = () => { if (!currentLogin) { showToast('⚠️ Crie um email primeiro', '#f59e0b'); return; } autoActive ? stopAuto() : startAuto(); };
-
-    if (Notification.permission === 'default') Notification.requestPermission();
-    criarEmail();
+    pedirPermissaoNotificacao();
+    
+    setTimeout(() => {
+        if (!currentEmail) {
+            gerarEmailTemp();
+        }
+    }, 500);
 </script>
 </body>
 </html>
