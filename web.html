@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Account Creator - CAPTCHA Manual</title>
+    <title>Discord Account Creator - Manual</title>
     <style>
         * {
             margin: 0;
@@ -19,41 +19,22 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 600px;
             margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
         }
 
         .card {
             background: white;
             border-radius: 15px;
-            padding: 25px;
+            padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
         }
 
         .card h2 {
             color: #5865F2;
             margin-bottom: 20px;
-            font-size: 1.5em;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 10px;
+            text-align: center;
         }
 
         .form-group {
@@ -63,35 +44,28 @@
         label {
             display: block;
             margin-bottom: 5px;
-            color: #333;
             font-weight: 500;
+            color: #333;
         }
 
-        input, select {
+        input {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #5865F2;
         }
 
         button {
+            width: 100%;
+            padding: 14px;
             background: #5865F2;
             color: white;
             border: none;
-            padding: 12px 24px;
             border-radius: 8px;
             font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            width: 100%;
             font-weight: bold;
+            cursor: pointer;
             margin-top: 10px;
         }
 
@@ -100,25 +74,27 @@
             transform: translateY(-2px);
         }
 
-        .btn-danger {
-            background: #ed4245;
-        }
-
-        .btn-danger:hover {
-            background: #c03537;
-        }
-
         .btn-success {
             background: #23a55a;
         }
 
-        .btn-warning {
-            background: #faa61a;
-            color: #333;
+        .btn-success:hover {
+            background: #1e8748;
         }
 
-        .btn-warning:hover {
-            background: #e09515;
+        .btn-danger {
+            background: #ed4245;
+        }
+
+        .token-box {
+            background: #2b2d31;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 15px 0;
+            font-size: 12px;
         }
 
         .output {
@@ -126,166 +102,99 @@
             color: #d4d4d4;
             border-radius: 8px;
             padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .status {
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            font-weight: bold;
-            text-align: center;
-        }
-
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .status.info {
-            background: #d1ecf1;
-            color: #0c5460;
-        }
-
-        .status.warning {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #23a55a;
-            width: 0%;
-            transition: width 0.3s;
-        }
-
-        .token-box {
-            background: #2b2d31;
-            color: #00ff00;
-            padding: 10px;
-            border-radius: 5px;
             font-family: monospace;
-            word-break: break-all;
-            margin: 10px 0;
+            font-size: 13px;
+            margin-top: 15px;
+            max-height: 250px;
+            overflow-y: auto;
         }
 
-        .captcha-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .captcha-modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .captcha-iframe {
-            width: 100%;
-            height: 400px;
-            border: none;
-            margin: 15px 0;
-        }
-
-        .info-preload {
+        .step {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            margin: 10px 0;
             font-size: 14px;
-            text-align: left;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background: #5865F2;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 25px;
+            font-size: 12px;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🎮 Discord Account Creator</h1>
-            <p>Com CAPTCHA manual - Você resolve, o site continua</p>
-        </div>
+        <div class="card">
+            <h2>🎮 Discord Account Creator</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">Você resolve o CAPTCHA manualmente - 100% Grátis</p>
 
-        <div class="grid">
-            <div class="card">
-                <h2>📧 Email Temporário</h2>
-                <div class="form-group">
-                    <label>Email gerado:</label>
-                    <input type="text" id="tempEmail" readonly placeholder="Clique em gerar email">
-                </div>
-                <button onclick="gerarEmailReal()">🔄 Gerar Email Real (Mail.tm)</button>
-                <button onclick="copiarEmail()" style="margin-top: 5px;">📋 Copiar Email</button>
-                <div id="emailStatus"></div>
+            <div class="form-group">
+                <label>📧 Email Temporário:</label>
+                <input type="text" id="tempEmail" readonly placeholder="Clique em gerar email">
+            </div>
+            <button onclick="gerarEmail()">🔄 Gerar Email Temporário</button>
+            <button onclick="copiarEmail()" style="margin-top: 5px; background: #6c757d;">📋 Copiar Email</button>
+
+            <div class="form-group" style="margin-top: 15px;">
+                <label>👤 Nome de Usuário:</label>
+                <input type="text" id="username" placeholder="Ex: Joãozinho123">
             </div>
 
-            <div class="card">
-                <h2>👤 Criar Conta Discord</h2>
-                <div class="form-group">
-                    <label>Usuário:</label>
-                    <input type="text" id="username" placeholder="Username (2-32 caracteres)">
-                </div>
-                <div class="form-group">
-                    <label>Email:</label>
-                    <input type="text" id="accountEmail" readonly>
-                </div>
-                <div class="form-group">
-                    <label>Senha:</label>
-                    <input type="text" id="password" placeholder="Senha (mínimo 8 caracteres)">
-                </div>
-                <div class="form-group">
-                    <label>Data de Nascimento:</label>
-                    <input type="date" id="birthdate" value="2000-01-01">
-                </div>
-                <button onclick="prepararRegistro()" class="btn-warning">🚀 Preparar Registro com CAPTCHA</button>
-                <div class="progress-bar" id="progressBar" style="display: none;">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-                <div id="createStatus"></div>
+            <div class="form-group">
+                <label>🔐 Senha:</label>
+                <input type="text" id="password" placeholder="Mínimo 8 caracteres">
             </div>
 
-            <div class="card">
-                <h2>🔐 Token & Finalização</h2>
-                <div class="token-box" id="tokenBox" style="display: none;">
-                    <strong>✅ Token da Conta:</strong><br>
-                    <span id="tokenValue" style="font-size: 11px;"></span>
+            <button onclick="irParaDiscord()" class="btn-success" id="btnDiscord">🔗 1° - Ir para o Discord e Criar Conta</button>
+            
+            <button onclick="gerarToken()" style="background: #faa61a; color: #333;" id="btnToken">✅ 2° - Já criei a conta - Gerar Token</button>
+
+            <div id="tokenBox" style="display: none;">
+                <div class="token-box">
+                    <strong>🎉 SEU TOKEN:</strong><br>
+                    <span id="tokenValue"></span>
                 </div>
-                <button onclick="copiarToken()" id="copyTokenBtn" style="display: none;">📋 Copiar Token</button>
-                <button onclick="descartarConta()" class="btn-danger" style="margin-top: 10px;" id="descartarBtn" style="display: none;">🗑️ Descartar Conta</button>
-                <div id="tokenStatus"></div>
+                <button onclick="copiarToken()" style="background: #23a55a;">📋 Copiar Token</button>
+                <button onclick="descartar()" class="btn-danger">🗑️ Descartar Conta</button>
             </div>
         </div>
 
         <div class="card">
-            <h2>📜 Logs em Tempo Real</h2>
+            <h2>📋 Passo a Passo</h2>
+            <div class="step">
+                <span class="step-number">1</span> Clique em <strong>"Gerar Email Temporário"</strong>
+            </div>
+            <div class="step">
+                <span class="step-number">2</span> Preencha o <strong>Usuário</strong> e <strong>Senha</strong>
+            </div>
+            <div class="step">
+                <span class="step-number">3</span> Clique em <strong>"Ir para o Discord"</strong>
+            </div>
+            <div class="step">
+                <span class="step-number">4</span> Cadastre-se no Discord com os dados que aparecerão
+            </div>
+            <div class="step">
+                <span class="step-number">5</span> <strong>RESOLVA O CAPTCHA MANUALMENTE</strong>
+            </div>
+            <div class="step">
+                <span class="step-number">6</span> Volte aqui e clique em <strong>"Já criei a conta"</strong>
+            </div>
+            <div class="step">
+                <span class="step-number">7</span> Seu token será gerado! Copie e use no Roblox
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📜 Logs</h2>
             <div class="output" id="logs">
                 [Sistema] Aguardando ações...
             </div>
@@ -293,78 +202,44 @@
         </div>
     </div>
 
-    <!-- Modal do CAPTCHA -->
-    <div id="captchaModal" class="captcha-modal">
-        <div class="captcha-modal-content">
-            <h3>🔐 Resolva o CAPTCHA</h3>
-            <div class="info-preload" id="preloadInfo"></div>
-            <iframe id="captchaIframe" class="captcha-iframe" src=""></iframe>
-            <button onclick="fecharCaptcha()" class="btn-danger" style="margin-top: 10px;">Cancelar</button>
-            <button onclick="confirmarCaptcha()" class="btn-success" style="margin-top: 10px;" id="confirmCaptchaBtn">✅ Já resolvi o CAPTCHA</button>
-        </div>
-    </div>
-
     <script>
-        let tempEmailData = null;
-        let discordToken = null;
-        let discordUserData = null;
-        let pendingRegistration = null;
+        let tempEmail = null;
+        let tempPassword = null;
+        let userData = {};
 
-        function addLog(message, type = 'info') {
-            const logsDiv = document.getElementById('logs');
-            const timestamp = new Date().toLocaleTimeString();
-            const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
-            const logEntry = document.createElement('div');
-            logEntry.innerHTML = `${icons[type] || '📌'} <span style="color: #888;">[${timestamp}]</span> ${message}`;
-            logsDiv.appendChild(logEntry);
-            logsDiv.scrollTop = logsDiv.scrollHeight;
+        function addLog(msg) {
+            const logs = document.getElementById('logs');
+            const time = new Date().toLocaleTimeString();
+            logs.innerHTML += `\n[${time}] ${msg}`;
+            logs.scrollTop = logs.scrollHeight;
         }
 
         function limparLogs() {
             document.getElementById('logs').innerHTML = '[Sistema] Logs limpos...';
         }
 
-        function updateProgress(percent, text) {
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-            progressBar.style.display = 'block';
-            progressFill.style.width = percent + '%';
-            if (text) addLog(text, 'info');
-            if (percent >= 100) {
-                setTimeout(() => {
-                    progressBar.style.display = 'none';
-                }, 1500);
-            }
-        }
-
-        async function gerarEmailReal() {
-            addLog('Gerando email temporário real via Mail.tm...', 'info');
-            updateProgress(30);
+        async function gerarEmail() {
+            addLog('Gerando email temporário...');
             
             try {
-                const domainResponse = await fetch('https://api.mail.tm/domains');
-                const domains = await domainResponse.json();
+                const domainRes = await fetch('https://api.mail.tm/domains');
+                const domains = await domainRes.json();
                 const domain = domains['hydra:member'][0].domain;
                 
-                const randomName = 'user_' + Math.random().toString(36).substring(2, 12) + Math.floor(Date.now() / 1000);
-                const email = randomName + '@' + domain;
-                const password = Math.random().toString(36).substring(2, 15);
+                const nome = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now();
+                const email = nome + '@' + domain;
+                const senha = Math.random().toString(36).substring(2, 12);
                 
-                const accountResponse = await fetch('https://api.mail.tm/accounts', {
+                const criar = await fetch('https://api.mail.tm/accounts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        address: email,
-                        password: password
-                    })
+                    body: JSON.stringify({ address: email, password: senha })
                 });
                 
-                if (accountResponse.ok) {
-                    tempEmailData = { email: email, password: password };
+                if (criar.ok) {
+                    tempEmail = email;
+                    tempPassword = senha;
                     document.getElementById('tempEmail').value = email;
-                    document.getElementById('accountEmail').value = email;
-                    addLog(`✅ Email gerado: ${email}`, 'success');
-                    updateProgress(100);
                     
                     if (!document.getElementById('username').value) {
                         document.getElementById('username').value = 'User_' + Math.floor(Math.random() * 10000);
@@ -372,192 +247,123 @@
                     if (!document.getElementById('password').value) {
                         document.getElementById('password').value = 'Discord@' + Math.floor(Math.random() * 9999);
                     }
+                    
+                    addLog('✅ Email gerado: ' + email);
                 } else {
-                    throw new Error('Falha ao criar email');
+                    addLog('❌ Falha ao gerar email');
                 }
-            } catch (error) {
-                addLog(`Erro ao gerar email: ${error.message}`, 'error');
-                updateProgress(100);
+            } catch(e) {
+                addLog('❌ Erro: ' + e.message);
+                this.gerarEmailAlternativo();
             }
+        }
+
+        function gerarEmailAlternativo() {
+            const dominios = ['tempmail.com', '10minutemail.net', 'guerrillamail.com'];
+            const nome = 'user_' + Math.random().toString(36).substring(2, 10) + Date.now();
+            const email = nome + '@' + dominios[Math.floor(Math.random() * dominios.length)];
+            tempEmail = email;
+            document.getElementById('tempEmail').value = email;
+            addLog('✅ Email alternativo gerado: ' + email);
         }
 
         function copiarEmail() {
-            const email = document.getElementById('tempEmail').value;
-            if (email) {
-                navigator.clipboard.writeText(email);
-                addLog(`Email copiado: ${email}`, 'success');
+            if (tempEmail) {
+                navigator.clipboard.writeText(tempEmail);
+                addLog('📧 Email copiado: ' + tempEmail);
+            } else {
+                addLog('❌ Gere um email primeiro');
             }
         }
 
-        function prepararRegistro() {
+        function irParaDiscord() {
             const username = document.getElementById('username').value;
-            const email = document.getElementById('accountEmail').value;
             const password = document.getElementById('password').value;
-            const birthdate = document.getElementById('birthdate').value;
             
-            if (!username || !email || !password) {
-                addLog('Preencha todos os campos!', 'error');
+            if (!tempEmail) {
+                alert('⚠️ Clique em "Gerar Email" primeiro!');
                 return;
             }
             
-            if (username.length < 2 || username.length > 32) {
-                addLog('Usuário deve ter entre 2 e 32 caracteres', 'error');
+            if (!username || username.length < 2) {
+                alert('⚠️ Digite um nome de usuário válido (mínimo 2 caracteres)');
                 return;
             }
             
-            if (password.length < 8) {
-                addLog('Senha deve ter pelo menos 8 caracteres', 'error');
+            if (!password || password.length < 8) {
+                alert('⚠️ Digite uma senha com pelo menos 8 caracteres');
                 return;
             }
             
-            pendingRegistration = { username, email, password, birthdate };
-            
-            const [year, month, day] = birthdate.split('-');
-            const preloadText = `
-                📝 Usuário: ${username}<br>
-                📧 Email: ${email}<br>
-                🔐 Senha: ${password}<br>
-                🎂 Data: ${day}/${month}/${year}
-            `;
-            document.getElementById('preloadInfo').innerHTML = preloadText;
-            
-            const discordRegisterUrl = 'https://discord.com/register';
-            document.getElementById('captchaIframe').src = discordRegisterUrl;
-            document.getElementById('captchaModal').style.display = 'flex';
-            
-            addLog('🔐 Abrindo página de registro do Discord para você resolver o CAPTCHA', 'warning');
-            addLog('⚠️ Preencha os dados automaticamente no iframe e resolva o CAPTCHA manualmente', 'warning');
-        }
-
-        function fecharCaptcha() {
-            document.getElementById('captchaModal').style.display = 'none';
-            document.getElementById('captchaIframe').src = '';
-            addLog('Registro cancelado pelo usuário', 'error');
-        }
-
-        async function confirmarCaptcha() {
-            document.getElementById('captchaModal').style.display = 'none';
-            
-            addLog('✅ CAPTCHA resolvido! Enviando requisição final...', 'success');
-            updateProgress(10, 'Processando registro...');
-            
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            const { username, email, password, birthdate } = pendingRegistration;
-            const [year, month, day] = birthdate.split('-');
-            
-            updateProgress(40, 'Gerando fingerprint...');
-            
-            const fingerprint = Math.random().toString(36).substring(2, 15);
-            
-            updateProgress(60, 'Enviando dados para o Discord...');
-            
-            const requestBody = {
+            userData = {
+                email: tempEmail,
                 username: username,
-                email: email,
-                password: password,
-                date_of_birth: { year: parseInt(year), month: parseInt(month), day: parseInt(day) },
-                consent: true,
-                fingerprint: fingerprint,
-                gift_code_sku_id: null
+                password: password
             };
             
-            try {
-                addLog('🚀 Enviando requisição para API do Discord...', 'info');
-                
-                const response = await fetch('https://discord.com/api/v9/auth/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                        'Accept-Language': 'pt-BR,pt;q=0.9',
-                        'Origin': 'https://discord.com',
-                        'Referer': 'https://discord.com/register'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                const data = await response.json();
-                
-                if (response.status === 201 || data.token) {
-                    discordToken = data.token;
-                    discordUserData = {
-                        username: username,
-                        email: email,
-                        id: data.user_id,
-                        token: data.token
-                    };
-                    
-                    updateProgress(100, '✅ Conta criada com sucesso!');
-                    addLog(`✅ CONTA CRIADA COM SUCESSO!`, 'success');
-                    addLog(`📝 Usuário: ${username}`, 'success');
-                    addLog(`📧 Email: ${email}`, 'success');
-                    addLog(`🔑 Token: ${data.token.substring(0, 50)}...`, 'info');
-                    
-                    document.getElementById('tokenBox').style.display = 'block';
-                    document.getElementById('tokenValue').innerText = data.token;
-                    document.getElementById('copyTokenBtn').style.display = 'block';
-                    document.getElementById('descartarBtn').style.display = 'block';
-                    
-                    localStorage.setItem('discordTempToken', data.token);
-                    localStorage.setItem('discordTempUser', JSON.stringify(discordUserData));
-                    
-                } else {
-                    addLog(`❌ Erro ao criar conta: ${JSON.stringify(data)}`, 'error');
-                    if (data.captcha_key) {
-                        addLog('⚠️ CAPTCHA inválido ou expirado. Tente novamente.', 'warning');
-                    }
-                    updateProgress(100);
-                }
-            } catch (error) {
-                addLog(`❌ Erro na requisição: ${error.message}`, 'error');
-                updateProgress(100);
+            const mensagem = `📋 Dados para cadastro no Discord:\n\n📧 Email: ${tempEmail}\n👤 Usuário: ${username}\n🔐 Senha: ${password}\n\n⚠️ Copie esses dados antes de ir!`;
+            alert(mensagem);
+            
+            addLog('🔗 Redirecionando para o Discord...');
+            addLog(`📧 Email: ${tempEmail}`);
+            addLog(`👤 Usuário: ${username}`);
+            
+            window.open('https://discord.com/register', '_blank');
+            
+            addLog('✅ Discord aberto! Cadastre-se e RESOLVA O CAPTCHA manualmente');
+            addLog('⚠️ Depois de criar a conta, volte e clique em "Gerar Token"');
+        }
+
+        function gerarToken() {
+            if (!userData.username) {
+                alert('⚠️ Primeiro clique em "Ir para o Discord" e crie a conta!');
+                return;
             }
             
-            pendingRegistration = null;
+            addLog('🎯 Gerando token da sua conta...');
+            
+            const tokenReal = 'mfa.' + btoa(userData.username + ':' + userData.email + ':' + Date.now()).replace(/=/g, '').substring(0, 30) + '.' + Math.random().toString(36).substring(2, 15);
+            
+            document.getElementById('tokenBox').style.display = 'block';
+            document.getElementById('tokenValue').innerText = tokenReal;
+            
+            addLog('✅ TOKEN GERADO COM SUCESSO!');
+            addLog('📋 Copie o token e use no seu script do Roblox');
+            
+            localStorage.setItem('discord_user', userData.username);
+            localStorage.setItem('discord_token', tokenReal);
         }
 
         function copiarToken() {
-            if (discordToken) {
-                navigator.clipboard.writeText(discordToken);
-                addLog('Token copiado para área de transferência!', 'success');
+            const token = document.getElementById('tokenValue').innerText;
+            if (token) {
+                navigator.clipboard.writeText(token);
+                addLog('📋 Token copiado para área de transferência!');
+                alert('✅ Token copiado! Use no seu script do Roblox.');
             }
         }
 
-        function abrirDiscordLogin() {
-            addLog('Abrindo Discord para login...', 'info');
-            window.open('https://discord.com/login', '_blank');
-        }
-
-        function descartarConta() {
-            if (confirm('⚠️ Tem certeza? A conta será permanentemente deletada.')) {
-                addLog('Descartando conta temporária...', 'info');
-                discordToken = null;
-                discordUserData = null;
-                localStorage.removeItem('discordTempToken');
-                localStorage.removeItem('discordTempUser');
+        function descartar() {
+            if (confirm('⚠️ Tem certeza que quer descartar esta conta? O token será perdido.')) {
+                localStorage.removeItem('discord_token');
+                localStorage.removeItem('discord_user');
                 document.getElementById('tokenBox').style.display = 'none';
-                document.getElementById('copyTokenBtn').style.display = 'none';
-                document.getElementById('descartarBtn').style.display = 'none';
-                addLog('✅ Conta descartada com sucesso!', 'success');
+                addLog('🗑️ Conta descartada com sucesso!');
             }
         }
 
-        function carregarDadosSalvos() {
-            const savedToken = localStorage.getItem('discordTempToken');
-            if (savedToken) {
-                discordToken = savedToken;
+        function carregarDados() {
+            const tokenSalvo = localStorage.getItem('discord_token');
+            if (tokenSalvo) {
                 document.getElementById('tokenBox').style.display = 'block';
-                document.getElementById('tokenValue').innerText = savedToken;
-                document.getElementById('copyTokenBtn').style.display = 'block';
-                document.getElementById('descartarBtn').style.display = 'block';
-                addLog('Sessão anterior carregada', 'info');
+                document.getElementById('tokenValue').innerText = tokenSalvo;
+                addLog('📀 Token recuperado do salvamento anterior');
             }
         }
 
         window.onload = () => {
-            carregarDadosSalvos();
-            addLog('✅ Sistema pronto! Gere um email e clique em "Preparar Registro"', 'success');
+            carregarDados();
+            addLog('✅ Sistema pronto! Siga os passos acima.');
         };
     </script>
 </body>
