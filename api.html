@@ -1,0 +1,40 @@
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const imgUrl = urlParams.get('url');
+const w = parseInt(urlParams.get('w')) || 64;
+const h = parseInt(urlParams.get('h')) || 64;
+
+if (!imgUrl) {
+    document.write(JSON.stringify({ error: 'missing url' }));
+} else {
+    fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(imgUrl)}`)
+        .then(res => res.blob())
+        .then(blob => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = w;
+                canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const imgData = ctx.getImageData(0, 0, w, h).data;
+                
+                const palette = [];
+                const paletteMap = {};
+                const indices = [];
+                
+                for (let i = 0; i < imgData.length; i += 4) {
+                    const key = `${imgData[i]},${imgData[i+1]},${imgData[i+2]}`;
+                    if (!paletteMap[key]) {
+                        paletteMap[key] = palette.length;
+                        palette.push([imgData[i], imgData[i+1], imgData[i+2]]);
+                    }
+                    indices.push(paletteMap[key]);
+                }
+                
+                document.write(JSON.stringify({ w, h, p: palette, i: indices }));
+            };
+            img.src = URL.createObjectURL(blob);
+        });
+}
+</script>
