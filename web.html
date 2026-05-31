@@ -3,624 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Navegador Multi-Telas - DPI e Configurações</title>
+    <title>Discord Creator - Multi Abas Navegador</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            user-select: none;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0f;
-            height: 100vh;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+
+        .floating-app {
+            width: 100%;
+            max-width: 550px;
+            margin: 0 auto;
+            background: rgba(30, 30, 47, 0.98);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid #5865F2;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        /* Barra superior */
-        .toolbar {
-            background: #1a1a2a;
-            padding: 8px 12px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #2a2a3a;
-        }
-
-        .url-bar {
-            flex: 1;
-            display: flex;
-            gap: 6px;
-            background: #0f0f1a;
-            border-radius: 30px;
-            padding: 4px 12px;
-            align-items: center;
-        }
-
-        .url-bar input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 14px;
-            padding: 8px 0;
-            outline: none;
-        }
-
-        .url-bar button {
-            background: #23a55a;
-            border: none;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .nav-btn {
+        .app-header {
             background: #5865F2;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .app-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .controls button {
+            background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            padding: 8px 14px;
-            border-radius: 25px;
             cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .controls button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .temp-email-box {
+            background: #0a0a0f;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #faa61a;
+        }
+
+        .temp-email-box h4 {
+            color: #faa61a;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .temp-email-display {
+            background: #1e1e2f;
+            padding: 12px;
+            border-radius: 12px;
+            font-family: monospace;
+            color: #00ff88;
+            word-break: break-all;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .dados-box {
+            background: #0a0a0f;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #2a2a3a;
+        }
+
+        .dados-box div {
+            margin: 8px 0;
+            word-break: break-all;
+        }
+
+        .dados-box label {
+            color: #5865F2;
             font-weight: bold;
         }
 
-        .settings-btn {
+        .dados-box span {
+            color: #00ff88;
+            font-family: monospace;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: #23a55a;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e8e4c;
+        }
+
+        .btn-secondary {
+            background: #1e1e2f;
+            color: #00ff88;
+            border: 1px solid #2a2a3a;
+        }
+
+        .btn-secondary:hover {
+            background: #2a2a3f;
+        }
+
+        .btn-warning {
             background: #faa61a;
             color: #1e1e2f;
         }
 
-        /* Botões de atalho */
-        .shortcuts {
-            display: flex;
-            gap: 6px;
-            padding: 6px 12px;
-            background: #1a1a2a;
-            overflow-x: auto;
+        .btn-warning:hover {
+            background: #e69500;
         }
 
-        .shortcuts button {
-            background: #0f0f1a;
-            border: none;
+        .btn-discord {
+            background: #5865F2;
             color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
         }
 
-        /* Container de abas (browsers) */
-        .tabs-container {
-            background: #1a1a2a;
-            display: flex;
-            gap: 2px;
-            overflow-x: auto;
-            padding: 5px 5px 0 5px;
+        .btn-discord:hover {
+            background: #4752c4;
         }
 
-        .tab {
-            background: #0f0f1a;
+        .btn-gmail {
+            background: #ea4335;
             color: white;
-            padding: 8px 16px;
-            border-radius: 12px 12px 0 0;
+        }
+
+        .btn-gmail:hover {
+            background: #d33426;
+        }
+
+        .btn-outlook {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-outlook:hover {
+            background: #005a9e;
+        }
+
+        .flex-buttons {
             display: flex;
-            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        .flex-buttons button {
+            flex: 1;
+            margin: 0;
+        }
+
+        .links-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #2a2a3a;
+        }
+
+        .links-section h4 {
+            color: #aaa;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .link-buttons {
+            display: flex;
             gap: 8px;
-            cursor: pointer;
-            min-width: 140px;
-            justify-content: space-between;
-            font-size: 12px;
+            flex-wrap: wrap;
         }
 
-        .tab.active {
-            background: #5865F2;
-        }
-
-        .tab button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0 5px;
-        }
-
-        .new-tab {
-            background: #23a55a;
-            border: none;
-            color: white;
-            padding: 6px 18px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        /* Área de conteúdo (browsers) */
-        .content-area {
+        .link-buttons button {
             flex: 1;
-            position: relative;
-        }
-
-        .browser-window {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            background: white;
-        }
-
-        .browser-window.active {
-            display: flex;
-        }
-
-        .browser-toolbar {
-            background: #2a2a3a;
-            padding: 4px 8px;
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .browser-toolbar input {
-            flex: 1;
-            background: #1e1e2f;
-            border: none;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
-
-        .browser-toolbar button {
-            background: #5865F2;
-            border: none;
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 11px;
-        }
-
-        .browser-frame {
-            flex: 1;
-            width: 100%;
-            border: none;
-        }
-
-        /* Modal de configurações */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #1e1e2f;
-            border-radius: 20px;
-            padding: 20px;
-            width: 90%;
-            max-width: 400px;
-            color: white;
-        }
-
-        .modal-content h3 {
-            margin-bottom: 15px;
-            color: #5865F2;
-        }
-
-        .modal-content label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-
-        .modal-content input, .modal-content select {
-            width: 100%;
+            min-width: 100px;
+            margin: 0;
             padding: 10px;
-            border-radius: 10px;
-            border: none;
-            background: #0f0f1a;
-            color: white;
-        }
-
-        .modal-content button {
-            margin-top: 15px;
-            background: #23a55a;
-            border: none;
-            padding: 10px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
+            font-size: 12px;
         }
 
         .toast {
             position: fixed;
-            bottom: 30px;
-            left: 20px;
-            right: 20px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             background: #1e1e2f;
             color: white;
-            padding: 12px;
-            border-radius: 30px;
-            text-align: center;
-            z-index: 9999;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 14px;
+            z-index: 100000;
             animation: fadeUp 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            white-space: nowrap;
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        .minimized .content {
+            display: none;
+        }
+
+        .minimized {
+            max-width: 200px;
+        }
+
+        .status-bar {
+            background: #1a1a2e;
+            padding: 10px;
+            font-size: 11px;
+            color: #aaa;
+            text-align: center;
+            border-radius: 0 0 28px 28px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .floating-app {
+                max-width: 100%;
+            }
+            
+            .toast {
+                white-space: normal;
+                text-align: center;
+                max-width: 90%;
+            }
+            
+            .link-buttons button {
+                min-width: 80px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="toolbar">
-    <div class="url-bar">
-        <input type="text" id="globalUrlInput" placeholder="Digite URL ou pesquise...">
-        <button id="globalGoBtn">IR</button>
+<div id="floatingApp" class="floating-app">
+    <div class="app-header">
+        <h3>🎮 Discord Creator Plus</h3>
+        <div class="controls">
+            <button id="minimizeBtn">─</button>
+        </div>
     </div>
-    <button id="globalBackBtn" class="nav-btn">◀</button>
-    <button id="globalForwardBtn" class="nav-btn">▶</button>
-    <button id="globalReloadBtn" class="nav-btn">🔄</button>
-    <button id="settingsBtn" class="nav-btn settings-btn">⚙️ DPI</button>
-</div>
-
-<div class="shortcuts">
-    <button data-url="https://cloud.vsphone.com/activation-code/shop/agent-apply">☁️ VSPhone</button>
-    <button data-url="https://temp-mail.org/pt/">📧 Temp Mail</button>
-    <button data-url="https://www.google.com">🔍 Google</button>
-    <button data-url="https://www.youtube.com">📺 YouTube</button>
-    <button data-url="https://www.roblox.com">🎮 Roblox</button>
-    <button data-url="https://discord.com/register">🎙️ Discord</button>
-    <button data-url="https://biel99lol.github.io/pixel/web.html">📧 Gerador</button>
-</div>
-
-<div class="tabs-container" id="tabsContainer"></div>
-<button id="newTabBtn" class="new-tab">+ NOVA ABA (Browser)</button>
-<div class="content-area" id="contentArea"></div>
-
-<!-- Modal Configurações DPI -->
-<div id="settingsModal" class="modal">
-    <div class="modal-content">
-        <h3>⚙️ Configurações de DPI / Zoom</h3>
-        <label>DPI (50% a 200%):</label>
-        <input type="range" id="dpiSlider" min="50" max="200" value="100" step="5">
-        <span id="dpiValue">100%</span>
+    
+    <div class="content">
+        <div class="temp-email-box">
+            <h4>📬 Email Temporário (Integrado)</h4>
+            <div class="temp-email-display" id="tempEmailDisplay">Clique em "Gerar Email"</div>
+            <div class="flex-buttons">
+                <button id="gerarEmailTempBtn" class="btn-warning">🔄 GERAR EMAIL</button>
+                <button id="copiarEmailTempBtn" class="btn-secondary">📋 COPIAR EMAIL</button>
+            </div>
+        </div>
         
-        <label>Zoom da Página (%):</label>
-        <input type="range" id="zoomSlider" min="30" max="200" value="100" step="5">
-        <span id="zoomValue">100%</span>
+        <div class="dados-box">
+            <div>👤 <label>USUÁRIO DISCORD:</label> <span id="username">---</span></div>
+            <div>🔐 <label>SENHA:</label> <span id="password">---</span></div>
+        </div>
         
-        <label>Modo Noturno:</label>
-        <select id="nightMode">
-            <option value="off">Desligado</option>
-            <option value="on">Ligado</option>
-        </select>
+        <button id="btnGerar" class="btn-primary">✨ GERAR CONTA COMPLETA</button>
         
-        <button id="saveSettingsBtn">Salvar e Aplicar</button>
-        <button id="closeModalBtn" style="background:#ed4245; margin-top:10px;">Fechar</button>
+        <div class="flex-buttons">
+            <button id="btnCopiar" class="btn-secondary">📋 COPIAR CONTA</button>
+            <button id="btnCopiarTudo" class="btn-secondary">📋 COPIAR TUDO</button>
+        </div>
+        
+        <div class="links-section">
+            <h4>🚀 Abrir em NOVA ABA do navegador:</h4>
+            <div class="link-buttons">
+                <button id="abrirDiscordBtn" class="btn-discord">🎮 Discord</button>
+                <button id="abrirGmailBtn" class="btn-gmail">📧 Gmail</button>
+                <button id="abrirOutlookBtn" class="btn-outlook">📧 Outlook</button>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            💡 Dica: Use o email temporário para se registrar no Discord, Gmail ou Outlook!
+        </div>
     </div>
 </div>
 
 <script>
-    let browsers = [];
-    let activeBrowserId = null;
-    let browserCounter = 0;
-    let settings = {
-        dpi: 100,
-        zoom: 100,
-        nightMode: 'off'
-    };
-
-    function mostrarToast(msg, cor = '#23a55a') {
+    let dadosAtuais = { username: '', password: '' };
+    let tempEmailAtual = '';
+    
+    function mostrarToast(msg, cor = '#1e1e2f') {
         const old = document.querySelector('.toast');
         if (old) old.remove();
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.style.background = cor;
-        toast.innerText = msg;
+        toast.innerHTML = msg;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+        setTimeout(() => toast.remove(), 3000);
     }
-
-    function aplicarDPI() {
-        document.body.style.zoom = settings.dpi + '%';
-        document.getElementById('dpiValue').innerText = settings.dpi + '%';
-        document.getElementById('dpiSlider').value = settings.dpi;
+    
+    function gerarEmailTemporario() {
+        const dominios = ['tempmail.com', 'guerrillamail.com', 'mailinator.com', '10minutemail.com', 'temp-mail.org', 'throwaway.com', 'dispostable.com', 'guerrillamail.net'];
+        const prefixos = ['user', 'discord', 'temp', 'mail', 'fast', 'quick', 'random', 'new', 'player', 'gamer'];
+        const random = Math.floor(Math.random() * 99999);
+        const randomNum = Math.floor(Math.random() * 999);
+        const prefixo = prefixos[Math.floor(Math.random() * prefixos.length)];
+        const dominio = dominios[Math.floor(Math.random() * dominios.length)];
+        tempEmailAtual = `${prefixo}${random}${randomNum}@${dominio}`;
+        document.getElementById('tempEmailDisplay').innerText = tempEmailAtual;
+        localStorage.setItem('temp_email', tempEmailAtual);
+        mostrarToast('📧 Email temporário gerado!', '#faa61a');
+        return tempEmailAtual;
     }
-
-    function aplicarZoomNoBrowser(browserId) {
-        const browser = browsers.find(b => b.id === browserId);
-        if (browser) {
-            const iframe = document.getElementById(browser.iframeId);
-            if (iframe) {
-                iframe.style.transform = `scale(${settings.zoom / 100})`;
-                iframe.style.transformOrigin = '0 0';
-                iframe.style.width = `${100 * 100 / settings.zoom}%`;
-                iframe.style.height = `${100 * 100 / settings.zoom}%`;
-            }
+    
+    function gerarNomeUsuario() {
+        const prefixos = ['Warrior', 'Dragon', 'Phoenix', 'Shadow', 'Light', 'Storm', 'Thunder', 'Crystal', 'Dark', 'Flame', 'Neon', 'Cyber', 'Alpha', 'Omega', 'Night', 'Frost'];
+        const sufixos = ['Rider', 'Hunter', 'Knight', 'Mage', 'Lord', 'Queen', 'King', 'Wolf', 'Eagle', 'Tiger', 'Blade', 'Star', 'Fury', 'Soul', 'Heart'];
+        const nums = Math.floor(Math.random() * 9999);
+        const prefix = prefixos[Math.floor(Math.random() * prefixos.length)];
+        const sufix = sufixos[Math.floor(Math.random() * sufixos.length)];
+        return `${prefix}${sufix}${nums}`;
+    }
+    
+    function gerarSenha() {
+        const maiusculas = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        const minusculas = 'abcdefghijkmnpqrstuvwxyz';
+        const numeros = '23456789';
+        const especiais = '!@#$%&*';
+        
+        let senha = '';
+        senha += maiusculas[Math.floor(Math.random() * maiusculas.length)];
+        senha += minusculas[Math.floor(Math.random() * minusculas.length)];
+        senha += numeros[Math.floor(Math.random() * numeros.length)];
+        senha += especiais[Math.floor(Math.random() * especiais.length)];
+        
+        for(let i = 0; i < 10; i++) {
+            const chars = minusculas + numeros;
+            senha += chars[Math.floor(Math.random() * chars.length)];
         }
+        
+        return senha.split('').sort(() => Math.random() - 0.5).join('');
     }
-
-    function aplicarZoomGlobal() {
-        browsers.forEach(b => aplicarZoomNoBrowser(b.id));
-        document.getElementById('zoomValue').innerText = settings.zoom + '%';
-        document.getElementById('zoomSlider').value = settings.zoom;
-    }
-
-    function aplicarModoNoturno() {
-        if (settings.nightMode === 'on') {
-            document.body.style.background = '#000';
-            document.body.style.backgroundColor = '#000';
-            const style = document.createElement('style');
-            style.id = 'nightModeStyle';
-            style.textContent = 'iframe { filter: invert(1) hue-rotate(180deg); }';
-            if (!document.getElementById('nightModeStyle')) document.head.appendChild(style);
-        } else {
-            const style = document.getElementById('nightModeStyle');
-            if (style) style.remove();
+    
+    function gerarContaCompleta() {
+        dadosAtuais.username = gerarNomeUsuario();
+        dadosAtuais.password = gerarSenha();
+        
+        document.getElementById('username').innerText = dadosAtuais.username;
+        document.getElementById('password').innerText = dadosAtuais.password;
+        
+        if (!tempEmailAtual) {
+            gerarEmailTemporario();
         }
-    }
-
-    function salvarSettings() {
-        localStorage.setItem('browser_settings', JSON.stringify(settings));
-        aplicarDPI();
-        aplicarZoomGlobal();
-        aplicarModoNoturno();
-        mostrarToast('✅ Configurações salvas!', '#23a55a');
-    }
-
-    function criarNovaBrowser(url = null) {
-        const browserId = 'browser_' + (++browserCounter);
-        const iframeId = 'iframe_' + browserId;
         
-        const browserDiv = document.createElement('div');
-        browserDiv.className = 'browser-window';
-        browserDiv.id = browserId;
+        mostrarToast('✅ Conta Discord gerada com sucesso!', '#23a55a');
         
-        browserDiv.innerHTML = `
-            <div class="browser-toolbar">
-                <input type="text" class="browser-url" id="url_${iframeId}" placeholder="Digite URL...">
-                <button class="browser-go" data-browser="${browserId}">IR</button>
-                <button class="browser-back" data-browser="${browserId}">◀</button>
-                <button class="browser-forward" data-browser="${browserId}">▶</button>
-                <button class="browser-reload" data-browser="${browserId}">🔄</button>
-            </div>
-            <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com/webhp?igu=1'}"></iframe>
-        `;
-        
-        document.getElementById('contentArea').appendChild(browserDiv);
-        
-        const iframe = document.getElementById(iframeId);
-        
-        const tabDiv = document.createElement('div');
-        tabDiv.className = 'tab';
-        tabDiv.id = 'tab_' + browserId;
-        tabDiv.innerHTML = `
-            <span>${url ? new URL(url).hostname : 'Nova aba'}</span>
-            <button class="close-tab" data-browser="${browserId}">✕</button>
-        `;
-        document.getElementById('tabsContainer').appendChild(tabDiv);
-        
-        browsers.push({
-            id: browserId,
-            iframeId: iframeId,
-            url: url || 'https://www.google.com/webhp?igu=1',
-            tabId: 'tab_' + browserId
-        });
-        
-        tabDiv.addEventListener('click', (e) => {
-            if (e.target.classList.contains('close-tab')) return;
-            ativarBrowser(browserId);
-        });
-        
-        const closeBtn = tabDiv.querySelector('.close-tab');
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            fecharBrowser(browserId);
-        });
-        
-        const goBtn = browserDiv.querySelector('.browser-go');
-        const urlInput = browserDiv.querySelector('.browser-url');
-        const backBtn = browserDiv.querySelector('.browser-back');
-        const forwardBtn = browserDiv.querySelector('.browser-forward');
-        const reloadBtn = browserDiv.querySelector('.browser-reload');
-        
-        urlInput.value = url || 'https://www.google.com/webhp?igu=1';
-        
-        goBtn.addEventListener('click', () => {
-            let newUrl = urlInput.value;
-            if (!newUrl.startsWith('http')) {
-                if (newUrl.includes('.')) newUrl = 'https://' + newUrl;
-                else newUrl = 'https://www.google.com/search?q=' + encodeURIComponent(newUrl);
-            }
-            iframe.src = newUrl;
-            urlInput.value = newUrl;
-            const b = browsers.find(b => b.id === browserId);
-            if (b) b.url = newUrl;
-            try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
-            mostrarToast('🔍 Carregando: ' + newUrl);
-        });
-        
-        backBtn.addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) { mostrarToast('Não foi possível voltar', '#ed4245'); } });
-        forwardBtn.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) { mostrarToast('Não foi possível avançar', '#ed4245'); } });
-        reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; mostrarToast('🔄 Recarregando'); });
-        
-        urlInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') goBtn.click();
-        });
-        
-        iframe.addEventListener('load', () => {
-            try {
-                const currentUrl = iframe.contentWindow.location.href;
-                urlInput.value = currentUrl;
-                const b = browsers.find(b => b.id === browserId);
-                if (b) b.url = currentUrl;
-                try { tabDiv.querySelector('span').textContent = new URL(currentUrl).hostname; } catch(e) {}
-            } catch(e) {}
-            aplicarZoomNoBrowser(browserId);
-        });
-        
-        ativarBrowser(browserId);
-        aplicarZoomNoBrowser(browserId);
-        return browserId;
-    }
-
-    function ativarBrowser(browserId) {
-        activeBrowserId = browserId;
-        browsers.forEach(b => {
-            const browser = document.getElementById(b.id);
-            if (browser) browser.classList.remove('active');
-            const tab = document.getElementById(b.tabId);
-            if (tab) tab.classList.remove('active');
-        });
-        document.getElementById(browserId).classList.add('active');
-        document.getElementById('tab_' + browserId).classList.add('active');
-        
-        const browser = browsers.find(b => b.id === browserId);
-        if (browser) {
-            const iframe = document.getElementById(browser.iframeId);
-            try {
-                const currentUrl = iframe.contentWindow.location.href;
-                if (currentUrl && currentUrl !== 'about:blank') {
-                    document.getElementById('globalUrlInput').value = currentUrl;
-                }
-            } catch(e) {
-                document.getElementById('globalUrlInput').value = browser.url;
-            }
-        }
-    }
-
-    function fecharBrowser(browserId) {
-        const index = browsers.findIndex(b => b.id === browserId);
-        if (index === -1) return;
-        const browser = browsers[index];
-        const browserDiv = document.getElementById(browser.id);
-        if (browserDiv) browserDiv.remove();
-        const tabDiv = document.getElementById(browser.tabId);
-        if (tabDiv) tabDiv.remove();
-        
-        browsers.splice(index, 1);
-        
-        if (browsers.length === 0) {
-            criarNovaBrowser('https://www.google.com/webhp?igu=1');
-        } else if (activeBrowserId === browserId) {
-            const nextIndex = index > 0 ? index - 1 : 0;
-            ativarBrowser(browsers[nextIndex].id);
-        }
-        mostrarToast('Browser fechado', '#5865F2');
-    }
-
-    function acaoGlobal(tipo) {
-        if (!activeBrowserId) return;
-        const browser = browsers.find(b => b.id === activeBrowserId);
-        if (!browser) return;
-        const iframe = document.getElementById(browser.iframeId);
-        if (tipo === 'back') { try { iframe.contentWindow.history.back(); } catch(e) { mostrarToast('Erro', '#ed4245'); } }
-        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); } catch(e) { mostrarToast('Erro', '#ed4245'); } }
-        else if (tipo === 'reload') { iframe.src = iframe.src; mostrarToast('🔄 Recarregado'); }
-    }
-
-    document.getElementById('globalGoBtn').addEventListener('click', () => {
-        if (!activeBrowserId) return;
-        let url = document.getElementById('globalUrlInput').value;
-        if (!url.startsWith('http')) {
-            if (url.includes('.')) url = 'https://' + url;
-            else url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-        }
-        const browser = browsers.find(b => b.id === activeBrowserId);
-        if (browser) {
-            const iframe = document.getElementById(browser.iframeId);
-            iframe.src = url;
-            browser.url = url;
-            const tab = document.getElementById(browser.tabId);
-            try { tab.querySelector('span').textContent = new URL(url).hostname; } catch(e) {}
-            mostrarToast('🔍 Carregando: ' + url);
-        }
-    });
-    
-    document.getElementById('globalUrlInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') document.getElementById('globalGoBtn').click();
-    });
-    
-    document.getElementById('globalBackBtn').addEventListener('click', () => acaoGlobal('back'));
-    document.getElementById('globalForwardBtn').addEventListener('click', () => acaoGlobal('forward'));
-    document.getElementById('globalReloadBtn').addEventListener('click', () => acaoGlobal('reload'));
-    document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser('https://www.google.com/webhp?igu=1'));
-    
-    document.querySelectorAll('.shortcuts button').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const url = btn.getAttribute('data-url');
-            if (url && activeBrowserId) {
-                const browser = browsers.find(b => b.id === activeBrowserId);
-                if (browser) {
-                    const iframe = document.getElementById(browser.iframeId);
-                    iframe.src = url;
-                    browser.url = url;
-                    mostrarToast('🌐 Carregando atalho: ' + url);
-                }
-            }
-        });
-    });
-    
-    const modal = document.getElementById('settingsModal');
-    document.getElementById('settingsBtn').addEventListener('click', () => {
-        document.getElementById('dpiSlider').value = settings.dpi;
-        document.getElementById('zoomSlider').value = settings.zoom;
-        document.getElementById('nightMode').value = settings.nightMode;
-        modal.style.display = 'flex';
-    });
-    
-    document.getElementById('closeModalBtn').addEventListener('click', () => { modal.style.display = 'none'; });
-    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-        settings.dpi = parseInt(document.getElementById('dpiSlider').value);
-        settings.zoom = parseInt(document.getElementById('zoomSlider').value);
-        settings.nightMode = document.getElementById('nightMode').value;
-        salvarSettings();
-        modal.style.display = 'none';
-    });
-    
-    document.getElementById('dpiSlider').addEventListener('input', (e) => {
-        document.getElementById('dpiValue').innerText = e.target.value + '%';
-    });
-    document.getElementById('zoomSlider').addEventListener('input', (e) => {
-        document.getElementById('zoomValue').innerText = e.target.value + '%';
-    });
-    
-    const saved = localStorage.getItem('browser_settings');
-    if (saved) {
         try {
-            const s = JSON.parse(saved);
-            settings.dpi = s.dpi || 100;
-            settings.zoom = s.zoom || 100;
-            settings.nightMode = s.nightMode || 'off';
+            localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
         } catch(e) {}
     }
-    aplicarDPI();
-    aplicarZoomGlobal();
-    aplicarModoNoturno();
     
-    criarNovaBrowser('https://www.google.com/webhp?igu=1');
-    mostrarToast('✅ Navegador Multi-Browsers pronto! Várias abas, DPI, zoom, VSPhone, Temp Mail.', '#23a55a');
+    async function copiarDados() {
+        if (!dadosAtuais.username || dadosAtuais.username === '---') {
+            mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
+            return;
+        }
+        
+        const texto = `👤 Usuário Discord: ${dadosAtuais.username}\n🔐 Senha: ${dadosAtuais.password}`;
+        
+        try {
+            await navigator.clipboard.writeText(texto);
+            mostrarToast('📋 Dados da conta copiados!', '#5865F2');
+        } catch(err) {
+            mostrarToast('❌ Erro ao copiar dados', '#ed4245');
+        }
+    }
+    
+    async function copiarTudo() {
+        if (!dadosAtuais.username || dadosAtuais.username === '---') {
+            mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
+            return;
+        }
+        
+        if (!tempEmailAtual) {
+            gerarEmailTemporario();
+        }
+        
+        const texto = `📧 Email Temporário: ${tempEmailAtual}\n👤 Usuário Discord: ${dadosAtuais.username}\n🔐 Senha: ${dadosAtuais.password}\n\n🌐 Use o email temporário para se registrar no Discord/Gmail/Outlook!`;
+        
+        try {
+            await navigator.clipboard.writeText(texto);
+            mostrarToast('📋 Email temp + conta copiados!', '#23a55a');
+        } catch(err) {
+            mostrarToast('❌ Erro ao copiar', '#ed4245');
+        }
+    }
+    
+    function abrirNovaAba(url, nomeSite) {
+        window.open(url, '_blank');
+        mostrarToast(`🔗 Abrindo ${nomeSite} em nova aba...`, '#5865F2');
+    }
+    
+    function carregarDados() {
+        try {
+            const salvos = localStorage.getItem('discord_dados');
+            if (salvos) {
+                dadosAtuais = JSON.parse(salvos);
+                document.getElementById('username').innerText = dadosAtuais.username;
+                document.getElementById('password').innerText = dadosAtuais.password;
+            } else {
+                gerarContaCompleta();
+            }
+            
+            const emailSalvo = localStorage.getItem('temp_email');
+            if (emailSalvo) {
+                tempEmailAtual = emailSalvo;
+                document.getElementById('tempEmailDisplay').innerText = tempEmailAtual;
+            } else {
+                gerarEmailTemporario();
+            }
+        } catch(e) {
+            gerarContaCompleta();
+            gerarEmailTemporario();
+        }
+    }
+    
+    let isMinimized = false;
+    const appDiv = document.getElementById('floatingApp');
+    const minimizeBtn = document.getElementById('minimizeBtn');
+    
+    minimizeBtn.addEventListener('click', () => {
+        if (isMinimized) {
+            appDiv.classList.remove('minimized');
+            minimizeBtn.textContent = '─';
+            appDiv.style.maxWidth = '550px';
+        } else {
+            appDiv.classList.add('minimized');
+            minimizeBtn.textContent = '□';
+            appDiv.style.maxWidth = '200px';
+        }
+        isMinimized = !isMinimized;
+    });
+    
+    document.getElementById('btnGerar').onclick = () => gerarContaCompleta();
+    document.getElementById('btnCopiar').onclick = () => copiarDados();
+    document.getElementById('btnCopiarTudo').onclick = () => copiarTudo();
+    document.getElementById('gerarEmailTempBtn').onclick = () => gerarEmailTemporario();
+    document.getElementById('copiarEmailTempBtn').onclick = () => {
+        if (tempEmailAtual) {
+            navigator.clipboard.writeText(tempEmailAtual);
+            mostrarToast('📧 Email temporário copiado!', '#faa61a');
+        } else {
+            mostrarToast('⚠️ Gere um email primeiro', '#faa61a');
+        }
+    };
+    
+    document.getElementById('abrirDiscordBtn').onclick = () => abrirNovaAba('https://discord.com/register', 'Discord');
+    document.getElementById('abrirGmailBtn').onclick = () => abrirNovaAba('https://accounts.google.com/signup', 'Gmail');
+    document.getElementById('abrirOutlookBtn').onclick = () => abrirNovaAba('https://signup.live.com', 'Outlook');
+    
+    carregarDados();
 </script>
 </body>
 </html>
