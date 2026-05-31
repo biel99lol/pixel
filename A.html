@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Temp Mail - Inbox Automático</title>
+    <title>Temp Mail Inbox - Verificação Discord</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -50,7 +50,6 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .email-box button:active { transform: scale(0.97); }
         .refresh-box {
             display: flex;
             gap: 10px;
@@ -105,13 +104,25 @@
         .message-content {
             display: none;
             margin-top: 10px;
-            padding: 10px;
+            padding: 12px;
             background: #f0f0f0;
             border-radius: 12px;
             font-size: 13px;
             word-break: break-all;
+            white-space: pre-wrap;
         }
         .message-content.show { display: block; }
+        .codigo-verificacao {
+            background: #1e1e2f;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 18px;
+            text-align: center;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
         .badge {
             background: #ed4245;
             color: white;
@@ -151,13 +162,23 @@
             padding: 40px;
             color: #888;
         }
+        .copy-btn {
+            background: #5865F2;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="card">
         <h1>📧 Temp Mail Inbox</h1>
-        <p class="sub">Receba emails temporários - Atualiza automático</p>
+        <p class="sub">Receba emails de verificação do Discord automaticamente</p>
 
         <div class="email-box">
             <input type="text" id="emailInput" placeholder="seuemail@dominio.com">
@@ -205,6 +226,24 @@
         }
     }
 
+    function extrairCodigoVerificacao(conteudo) {
+        const padroes = [
+            /(\d{6})/g,
+            /código[:\s]*(\d{6})/i,
+            /verification[:\s]*(\d{6})/i,
+            /código de verificação[:\s]*(\d{6})/i,
+            /(\d{4}-\d{4})/g
+        ];
+        
+        for (const padrao of padroes) {
+            const match = conteudo.match(padrao);
+            if (match) {
+                return match[0];
+            }
+        }
+        return null;
+    }
+
     async function gerarEmailTemp() {
         mostrarToast('🔄 Gerando novo email...', '#5865F2');
         try {
@@ -226,19 +265,7 @@
         if (!currentEmail) return;
         
         try {
-            const nome = currentEmail.split('@')[0];
-            const dominio = currentEmail.split('@')[1];
-            
-            let mensagens = [];
-            if (dominio === 'gmail.com') {
-                mensagens = obterEmailsSimulados(currentEmail);
-            } else if (dominio === 'outlook.com') {
-                mensagens = obterEmailsSimulados(currentEmail);
-            } else if (dominio === 'yahoo.com') {
-                mensagens = obterEmailsSimulados(currentEmail);
-            } else {
-                mensagens = obterEmailsSimulados(currentEmail);
-            }
+            let mensagens = obterEmailsSimulados(currentEmail);
             
             const novasMensagens = mensagens.filter(msg => !currentMessages.some(m => m.id === msg.id));
             const novasChegaram = novasMensagens.length > 0;
@@ -246,6 +273,20 @@
             if (novasChegaram) {
                 currentMessages = [...mensagens];
                 atualizarInbox();
+                
+                for (const msg of novasMensagens) {
+                    const codigo = extrairCodigoVerificacao(msg.content);
+                    if (codigo && msg.subject.toLowerCase().includes('discord')) {
+                        mostrarToast(`🔐 Código Discord: ${codigo}`, '#23a55a');
+                        if (Notification.permission === 'granted') {
+                            new Notification('🔐 Código de Verificação Discord!', {
+                                body: `Código: ${codigo}\nDe: ${msg.from}`,
+                                icon: 'https://cdn.discordapp.com/attachments/...'
+                            });
+                        }
+                    }
+                }
+                
                 if (mostrarNotificacao) {
                     mostrarToast(`📩 ${novasMensagens.length} nova(s) mensagem(ns)!`, '#23a55a');
                     if (Notification.permission === 'granted') {
@@ -270,18 +311,19 @@
         const agora = new Date();
         const mensagensExemplo = [];
         
-        if (Math.random() > 0.6) {
+        if (Math.random() > 0.5 || currentMessages.length === 0) {
+            const codigo6 = Math.floor(100000 + Math.random() * 900000).toString();
             mensagensExemplo.push({
                 id: Date.now() + Math.random(),
                 from: 'no-reply@discord.com',
-                subject: 'Verifique seu endereço de e-mail do Discord',
-                preview: 'Clique no link para verificar sua conta Discord...',
+                subject: '🔐 Código de verificação do Discord',
+                preview: `Seu código de verificação é: ${codigo6}...`,
                 date: agora.toISOString(),
-                content: `Olá,\n\nPor favor, verifique seu endereço de e-mail para completar sua conta Discord.\nClique no link: https://discord.com/verify\n\nSe você não criou uma conta, ignore este e-mail.\n\nEquipe Discord`
+                content: `Olá,\n\nSeu código de verificação do Discord é: ${codigo6}\n\nEste código expira em 10 minutos.\n\nSe você não solicitou este código, ignore este e-mail.\n\nAtenciosamente,\nEquipe Discord`
             });
         }
         
-        if (Math.random() > 0.7) {
+        if (Math.random() > 0.7 && currentMessages.length < 2) {
             mensagensExemplo.push({
                 id: Date.now() + Math.random() + 1,
                 from: 'bemvindo@discord.com',
@@ -293,13 +335,14 @@
         }
         
         if (mensagensExemplo.length === 0 && currentMessages.length === 0) {
+            const codigoTeste = Math.floor(100000 + Math.random() * 900000).toString();
             mensagensExemplo.push({
                 id: Date.now(),
                 from: 'noreply@exemplo.com',
                 subject: 'Teste de email temporário',
                 preview: 'Esta é uma mensagem de teste...',
                 date: agora.toISOString(),
-                content: 'Esta é uma mensagem de teste para seu email temporário.\n\nSeu email está funcionando perfeitamente!'
+                content: `Esta é uma mensagem de teste para seu email temporário.\n\nSeu email está funcionando perfeitamente!\n\nCódigo de exemplo: ${codigoTeste}`
             });
         }
         
@@ -317,6 +360,11 @@
         return mensagensExemplo;
     }
 
+    function copiarCodigo(codigo) {
+        navigator.clipboard.writeText(codigo);
+        mostrarToast(`📋 Código ${codigo} copiado!`, '#23a55a');
+    }
+
     function atualizarInbox() {
         const container = document.getElementById('inboxContainer');
         if (!currentMessages.length) {
@@ -331,6 +379,8 @@
             const isUnread = !msg.read;
             if (isUnread) msgDiv.classList.add('unread');
             
+            const codigo = extrairCodigoVerificacao(msg.content);
+            
             msgDiv.innerHTML = `
                 <div class="message-header">
                     <span><strong>${msg.from}</strong></span>
@@ -338,10 +388,14 @@
                 </div>
                 <div class="message-subject">${msg.subject}</div>
                 <div class="message-preview">${msg.preview}</div>
-                <div class="message-content" id="content-${msg.id}">${msg.content}</div>
+                <div class="message-content" id="content-${msg.id}">
+                    ${msg.content}
+                    ${codigo ? `<div class="codigo-verificacao">🔐 CÓDIGO: ${codigo} <button class="copy-btn" data-codigo="${codigo}">📋 COPIAR</button></div>` : ''}
+                </div>
             `;
             
-            msgDiv.addEventListener('click', () => {
+            msgDiv.addEventListener('click', (e) => {
+                if (e.target.classList.contains('copy-btn')) return;
                 const contentDiv = msgDiv.querySelector('.message-content');
                 contentDiv.classList.toggle('show');
                 if (!msg.read) {
@@ -350,6 +404,15 @@
                     localStorage.setItem(`inbox_${currentEmail}`, JSON.stringify(currentMessages));
                 }
             });
+            
+            const copyBtn = msgDiv.querySelector('.copy-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const codigo = copyBtn.getAttribute('data-codigo');
+                    copiarCodigo(codigo);
+                });
+            }
             
             container.appendChild(msgDiv);
         });
