@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<script>
+const url = new URLSearchParams(location.search);
+const img = url.get('url');
+const w = url.get('w') || 64;
+const h = url.get('h') || 64;
+
+fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(img)}`)
+    .then(r => r.blob())
+    .then(blob => {
+        const img2 = new Image();
+        img2.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = w;
+            c.height = h;
+            const ctx = c.getContext('2d');
+            ctx.drawImage(img2, 0, 0, w, h);
+            const d = ctx.getImageData(0, 0, w, h).data;
+            const p = [];
+            const pm = {};
+            const i = [];
+            for (let i2 = 0; i2 < d.length; i2 += 4) {
+                const k = d[i2] + ',' + d[i2+1] + ',' + d[i2+2];
+                if (!pm[k]) { pm[k] = p.length; p.push([d[i2], d[i2+1], d[i2+2]]); }
+                i.push(pm[k]);
+            }
+            fetch('https://hastebin.com/documents', {
+                method: 'POST',
+                body: JSON.stringify({w:parseInt(w), h:parseInt(h), p, i})
+            }).then(r2 => r2.json()).then(d2 => {
+                document.write('https://hastebin.com/raw/' + d2.key);
+            });
+        };
+        img2.src = URL.createObjectURL(blob);
+    });
+</script>
+</body>
+</html>
