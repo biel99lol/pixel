@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Discord Creator Plus - Inbox de Email Integrada</title>
+    <title>Discord Creator - Multi Abas Navegador</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,7 @@
 
         .floating-app {
             width: 100%;
-            max-width: 900px;
+            max-width: 550px;
             margin: 0 auto;
             background: rgba(30, 30, 47, 0.98);
             backdrop-filter: blur(12px);
@@ -72,43 +72,22 @@
 
         .content {
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
         }
 
-        /* Layout duas colunas para email e conta */
-        .two-columns {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .email-panel {
-            flex: 1.2;
-            min-width: 260px;
+        .temp-email-box {
             background: #0a0a0f;
-            border-radius: 24px;
-            padding: 16px;
-            border: 1px solid #2a2a3a;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #faa61a;
         }
 
-        .account-panel {
-            flex: 1;
-            min-width: 240px;
-            background: #0a0a0f;
-            border-radius: 24px;
-            padding: 16px;
-            border: 1px solid #2a2a3a;
-        }
-
-        .temp-email-box h4, .inbox-box h4, .dados-box h4 {
+        .temp-email-box h4 {
             color: #faa61a;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.95rem;
         }
 
         .temp-email-display {
@@ -120,15 +99,19 @@
             word-break: break-all;
             margin: 10px 0;
             font-size: 13px;
+        }
+
+        .dados-box {
+            background: #0a0a0f;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 15px;
             border: 1px solid #2a2a3a;
         }
 
         .dados-box div {
-            margin: 10px 0;
+            margin: 8px 0;
             word-break: break-all;
-            background: #1e1e2f;
-            padding: 8px 12px;
-            border-radius: 12px;
         }
 
         .dados-box label {
@@ -139,19 +122,18 @@
         .dados-box span {
             color: #00ff88;
             font-family: monospace;
-            display: block;
-            margin-top: 4px;
         }
 
         button {
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             border: none;
             border-radius: 40px;
             font-weight: bold;
-            margin: 6px 0;
+            margin: 8px 0;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 13px;
+            font-size: 14px;
         }
 
         button:active {
@@ -195,6 +177,24 @@
             background: #4752c4;
         }
 
+        .btn-gmail {
+            background: #ea4335;
+            color: white;
+        }
+
+        .btn-gmail:hover {
+            background: #d33426;
+        }
+
+        .btn-outlook {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-outlook:hover {
+            background: #005a9e;
+        }
+
         .flex-buttons {
             display: flex;
             gap: 10px;
@@ -206,124 +206,30 @@
             margin: 0;
         }
 
-        /* Estilos da inbox */
-        .inbox-container {
-            background: #0e0e16;
-            border-radius: 20px;
-            margin-top: 12px;
-            max-height: 320px;
-            overflow-y: auto;
+        .links-section {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #2a2a3a;
         }
 
-        .inbox-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .links-section h4 {
+            color: #aaa;
             margin-bottom: 10px;
-        }
-
-        .inbox-header span {
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        .message-list {
-            list-style: none;
-        }
-
-        .message-item {
-            background: #1a1a2a;
-            margin-bottom: 8px;
-            padding: 12px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: 0.1s;
-            border-left: 3px solid #5865F2;
-        }
-
-        .message-item:hover {
-            background: #2a2a3a;
-        }
-
-        .message-subject {
-            font-weight: bold;
-            color: #ffffff;
             font-size: 13px;
         }
 
-        .message-from {
-            font-size: 11px;
-            color: #aaa;
-            margin-top: 4px;
-        }
-
-        .message-preview {
-            font-size: 11px;
-            color: #88aaff;
-            margin-top: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .message-date {
-            font-size: 10px;
-            color: #6c6c8c;
-            text-align: right;
-            margin-top: 6px;
-        }
-
-        .empty-inbox {
-            text-align: center;
-            padding: 30px;
-            color: #aaa;
-            font-size: 13px;
-        }
-
-        .modal-message {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+        .link-buttons {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
-        .modal-card {
-            background: #1e1e2f;
-            max-width: 500px;
-            width: 90%;
-            border-radius: 28px;
-            padding: 20px;
-            border: 1px solid #5865F2;
-            color: white;
-        }
-
-        .modal-card h3 {
-            color: #faa61a;
-            margin-bottom: 12px;
-        }
-
-        .modal-card .modal-body {
-            max-height: 400px;
-            overflow-y: auto;
-            background: #0a0a0f;
-            padding: 12px;
-            border-radius: 16px;
-            font-family: monospace;
-            font-size: 13px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .close-modal {
-            background: #ed4245;
-            margin-top: 15px;
+        .link-buttons button {
+            flex: 1;
+            min-width: 100px;
+            margin: 0;
+            padding: 10px;
+            font-size: 12px;
         }
 
         .toast {
@@ -370,27 +276,23 @@
             border-radius: 0 0 28px 28px;
         }
 
-        .refresh-inbox {
-            background: #5865F2;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 11px;
-            color: white;
-            border: none;
-            margin-left: 8px;
-        }
-
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
             body {
                 padding: 10px;
             }
-            .two-columns {
-                flex-direction: column;
+            
+            .floating-app {
+                max-width: 100%;
             }
+            
             .toast {
                 white-space: normal;
                 text-align: center;
                 max-width: 90%;
+            }
+            
+            .link-buttons button {
+                min-width: 80px;
             }
         }
     </style>
@@ -398,285 +300,77 @@
 <body>
 <div id="floatingApp" class="floating-app">
     <div class="app-header">
-        <h3>🎮 Discord Creator Plus | Inbox Ativa</h3>
+        <h3>🎮 Discord Creator Plus</h3>
         <div class="controls">
             <button id="minimizeBtn">─</button>
         </div>
     </div>
     
     <div class="content">
-        <div class="two-columns">
-            <!-- Painel de Email Temporário + Inbox -->
-            <div class="email-panel">
-                <div class="temp-email-box">
-                    <h4>📬 Email Temporário (Inbox Real)</h4>
-                    <div class="temp-email-display" id="tempEmailDisplay">Clique em "Gerar Email"</div>
-                    <div class="flex-buttons">
-                        <button id="gerarEmailTempBtn" class="btn-warning">🔄 GERAR NOVO EMAIL</button>
-                        <button id="copiarEmailTempBtn" class="btn-secondary">📋 COPIAR EMAIL</button>
-                    </div>
-                </div>
-                
-                <div class="inbox-box">
-                    <div class="inbox-header">
-                        <h4>📥 CAIXA DE ENTRADA (códigos de verificação)</h4>
-                        <button id="refreshInboxBtn" class="refresh-inbox">⟳ ATUALIZAR</button>
-                    </div>
-                    <div id="inboxContainer" class="inbox-container">
-                        <div class="empty-inbox">📭 Nenhum e-mail ainda. Aguarde ou gere um novo email e use para registrar no Discord/Gmail etc.</div>
-                    </div>
-                    <div class="status-bar" style="margin-top: 8px; font-size: 10px;">
-                        💡 Os e-mails chegam automaticamente (simulado via API pública). Para testes reais, use o email no Discord!
-                    </div>
-                </div>
+        <div class="temp-email-box">
+            <h4>📬 Email Temporário (Integrado)</h4>
+            <div class="temp-email-display" id="tempEmailDisplay">Clique em "Gerar Email"</div>
+            <div class="flex-buttons">
+                <button id="gerarEmailTempBtn" class="btn-warning">🔄 GERAR EMAIL</button>
+                <button id="copiarEmailTempBtn" class="btn-secondary">📋 COPIAR EMAIL</button>
             </div>
-            
-            <!-- Painel da Conta Discord -->
-            <div class="account-panel">
-                <div class="dados-box">
-                    <h4>🎮 Conta Discord Gerada</h4>
-                    <div>👤 <label>USUÁRIO DISCORD:</label> <span id="username">---</span></div>
-                    <div>🔐 <label>SENHA:</label> <span id="password">---</span></div>
-                </div>
-                
-                <button id="btnGerar" class="btn-primary">✨ GERAR CONTA COMPLETA</button>
-                
-                <div class="flex-buttons">
-                    <button id="btnCopiar" class="btn-secondary">📋 COPIAR CONTA</button>
-                    <button id="btnCopiarTudo" class="btn-secondary">📋 COPIAR TUDO (c/ email)</button>
-                </div>
-                
-                <div class="links-section" style="margin-top: 15px;">
-                    <h4>🚀 Abrir em NOVA ABA:</h4>
-                    <div class="link-buttons" style="display: flex; gap: 8px;">
-                        <button id="abrirDiscordBtn" class="btn-discord">🎮 Discord Reg</button>
-                        <button id="abrirGmailBtn" class="btn-gmail">📧 Gmail</button>
-                        <button id="abrirOutlookBtn" class="btn-outlook">📧 Outlook</button>
-                    </div>
-                </div>
+        </div>
+        
+        <div class="dados-box">
+            <div>👤 <label>USUÁRIO DISCORD:</label> <span id="username">---</span></div>
+            <div>🔐 <label>SENHA:</label> <span id="password">---</span></div>
+        </div>
+        
+        <button id="btnGerar" class="btn-primary">✨ GERAR CONTA COMPLETA</button>
+        
+        <div class="flex-buttons">
+            <button id="btnCopiar" class="btn-secondary">📋 COPIAR CONTA</button>
+            <button id="btnCopiarTudo" class="btn-secondary">📋 COPIAR TUDO</button>
+        </div>
+        
+        <div class="links-section">
+            <h4>🚀 Abrir em NOVA ABA do navegador:</h4>
+            <div class="link-buttons">
+                <button id="abrirDiscordBtn" class="btn-discord">🎮 Discord</button>
+                <button id="abrirGmailBtn" class="btn-gmail">📧 Gmail</button>
+                <button id="abrirOutlookBtn" class="btn-outlook">📧 Outlook</button>
             </div>
+        </div>
+        
+        <div class="status-bar">
+            💡 Dica: Use o email temporário para se registrar no Discord, Gmail ou Outlook!
         </div>
     </div>
 </div>
 
 <script>
-    // ---------- SISTEMA DE EMAIL TEMPORÁRIO COM INBOX (API pública Guerrillamail inspirada + fallback simulação local) ----------
-    // Usamos a API gratuita do GuerrillaMail para receber emails reais (sem necessidade de chave).
-    // Mas para maior confiabilidade e evitar bloqueios misturamos com um servidor de mock inteligente via fetch.
-    // URL: https://www.guerrillamail.com//ajax?function=get_email_addr&ip=... porém utilizaremos endpoint alternativo.
-    // Vamos integrar o serviço GuerrillaMail (api pública) para inbox funcional!
-    
-    let currentEmailId = null;      // id da sessão no GuerrillaMail
-    let currentEmailAddress = "";
-    let sid = null;                 // session id
-    let inboxMessages = [];         // array de mensagens { mail_id, subject, from, body, date }
-    
-    // Função para gerar nome aleatório e criar novo email via GuerrillaMail
-    async function criarEmailGuerrilla() {
-        try {
-            // Reset session
-            const timestamp = Date.now();
-            const randomUser = `discord_${Math.random().toString(36).substring(2, 12)}`;
-            // Primeiro: obter um endereço de email da API GuerrillaMail (função get_email_addr)
-            const url = `https://www.guerrillamail.com/ajax?function=get_email_addr&ip=127.0.0.1&agent=discord_creator&lang=en&f=1&r=-${timestamp}`;
-            const response = await fetch(url, { cache: 'no-store' });
-            const data = await response.json();
-            if (data && data.email_addr) {
-                currentEmailAddress = data.email_addr;
-                sid = data.sid;
-                currentEmailId = data.email_id;
-                // salva dados localmente
-                localStorage.setItem('guerrilla_sid', sid);
-                localStorage.setItem('guerrilla_email', currentEmailAddress);
-                localStorage.setItem('guerrilla_id', currentEmailId);
-                updateTempEmailDisplay();
-                await fetchInboxGuerrilla(true);
-                return currentEmailAddress;
-            } else {
-                throw new Error("Falha ao gerar email temporário real");
-            }
-        } catch (error) {
-            console.warn("Guerrilla Mail falhou, usando fallback interno simulado:", error);
-            return gerarEmailFallback();
-        }
-    }
-    
-    // Fallback caso a API pública esteja bloqueada: gera email fictício mas com simulação de inbox inteligente (recebe códigos mock)
-    function gerarEmailFallback() {
-        const dominios = ['tempmail.xyz', 'mailcatch.com', 'discordverify.me', '10mail.org'];
-        const prefixos = ['gamer', 'discord', 'verify', 'code', 'temp', 'user'];
-        const random = Math.floor(Math.random() * 99999);
-        const prefix = prefixos[Math.floor(Math.random() * prefixos.length)];
-        const dominio = dominios[Math.floor(Math.random() * dominios.length)];
-        currentEmailAddress = `${prefix}${random}@${dominio}`;
-        sid = `fallback_${Date.now()}`;
-        currentEmailId = `fb_${random}`;
-        localStorage.setItem('fallback_email', currentEmailAddress);
-        localStorage.setItem('fallback_sid', sid);
-        updateTempEmailDisplay();
-        // Para fallback, geramos mensagens mock para demonstração de código de verificação
-        gerarMensagensMock();
-        renderInbox();
-        return currentEmailAddress;
-    }
-    
-    // gerar mensagens de demonstração de verificação para fallback
-    function gerarMensagensMock() {
-        const now = new Date().toLocaleString();
-        inboxMessages = [];
-        // simular uma possível mensagem de código do Discord
-        const codigoDiscord = Math.floor(100000 + Math.random() * 900000);
-        inboxMessages.push({
-            mail_id: "mock1",
-            subject: "Código de verificação do Discord",
-            from: "noreply@discord.com",
-            body: `Seu código de verificação do Discord é: ${codigoDiscord}\n\nUse este código para completar seu registro.\n\nSe você não solicitou este código, ignore este e-mail.`,
-            date: now,
-            preview: `Código: ${codigoDiscord}`
-        });
-        // possivelmente outro email do gmail/outlook simulado
-        inboxMessages.push({
-            mail_id: "mock2",
-            subject: "Verificação de conta Google",
-            from: "google-noreply@accounts.google.com",
-            body: `Código de verificação Google: G-${codigoDiscord+1122}\n\nInsira para confirmar seu endereço.`,
-            date: now,
-            preview: `Código de verificação Google`
-        });
-    }
-    
-    // Atualiza display do email na tela
-    function updateTempEmailDisplay() {
-        const displayEl = document.getElementById('tempEmailDisplay');
-        if (displayEl) displayEl.innerText = currentEmailAddress || "---";
-    }
-    
-    // Buscar inbox via GuerrillaMail
-    async function fetchInboxGuerrilla(force = false) {
-        if (!sid && !force) return false;
-        if (!sid) return false;
-        try {
-            const url = `https://www.guerrillamail.com/ajax?function=fetch_email&sid=${sid}&f=1&seq=0`;
-            const response = await fetch(url, { cache: 'no-store' });
-            const data = await response.json();
-            if (data && data.list && data.list.length > 0) {
-                const mails = data.list;
-                inboxMessages = mails.map(mail => ({
-                    mail_id: mail.mail_id,
-                    subject: mail.mail_subject || "Sem assunto",
-                    from: mail.mail_from || "remetente desconhecido",
-                    body: mail.mail_body || "Corpo não disponível",
-                    date: mail.mail_timestamp ? new Date(mail.mail_timestamp * 1000).toLocaleString() : new Date().toLocaleString(),
-                    preview: (mail.mail_excerpt || "").substring(0, 60)
-                }));
-                renderInbox();
-                return true;
-            } else {
-                // se não tiver emails, mantém anterior
-                if(inboxMessages.length === 0) renderInbox();
-                return true;
-            }
-        } catch(e) {
-            console.warn("Erro ao buscar inbox real, mantendo fallback", e);
-            if (!inboxMessages.length) gerarMensagensMock();
-            renderInbox();
-            return false;
-        }
-    }
-    
-    // Função para tentar recarregar a inbox e também simular auto-recebimento
-    async function refreshInbox() {
-        if (sid && !sid.startsWith('fallback')) {
-            await fetchInboxGuerrilla(true);
-            mostrarToast("📬 Caixa de entrada atualizada!", "#5865F2");
-        } else {
-            // fallback: gera novas mensagens de código periodicamente
-            gerarMensagensMock();
-            renderInbox();
-            mostrarToast("📬 Inbox simulada (fallback) atualizada com códigos de verificação", "#faa61a");
-        }
-    }
-    
-    function renderInbox() {
-        const container = document.getElementById('inboxContainer');
-        if (!container) return;
-        if (!inboxMessages || inboxMessages.length === 0) {
-            container.innerHTML = '<div class="empty-inbox">📭 Nenhum e-mail recebido ainda. Use o email para se registrar no Discord e aguarde alguns segundos, depois clique em ATUALIZAR.</div>';
-            return;
-        }
-        const ul = document.createElement('ul');
-        ul.className = 'message-list';
-        inboxMessages.forEach(msg => {
-            const li = document.createElement('li');
-            li.className = 'message-item';
-            li.setAttribute('data-mailid', msg.mail_id);
-            li.innerHTML = `
-                <div class="message-subject">📩 ${escapeHtml(msg.subject)}</div>
-                <div class="message-from">📨 ${escapeHtml(msg.from)}</div>
-                <div class="message-preview">${escapeHtml(msg.preview || msg.body.substring(0, 50))}</div>
-                <div class="message-date">🕒 ${escapeHtml(msg.date)}</div>
-            `;
-            li.addEventListener('click', (e) => {
-                e.stopPropagation();
-                mostrarModalMensagem(msg);
-            });
-            ul.appendChild(li);
-        });
-        container.innerHTML = '';
-        container.appendChild(ul);
-    }
-    
-    function mostrarModalMensagem(msg) {
-        const modalDiv = document.createElement('div');
-        modalDiv.className = 'modal-message';
-        modalDiv.innerHTML = `
-            <div class="modal-card">
-                <h3>📧 ${escapeHtml(msg.subject)}</h3>
-                <div><strong>De:</strong> ${escapeHtml(msg.from)}</div>
-                <div><strong>Data:</strong> ${escapeHtml(msg.date)}</div>
-                <div class="modal-body">${escapeHtml(msg.body).replace(/\n/g, '<br>')}</div>
-                <button class="close-modal btn-secondary">Fechar</button>
-            </div>
-        `;
-        document.body.appendChild(modalDiv);
-        const closeBtn = modalDiv.querySelector('.close-modal');
-        closeBtn.onclick = () => modalDiv.remove();
-        modalDiv.addEventListener('click', (e) => {
-            if (e.target === modalDiv) modalDiv.remove();
-        });
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
-    
-    // Gerar novo email (reset inbox)
-    async function gerarEmailTemporarioCompleto() {
-        // resetar dados
-        inboxMessages = [];
-        renderInbox();
-        if (sid && !sid.startsWith('fallback')) {
-            await criarEmailGuerrilla();
-        } else {
-            await criarEmailGuerrilla().catch(() => {
-                gerarEmailFallback();
-            });
-        }
-        mostrarToast('📧 Novo email temporário gerado! Inbox pronta para receber códigos.', '#23a55a');
-        // tentar buscar após criação
-        setTimeout(() => refreshInbox(), 1500);
-    }
-    
-    // ---------- GERADOR DE CONTA DISCORD ----------
     let dadosAtuais = { username: '', password: '' };
+    let tempEmailAtual = '';
+    
+    function mostrarToast(msg, cor = '#1e1e2f') {
+        const old = document.querySelector('.toast');
+        if (old) old.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = cor;
+        toast.innerHTML = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function gerarEmailTemporario() {
+        const dominios = ['tempmail.com', 'guerrillamail.com', 'mailinator.com', '10minutemail.com', 'temp-mail.org', 'throwaway.com', 'dispostable.com', 'guerrillamail.net'];
+        const prefixos = ['user', 'discord', 'temp', 'mail', 'fast', 'quick', 'random', 'new', 'player', 'gamer'];
+        const random = Math.floor(Math.random() * 99999);
+        const randomNum = Math.floor(Math.random() * 999);
+        const prefixo = prefixos[Math.floor(Math.random() * prefixos.length)];
+        const dominio = dominios[Math.floor(Math.random() * dominios.length)];
+        tempEmailAtual = `${prefixo}${random}${randomNum}@${dominio}`;
+        document.getElementById('tempEmailDisplay').innerText = tempEmailAtual;
+        localStorage.setItem('temp_email', tempEmailAtual);
+        mostrarToast('📧 Email temporário gerado!', '#faa61a');
+        return tempEmailAtual;
+    }
     
     function gerarNomeUsuario() {
         const prefixos = ['Warrior', 'Dragon', 'Phoenix', 'Shadow', 'Light', 'Storm', 'Thunder', 'Crystal', 'Dark', 'Flame', 'Neon', 'Cyber', 'Alpha', 'Omega', 'Night', 'Frost'];
@@ -692,28 +386,37 @@
         const minusculas = 'abcdefghijkmnpqrstuvwxyz';
         const numeros = '23456789';
         const especiais = '!@#$%&*';
+        
         let senha = '';
         senha += maiusculas[Math.floor(Math.random() * maiusculas.length)];
         senha += minusculas[Math.floor(Math.random() * minusculas.length)];
         senha += numeros[Math.floor(Math.random() * numeros.length)];
         senha += especiais[Math.floor(Math.random() * especiais.length)];
+        
         for(let i = 0; i < 10; i++) {
             const chars = minusculas + numeros;
             senha += chars[Math.floor(Math.random() * chars.length)];
         }
+        
         return senha.split('').sort(() => Math.random() - 0.5).join('');
     }
     
     function gerarContaCompleta() {
         dadosAtuais.username = gerarNomeUsuario();
         dadosAtuais.password = gerarSenha();
+        
         document.getElementById('username').innerText = dadosAtuais.username;
         document.getElementById('password').innerText = dadosAtuais.password;
-        if (!currentEmailAddress) {
-            gerarEmailTemporarioCompleto();
+        
+        if (!tempEmailAtual) {
+            gerarEmailTemporario();
         }
-        mostrarToast('✅ Conta Discord gerada! Use o email ao lado para verificar.', '#23a55a');
-        localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
+        
+        mostrarToast('✅ Conta Discord gerada com sucesso!', '#23a55a');
+        
+        try {
+            localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
+        } catch(e) {}
     }
     
     async function copiarDados() {
@@ -721,9 +424,15 @@
             mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
             return;
         }
+        
         const texto = `👤 Usuário Discord: ${dadosAtuais.username}\n🔐 Senha: ${dadosAtuais.password}`;
-        await navigator.clipboard.writeText(texto);
-        mostrarToast('📋 Dados da conta copiados!', '#5865F2');
+        
+        try {
+            await navigator.clipboard.writeText(texto);
+            mostrarToast('📋 Dados da conta copiados!', '#5865F2');
+        } catch(err) {
+            mostrarToast('❌ Erro ao copiar dados', '#ed4245');
+        }
     }
     
     async function copiarTudo() {
@@ -731,10 +440,19 @@
             mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
             return;
         }
-        if (!currentEmailAddress) await gerarEmailTemporarioCompleto();
-        const texto = `📧 Email: ${currentEmailAddress}\n👤 Discord: ${dadosAtuais.username}\n🔐 Senha: ${dadosAtuais.password}\n\n🔁 Use este email para receber o código de verificação no inbox do app.`;
-        await navigator.clipboard.writeText(texto);
-        mostrarToast('📋 Email + conta copiados!', '#23a55a');
+        
+        if (!tempEmailAtual) {
+            gerarEmailTemporario();
+        }
+        
+        const texto = `📧 Email Temporário: ${tempEmailAtual}\n👤 Usuário Discord: ${dadosAtuais.username}\n🔐 Senha: ${dadosAtuais.password}\n\n🌐 Use o email temporário para se registrar no Discord/Gmail/Outlook!`;
+        
+        try {
+            await navigator.clipboard.writeText(texto);
+            mostrarToast('📋 Email temp + conta copiados!', '#23a55a');
+        } catch(err) {
+            mostrarToast('❌ Erro ao copiar', '#ed4245');
+        }
     }
     
     function abrirNovaAba(url, nomeSite) {
@@ -742,19 +460,7 @@
         mostrarToast(`🔗 Abrindo ${nomeSite} em nova aba...`, '#5865F2');
     }
     
-    function mostrarToast(msg, cor = '#1e1e2f') {
-        const old = document.querySelector('.toast');
-        if (old) old.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.style.background = cor;
-        toast.innerHTML = msg;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    // Carregar estado salvo
-    async function carregarDadosIniciais() {
+    function carregarDados() {
         try {
             const salvos = localStorage.getItem('discord_dados');
             if (salvos) {
@@ -764,33 +470,29 @@
             } else {
                 gerarContaCompleta();
             }
-            // Recuperar email antigo guerrilha ou gerar novo
-            const savedSid = localStorage.getItem('guerrilla_sid');
-            const savedEmail = localStorage.getItem('guerrilla_email');
-            if (savedSid && savedEmail) {
-                sid = savedSid;
-                currentEmailAddress = savedEmail;
-                currentEmailId = localStorage.getItem('guerrilla_id');
-                updateTempEmailDisplay();
-                await fetchInboxGuerrilla(true);
+            
+            const emailSalvo = localStorage.getItem('temp_email');
+            if (emailSalvo) {
+                tempEmailAtual = emailSalvo;
+                document.getElementById('tempEmailDisplay').innerText = tempEmailAtual;
             } else {
-                await criarEmailGuerrilla().catch(() => gerarEmailFallback());
+                gerarEmailTemporario();
             }
         } catch(e) {
             gerarContaCompleta();
-            await criarEmailGuerrilla().catch(() => gerarEmailFallback());
+            gerarEmailTemporario();
         }
     }
     
-    // Minimizar app
     let isMinimized = false;
     const appDiv = document.getElementById('floatingApp');
     const minimizeBtn = document.getElementById('minimizeBtn');
+    
     minimizeBtn.addEventListener('click', () => {
         if (isMinimized) {
             appDiv.classList.remove('minimized');
             minimizeBtn.textContent = '─';
-            appDiv.style.maxWidth = '900px';
+            appDiv.style.maxWidth = '550px';
         } else {
             appDiv.classList.add('minimized');
             minimizeBtn.textContent = '□';
@@ -802,39 +504,21 @@
     document.getElementById('btnGerar').onclick = () => gerarContaCompleta();
     document.getElementById('btnCopiar').onclick = () => copiarDados();
     document.getElementById('btnCopiarTudo').onclick = () => copiarTudo();
-    document.getElementById('gerarEmailTempBtn').onclick = () => gerarEmailTemporarioCompleto();
-    document.getElementById('copiarEmailTempBtn').onclick = async () => {
-        if (currentEmailAddress) {
-            await navigator.clipboard.writeText(currentEmailAddress);
+    document.getElementById('gerarEmailTempBtn').onclick = () => gerarEmailTemporario();
+    document.getElementById('copiarEmailTempBtn').onclick = () => {
+        if (tempEmailAtual) {
+            navigator.clipboard.writeText(tempEmailAtual);
             mostrarToast('📧 Email temporário copiado!', '#faa61a');
         } else {
             mostrarToast('⚠️ Gere um email primeiro', '#faa61a');
         }
     };
-    document.getElementById('refreshInboxBtn').onclick = () => refreshInbox();
+    
     document.getElementById('abrirDiscordBtn').onclick = () => abrirNovaAba('https://discord.com/register', 'Discord');
     document.getElementById('abrirGmailBtn').onclick = () => abrirNovaAba('https://accounts.google.com/signup', 'Gmail');
     document.getElementById('abrirOutlookBtn').onclick = () => abrirNovaAba('https://signup.live.com', 'Outlook');
     
-    carregarDadosIniciais();
-    setInterval(() => {
-        if (sid && !sid.startsWith('fallback')) {
-            fetchInboxGuerrilla(false);
-        } else if (sid && sid.startsWith('fallback')) {
-            // gerar uma nova mensagem a cada 30s simulando possível chegada de código
-            const codigo = Math.floor(100000 + Math.random() * 900000);
-            inboxMessages.unshift({
-                mail_id: "auto"+Date.now(),
-                subject: "🔐 Seu código de verificação Discord",
-                from: "verify@discord.com",
-                body: `Olá! Use o código ${codigo} para completar seu registro no Discord. Código válido por 10 minutos.\n\nEquipe Discord.`,
-                date: new Date().toLocaleString(),
-                preview: `Código: ${codigo}`
-            });
-            if (inboxMessages.length > 8) inboxMessages.pop();
-            renderInbox();
-        }
-    }, 15000);
+    carregarDados();
 </script>
 </body>
 </html>
