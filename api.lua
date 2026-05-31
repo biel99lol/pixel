@@ -1,4 +1,3 @@
--- api.lua - Retorna link do Hastebin igual ao site
 return function(imageUrl, w, h)
     w = w or 64
     h = h or 64
@@ -7,7 +6,7 @@ return function(imageUrl, w, h)
     
     local proxy = "https://api.allorigins.win/raw?url=" .. HttpService:UrlEncode(imageUrl)
     
-    local imgResponse = http.request({
+    local imgResponse = syn.request({
         Url = proxy,
         Method = "GET"
     })
@@ -18,26 +17,19 @@ return function(imageUrl, w, h)
     local indices = {}
     local paletteMap = {}
     
-    local bytes = {string.byte(imgData, 1, #imgData)}
-    
     for y = 0, h - 1 do
         for x = 0, w - 1 do
             local pos = (y * w + x) * 4 + 1
-            local r = bytes[pos] or 0
-            local g = bytes[pos + 1] or 0
-            local b = bytes[pos + 2] or 0
-            local a = bytes[pos + 3] or 255
+            local r = string.byte(imgData, pos) or 0
+            local g = string.byte(imgData, pos + 1) or 0
+            local b = string.byte(imgData, pos + 2) or 0
             
-            if a > 0 then
-                local key = string.format("%d,%d,%d", r, g, b)
-                if not paletteMap[key] then
-                    paletteMap[key] = #palette + 1
-                    palette[#palette + 1] = {r, g, b}
-                end
-                indices[#indices + 1] = paletteMap[key] - 1
-            else
-                indices[#indices + 1] = -1
+            local key = string.format("%d,%d,%d", r, g, b)
+            if not paletteMap[key] then
+                paletteMap[key] = #palette + 1
+                palette[#palette + 1] = {r, g, b}
             end
+            indices[#indices + 1] = paletteMap[key] - 1
         end
     end
     
@@ -48,7 +40,7 @@ return function(imageUrl, w, h)
         i = indices
     })
     
-    local hasteResponse = http.request({
+    local hasteResponse = syn.request({
         Url = "https://hastebin.com/documents",
         Method = "POST",
         Body = jsonData
