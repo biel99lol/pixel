@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Discord Creator Pro</title>
-    <link rel="manifest" href="manifest.json">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -46,10 +45,9 @@
             margin: 8px 0;
             transition: all 0.2s;
         }
-        button:active { transform: scale(0.97); opacity: 0.9; }
+        button:active { transform: scale(0.97); }
         .btn-success { background: #23a55a; }
         .btn-warning { background: #faa61a; color: #333; }
-        .btn-danger { background: #ed4245; }
         .status {
             background: #e8f4fd;
             padding: 12px;
@@ -69,10 +67,9 @@
             border-radius: 30px;
             text-align: center;
             z-index: 1000;
-            animation: slideUp 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: fadeUp 0.3s ease;
         }
-        @keyframes slideUp {
+        @keyframes fadeUp {
             from { transform: translateY(100px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
@@ -85,13 +82,26 @@
             display: inline-block;
             margin-left: 8px;
         }
+        .perm-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 14px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h1>🎮 Discord Creator Pro <span class="badge">APP</span></h1>
-            <p class="sub">Sistema automático com notificações</p>
+            <p class="sub">Clique em PERMITIR nas notificações</p>
+
+            <div class="perm-box" id="permBox">
+                ⚠️ <strong>Ative as notificações:</strong> Clique no botão abaixo e escolha "PERMITIR"
+            </div>
 
             <div class="dados-box" id="dadosBox">
                 📧 <span id="email">Clique em "Nova Conta"</span><br>
@@ -99,30 +109,79 @@
                 🔐 <span id="password">---</span>
             </div>
 
+            <button id="btnPermitir" class="btn-warning">🔔 ATIVAR NOTIFICAÇÕES</button>
             <button id="btnNovaConta" class="btn-success">🔄 NOVA CONTA</button>
             <button id="btnCopiarDados">📋 COPIAR DADOS</button>
             <button id="btnAbrirDiscord">🔗 ABRIR DISCORD</button>
-            <button id="btnTestarNotificacao" class="btn-warning">🔔 TESTAR NOTIFICAÇÃO</button>
 
             <div class="status" id="statusArea">
-                ✅ Sistema pronto. Clique em "Nova Conta"
+                ✅ Sistema pronto. Ative as notificações primeiro.
             </div>
         </div>
     </div>
 
     <script>
         let dadosAtuais = { email: '', username: '', password: '' };
-        let wakeLock = null;
+        let notificacoesAtivas = false;
 
-        function mostrarToast(mensagem, tipo = 'normal') {
+        function mostrarToast(mensagem, cor = '#1e1e1e') {
             const toast = document.createElement('div');
             toast.className = 'toast';
+            toast.style.background = cor;
             toast.innerHTML = mensagem;
-            if (tipo === 'sucesso') toast.style.background = '#23a55a';
-            if (tipo === 'erro') toast.style.background = '#ed4245';
-            if (tipo === 'alerta') toast.style.background = '#faa61a';
             document.body.appendChild(toast);
             setTimeout(() => toast.remove(), 3000);
+        }
+
+        function enviarNotificacao(titulo, corpo) {
+            if (notificacoesAtivas && Notification.permission === 'granted') {
+                try {
+                    new Notification(titulo, {
+                        body: corpo,
+                        icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
+                        vibrate: [200, 100, 200],
+                        silent: false
+                    });
+                    console.log('Notificação enviada:', titulo);
+                    return true;
+                } catch(e) {
+                    console.log('Erro na notificação:', e);
+                    return false;
+                }
+            } else {
+                console.log('Notificações não ativadas');
+                return false;
+            }
+        }
+
+        async function ativarNotificacoes() {
+            if (Notification.permission === 'granted') {
+                notificacoesAtivas = true;
+                document.getElementById('permBox').innerHTML = '✅ <strong>Notificações ativadas!</strong> Você receberá alertas do app.';
+                document.getElementById('permBox').style.background = '#d4edda';
+                document.getElementById('permBox').style.borderColor = '#28a745';
+                mostrarToast('🔔 Notificações ativadas com sucesso!', '#23a55a');
+                enviarNotificacao('✅ Notificações ativas', 'App Discord Creator Pro está pronto para usar!');
+                return;
+            }
+            
+            if (Notification.permission === 'denied') {
+                mostrarToast('❌ Notificações bloqueadas. Vá nas configurações do site e permita.', '#ed4245');
+                alert('Notificações estão bloqueadas. Vá em Configurações > Configurações do site > Notificações e permita para este site.');
+                return;
+            }
+            
+            const permissao = await Notification.requestPermission();
+            if (permissao === 'granted') {
+                notificacoesAtivas = true;
+                document.getElementById('permBox').innerHTML = '✅ <strong>Notificações ativadas!</strong> Você receberá alertas do app.';
+                document.getElementById('permBox').style.background = '#d4edda';
+                document.getElementById('permBox').style.borderColor = '#28a745';
+                mostrarToast('🔔 Notificações ativadas!', '#23a55a');
+                enviarNotificacao('✅ App pronto!', 'Clique em "Nova Conta" para começar.');
+            } else {
+                mostrarToast('❌ Você precisa permitir as notificações para o app funcionar completamente.', '#ed4245');
+            }
         }
 
         function gerarDados() {
@@ -138,25 +197,17 @@
             document.getElementById('email').innerText = dadosAtuais.email;
             document.getElementById('username').innerText = dadosAtuais.username;
             document.getElementById('password').innerText = dadosAtuais.password;
-            document.getElementById('statusArea').innerHTML = '✅ DADOS GERADOS! Clique em "Copiar Dados" e depois "Abrir Discord"';
+            document.getElementById('statusArea').innerHTML = '✅ DADOS GERADOS! Clique em "Copiar Dados"';
             
-            mostrarToast('🎉 Dados gerados com sucesso!', 'sucesso');
-            
-            if (Notification.permission === 'granted') {
-                new Notification('📧 Dados gerados!', {
-                    body: `Email: ${dadosAtuais.email}\nUsuário: ${dadosAtuais.username}`,
-                    icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
-                    vibrate: [200, 100, 200]
-                });
-            }
+            mostrarToast('🎉 Dados gerados com sucesso!', '#23a55a');
+            enviarNotificacao('🎉 NOVOS DADOS GERADOS!', `Email: ${dadosAtuais.email}\nUsuário: ${dadosAtuais.username}`);
             
             localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
-            return dadosAtuais;
         }
 
         async function copiarDados() {
             if (!dadosAtuais.email) {
-                mostrarToast('⚠️ Clique em "Nova Conta" primeiro!', 'alerta');
+                mostrarToast('⚠️ Clique em "Nova Conta" primeiro!', '#faa61a');
                 return;
             }
             
@@ -164,71 +215,24 @@
             
             try {
                 await navigator.clipboard.writeText(texto);
-                mostrarToast('📋 Dados copiados para área de transferência!', 'sucesso');
-                document.getElementById('statusArea').innerHTML = '✅ Dados copiados! Agora clique em "Abrir Discord" e cole os campos.';
-                
-                if (Notification.permission === 'granted') {
-                    new Notification('✅ Dados copiados!', {
-                        body: 'Agora cole no Discord e resolva o CAPTCHA',
-                        icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
-                    });
-                }
+                mostrarToast('📋 Dados copiados para área de transferência!', '#23a55a');
+                enviarNotificacao('✅ DADOS COPIADOS!', 'Agora cole no Discord e resolva o CAPTCHA');
+                document.getElementById('statusArea').innerHTML = '✅ Dados copiados! Clique em "Abrir Discord"';
             } catch (err) {
-                mostrarToast('❌ Erro ao copiar. Copie manualmente.', 'erro');
+                mostrarToast('❌ Erro ao copiar. Copie manualmente.', '#ed4245');
             }
         }
 
         function abrirDiscord() {
             if (!dadosAtuais.email) {
-                mostrarToast('⚠️ Gere os dados primeiro!', 'alerta');
+                mostrarToast('⚠️ Gere os dados primeiro!', '#faa61a');
                 return;
             }
             
             window.open('https://discord.com/register', '_blank');
-            mostrarToast('🔗 Discord aberto! Cole os dados e resolva o CAPTCHA', 'sucesso');
+            mostrarToast('🔗 Discord aberto! Cole os dados.', '#5865F2');
+            enviarNotificacao('🔗 DISCORD ABERTO!', 'Cole os dados e resolva o CAPTCHA para criar sua conta');
             document.getElementById('statusArea').innerHTML = '🔗 Discord aberto! Cole os dados e resolva o CAPTCHA.';
-            
-            setTimeout(() => {
-                if (Notification.permission === 'granted') {
-                    new Notification('🔗 Discord aberto!', {
-                        body: 'Cole os dados e resolva o CAPTCHA para criar sua conta',
-                        icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
-                    });
-                }
-            }, 1000);
-        }
-
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    console.log('Wake Lock ativado - app mantido ativo');
-                    
-                    wakeLock.addEventListener('release', () => {
-                        console.log('Wake Lock liberado');
-                    });
-                }
-            } catch (err) {
-                console.log('Wake Lock não suportado:', err);
-            }
-        }
-
-        function iniciarNotificacoes() {
-            if ('Notification' in window) {
-                if (Notification.permission === 'granted') {
-                    mostrarToast('🔔 Notificações ativadas!', 'sucesso');
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            mostrarToast('🔔 Notificações ativadas!', 'sucesso');
-                            new Notification('Discord Creator Pro', {
-                                body: 'App rodando em segundo plano. Notificações ativas!',
-                                icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
-                            });
-                        }
-                    });
-                }
-            }
         }
 
         function carregarDadosSalvos() {
@@ -239,84 +243,31 @@
                     document.getElementById('email').innerText = dadosAtuais.email;
                     document.getElementById('username').innerText = dadosAtuais.username;
                     document.getElementById('password').innerText = dadosAtuais.password;
-                    mostrarToast('📀 Dados carregados da sessão anterior', 'sucesso');
                 } catch(e) {}
             }
         }
 
-        function manterAtivoBackground() {
-            let interval = setInterval(() => {
-                console.log('App rodando em segundo plano - ' + new Date().toLocaleTimeString());
-                if (Notification.permission === 'granted') {
-                    const agora = new Date();
-                    if (agora.getSeconds() === 0 || agora.getSeconds() === 30) {
-                        new Notification('🟢 Discord Creator Pro', {
-                            body: 'App ainda rodando normalmente. Clique em "Nova Conta" para gerar dados.',
-                            icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
-                            silent: true
-                        });
-                    }
-                }
-            }, 30000);
-            
-            window.addEventListener('beforeunload', () => {
-                clearInterval(interval);
-            });
-        }
-
-        function registrarServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/sw.js').then(() => {
-                    console.log('Service Worker registrado');
-                }).catch(err => {
-                    console.log('Service Worker falhou:', err);
-                });
-            }
-        }
-
-        document.getElementById('btnNovaConta').onclick = () => {
-            gerarDados();
-            requestWakeLock();
-        };
+        document.getElementById('btnPermitir').onclick = ativarNotificacoes;
+        document.getElementById('btnNovaConta').onclick = gerarDados;
         document.getElementById('btnCopiarDados').onclick = copiarDados;
         document.getElementById('btnAbrirDiscord').onclick = abrirDiscord;
-        document.getElementById('btnTestarNotificacao').onclick = () => {
-            if (Notification.permission === 'granted') {
-                new Notification('🔔 TESTE DE NOTIFICAÇÃO', {
-                    body: 'O app está rodando em segundo plano corretamente!',
-                    icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png',
-                    vibrate: [200, 100, 200, 100, 200]
-                });
-                mostrarToast('🔔 Notificação enviada!', 'sucesso');
-            } else {
-                Notification.requestPermission().then(perm => {
-                    if (perm === 'granted') {
-                        new Notification('🔔 Notificações ativadas!', {
-                            body: 'Agora você receberá alertas do app.',
-                            icon: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
-                        });
-                        mostrarToast('🔔 Notificações ativadas!', 'sucesso');
-                    }
-                });
-            }
-        };
 
-        requestWakeLock();
-        iniciarNotificacoes();
         carregarDadosSalvos();
-        manterAtivoBackground();
+        
+        if (Notification.permission === 'granted') {
+            notificacoesAtivas = true;
+            document.getElementById('permBox').innerHTML = '✅ <strong>Notificações ativadas!</strong> Você receberá alertas do app.';
+            document.getElementById('permBox').style.background = '#d4edda';
+            document.getElementById('permBox').style.borderColor = '#28a745';
+        }
         
         if (!dadosAtuais.email) {
             setTimeout(() => {
-                gerarDados();
-            }, 500);
+                if (Notification.permission === 'granted') {
+                    enviarNotificacao('🎮 Discord Creator Pro', 'App pronto! Clique em "Nova Conta" para começar.');
+                }
+            }, 1000);
         }
-        
-        setInterval(() => {
-            if (document.hidden) {
-                console.log('App rodando em segundo plano');
-            }
-        }, 5000);
     </script>
 </body>
 </html>
