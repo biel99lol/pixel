@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TempMail API - Inbox Real</title>
+    <title>📬 INBOX REAL - Caixa de Entrada</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -12,32 +12,32 @@
             min-height: 100vh;
             padding: 20px;
         }
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 1000px; margin: 0 auto; }
         .card {
             background: white;
             border-radius: 32px;
-            padding: 28px;
+            padding: 30px;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
         }
-        h1 { color: #3b82f6; text-align: center; font-size: 28px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .sub { text-align: center; color: #64748b; margin-bottom: 25px; font-size: 14px; }
+        h1 { color: #3b82f6; text-align: center; font-size: 32px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .sub { text-align: center; color: #64748b; margin-bottom: 30px; font-size: 14px; }
         .toolbar {
             background: #f1f5f9;
-            padding: 16px;
-            border-radius: 24px;
-            margin-bottom: 24px;
+            padding: 20px;
+            border-radius: 28px;
+            margin-bottom: 25px;
             display: flex;
-            gap: 12px;
+            gap: 15px;
             flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
         }
-        .email-info {
+        .email-box {
             background: #e2e8f0;
-            padding: 8px 18px;
-            border-radius: 40px;
+            padding: 10px 20px;
+            border-radius: 60px;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: bold;
             color: #0f172a;
             word-break: break-all;
@@ -45,13 +45,13 @@
         button {
             background: #3b82f6;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 40px;
             color: white;
             font-weight: bold;
             cursor: pointer;
             transition: 0.15s;
-            font-size: 13px;
+            font-size: 14px;
         }
         button:active { transform: scale(0.96); }
         .btn-outline { background: #64748b; }
@@ -61,13 +61,13 @@
             border-radius: 24px;
             overflow: hidden;
             background: #f8fafc;
-            min-height: 450px;
-            max-height: 550px;
+            min-height: 500px;
+            max-height: 600px;
             overflow-y: auto;
         }
         .email-item {
             background: white;
-            padding: 16px 20px;
+            padding: 18px 22px;
             border-bottom: 1px solid #e2e8f0;
             cursor: pointer;
             transition: 0.1s;
@@ -77,16 +77,16 @@
         .email-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 13px;
             color: #475569;
         }
-        .email-subject { font-weight: 700; color: #0f172a; margin-bottom: 6px; font-size: 15px; }
+        .email-subject { font-weight: 700; color: #0f172a; margin-bottom: 8px; font-size: 16px; }
         .email-preview { font-size: 13px; color: #64748b; }
         .email-body {
             display: none;
-            margin-top: 14px;
-            padding: 16px;
+            margin-top: 16px;
+            padding: 18px;
             background: #f1f5f9;
             border-radius: 20px;
             font-size: 14px;
@@ -101,7 +101,7 @@
             padding: 12px;
             border-radius: 16px;
             font-family: monospace;
-            font-size: 20px;
+            font-size: 22px;
             text-align: center;
             letter-spacing: 4px;
             margin: 12px 0;
@@ -118,8 +118,9 @@
         }
         .empty-inbox {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
             color: #94a3b8;
+            font-size: 16px;
         }
         .toast {
             position: fixed;
@@ -128,7 +129,7 @@
             right: 20px;
             background: #0f172a;
             color: white;
-            padding: 12px 20px;
+            padding: 14px 20px;
             border-radius: 60px;
             text-align: center;
             z-index: 999;
@@ -139,17 +140,12 @@
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #3b82f6;
-        }
         .badge {
             background: #ef4444;
             color: white;
             border-radius: 30px;
-            padding: 2px 10px;
-            font-size: 11px;
+            padding: 2px 12px;
+            font-size: 12px;
             margin-left: 8px;
         }
     </style>
@@ -157,12 +153,12 @@
 <body>
 <div class="container">
     <div class="card">
-        <h1>📬 TempMail API <span class="badge">REAL</span></h1>
-        <p class="sub">Email temporário funcional + API real (1secmail.com)</p>
+        <h1>📬 INBOX REAL <span class="badge">FUNCIONAL</span></h1>
+        <p class="sub">Email temporário com caixa de entrada real (API 1secmail)</p>
 
         <div class="toolbar">
-            <div class="email-info" id="emailDisplay">carregando...</div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div class="email-box" id="emailDisplay">🔁 Clique em "NOVO EMAIL"</div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button id="newEmailBtn">🔄 NOVO EMAIL</button>
                 <button id="refreshBtn" class="btn-outline">🔄 ATUALIZAR</button>
                 <button id="autoRefreshBtn" class="btn-warning">⏱️ AUTO (30s)</button>
@@ -170,18 +166,18 @@
         </div>
 
         <div class="inbox" id="inboxContainer">
-            <div class="empty-inbox">📭 Aguardando...</div>
+            <div class="empty-inbox">📭 Nenhum email ainda. Clique em "NOVO EMAIL" para começar.</div>
         </div>
         <div style="font-size: 12px; text-align: center; margin-top: 18px; color: #94a3b8;">
-            ✅ Inbox real usando API do 1secmail.com | Os emails chegam de verdade
+            ✅ Os emails chegam de verdade | Códigos de verificação aparecem no inbox
         </div>
     </div>
 </div>
 
 <script>
-    let currentEmail = '';
     let currentLogin = '';
     let currentDomain = '';
+    let currentEmail = '';
     let messagesList = [];
     let autoInterval = null;
     let autoActive = false;
@@ -194,69 +190,64 @@
         toast.style.background = bg;
         toast.innerText = msg;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
+        setTimeout(() => toast.remove(), 3000);
     }
 
-    async function criarEmailReal() {
-        showToast('🔄 Criando email real via API...', '#3b82f6');
+    async function criarEmail() {
+        showToast('🔄 Criando email real...', '#3b82f6');
         try {
             const dominios = ['1secmail.com', '1secmail.org', '1secmail.net'];
             const randomDomain = dominios[Math.floor(Math.random() * dominios.length)];
             const nome = 'user_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
-            const email = nome + '@' + randomDomain;
             currentLogin = nome;
             currentDomain = randomDomain;
-            currentEmail = email;
-            
+            currentEmail = nome + '@' + randomDomain;
             document.getElementById('emailDisplay').innerText = currentEmail;
             messagesList = [];
             renderInbox();
             showToast(`✅ Email criado: ${currentEmail}`, '#10b981');
-            
             setTimeout(() => checkInbox(true), 2000);
         } catch(e) {
-            showToast('❌ Erro ao criar email, tentando novamente...', '#ef4444');
-            setTimeout(() => criarEmailReal(), 1000);
+            showToast('❌ Erro, tentando novamente...', '#ef4444');
+            setTimeout(() => criarEmail(), 1000);
         }
     }
 
-    async function checkInbox(showNotif = false) {
+    async function checkInbox(notify = false) {
         if (!currentLogin || !currentDomain) return;
-        
         try {
-            const response = await fetch(`https://www.1secmail.com/api/v1/?action=getMessages&login=${currentLogin}&domain=${currentDomain}`);
+            const url = `https://www.1secmail.com/api/v1/?action=getMessages&login=${currentLogin}&domain=${currentDomain}`;
+            const response = await fetch(url);
             const data = await response.json();
-            
             if (!Array.isArray(data)) return;
             
             if (data.length > messagesList.length) {
-                const newMessages = data.slice(messagesList.length);
-                for (const msg of newMessages) {
-                    const fullMsg = await getMessageContent(msg.id);
-                    messagesList.push(fullMsg);
+                const newMsgs = data.slice(messagesList.length);
+                for (const msg of newMsgs) {
+                    const full = await getFullMessage(msg.id);
+                    messagesList.push(full);
                 }
                 renderInbox();
-                if (showNotif && newMessages.length > 0) {
-                    showToast(`📩 ${newMessages.length} nova(s) mensagem(ns)!`, '#3b82f6');
+                if (notify && newMsgs.length) {
+                    showToast(`📩 ${newMsgs.length} nova(s) mensagem(ns)!`, '#3b82f6');
                     if (Notification.permission === 'granted') {
                         new Notification('📬 Nova mensagem!', {
-                            body: `${newMessages.length} email(s) recebido(s) em ${currentEmail}`,
+                            body: `${newMsgs.length} email(s) recebido(s) em ${currentEmail}`,
                             icon: 'https://cdn-icons-png.flaticon.com/512/732/732200.png'
                         });
                     }
                 }
             }
-        } catch(e) {
-            console.log('Erro ao verificar inbox:', e);
-        }
+        } catch(e) { console.log(e); }
     }
 
-    async function getMessageContent(messageId) {
+    async function getFullMessage(id) {
         try {
-            const res = await fetch(`https://www.1secmail.com/api/v1/?action=readMessage&login=${currentLogin}&domain=${currentDomain}&id=${messageId}`);
+            const url = `https://www.1secmail.com/api/v1/?action=readMessage&login=${currentLogin}&domain=${currentDomain}&id=${id}`;
+            const res = await fetch(url);
             const data = await res.json();
             return {
-                id: messageId,
+                id: id,
                 from: data.from || 'remetente@desconhecido',
                 subject: data.subject || 'Sem assunto',
                 date: data.date || new Date().toISOString(),
@@ -264,91 +255,17 @@
                 read: false
             };
         } catch(e) {
-            return {
-                id: messageId,
-                from: 'erro@api.com',
-                subject: 'Erro ao carregar',
-                date: new Date().toISOString(),
-                body: 'Não foi possível carregar o conteúdo.',
-                read: false
-            };
+            return { id, from: 'erro@api.com', subject: 'Erro', date: new Date().toISOString(), body: 'Erro ao carregar', read: false };
         }
     }
 
-    function extractVerificationCode(text) {
-        const patterns = [
-            /\b(\d{6})\b/g,
-            /\b(\d{4}-\d{4})\b/g,
-            /código[:\s]*(\d{6})/i,
-            /verification code[:\s]*(\d{6})/i,
-            /código de verificação[:\s]*(\d{6})/i
-        ];
-        for (const pattern of patterns) {
-            const match = text.match(pattern);
-            if (match) return match[0];
-        }
-        return null;
+    function extractCode(text) {
+        const match = text.match(/\b(\d{6})\b/);
+        return match ? match[0] : null;
     }
 
-    function formatDate(dateStr) {
-        try {
-            const d = new Date(dateStr);
-            return d.toLocaleTimeString() + ' ' + d.toLocaleDateString();
-        } catch(e) {
-            return dateStr;
-        }
-    }
-
-    function renderInbox() {
-        const container = document.getElementById('inboxContainer');
-        if (!messagesList.length) {
-            container.innerHTML = '<div class="empty-inbox">📭 Nenhum email recebido ainda. Aguarde ou atualize.</div>';
-            return;
-        }
-        
-        container.innerHTML = '';
-        messagesList.forEach(msg => {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'email-item' + (msg.read ? '' : ' unread');
-            
-            const preview = msg.body.substring(0, 80) + (msg.body.length > 80 ? '...' : '');
-            const code = extractVerificationCode(msg.body);
-            
-            msgDiv.innerHTML = `
-                <div class="email-header">
-                    <span><strong>${escapeHtml(msg.from)}</strong></span>
-                    <span>${formatDate(msg.date)}</span>
-                </div>
-                <div class="email-subject">${escapeHtml(msg.subject)}</div>
-                <div class="email-preview">${escapeHtml(preview)}</div>
-                <div class="email-body" id="body-${msg.id}">
-                    <div style="white-space: pre-wrap;">${escapeHtml(msg.body)}</div>
-                    ${code ? `<div class="verification-code">🔐 CÓDIGO: ${code} <button class="copy-code-btn" data-code="${code}">📋 COPIAR</button></div>` : ''}
-                </div>
-            `;
-            
-            msgDiv.addEventListener('click', (e) => {
-                if (e.target.classList.contains('copy-code-btn')) return;
-                const bodyDiv = msgDiv.querySelector('.email-body');
-                bodyDiv.classList.toggle('show');
-                if (!msg.read) {
-                    msg.read = true;
-                    msgDiv.classList.remove('unread');
-                }
-            });
-            
-            const copyBtn = msgDiv.querySelector('.copy-code-btn');
-            if (copyBtn) {
-                copyBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const code = copyBtn.getAttribute('data-code');
-                    navigator.clipboard.writeText(code);
-                    showToast(`📋 Código ${code} copiado!`, '#10b981');
-                });
-            }
-            
-            container.appendChild(msgDiv);
-        });
+    function formatDate(d) {
+        try { return new Date(d).toLocaleString(); } catch(e) { return d; }
     }
 
     function escapeHtml(str) {
@@ -360,18 +277,59 @@
         });
     }
 
-    function startAutoRefresh() {
+    function renderInbox() {
+        const container = document.getElementById('inboxContainer');
+        if (!messagesList.length) {
+            container.innerHTML = '<div class="empty-inbox">📭 Nenhum email ainda. Aguarde ou atualize.</div>';
+            return;
+        }
+        container.innerHTML = '';
+        for (const msg of messagesList) {
+            const div = document.createElement('div');
+            div.className = 'email-item' + (msg.read ? '' : ' unread');
+            const preview = msg.body.substring(0, 90);
+            const code = extractCode(msg.body);
+            div.innerHTML = `
+                <div class="email-header">
+                    <span><strong>${escapeHtml(msg.from)}</strong></span>
+                    <span>${formatDate(msg.date)}</span>
+                </div>
+                <div class="email-subject">${escapeHtml(msg.subject)}</div>
+                <div class="email-preview">${escapeHtml(preview)}...</div>
+                <div class="email-body" id="body-${msg.id}">
+                    <div style="white-space: pre-wrap;">${escapeHtml(msg.body)}</div>
+                    ${code ? `<div class="verification-code">🔐 CÓDIGO: ${code} <button class="copy-btn" data-code="${code}">📋 COPIAR</button></div>` : ''}
+                </div>
+            `;
+            div.addEventListener('click', (e) => {
+                if (e.target.classList.contains('copy-btn')) return;
+                const b = div.querySelector('.email-body');
+                b.classList.toggle('show');
+                if (!msg.read) { msg.read = true; div.classList.remove('unread'); }
+            });
+            const btn = div.querySelector('.copy-btn');
+            if (btn) {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const code = btn.getAttribute('data-code');
+                    navigator.clipboard.writeText(code);
+                    showToast(`📋 Código ${code} copiado!`, '#10b981');
+                });
+            }
+            container.appendChild(div);
+        }
+    }
+
+    function startAuto() {
         if (autoInterval) clearInterval(autoInterval);
         autoActive = true;
-        autoInterval = setInterval(() => {
-            if (currentLogin) checkInbox(true);
-        }, 30000);
+        autoInterval = setInterval(() => { if (currentLogin) checkInbox(true); }, 30000);
         document.getElementById('autoRefreshBtn').innerHTML = '⏱️ AUTO ✅ ATIVO';
         document.getElementById('autoRefreshBtn').style.background = '#10b981';
         showToast('✅ Auto-refresh ativado (30s)', '#10b981');
     }
 
-    function stopAutoRefresh() {
+    function stopAuto() {
         if (autoInterval) clearInterval(autoInterval);
         autoActive = false;
         document.getElementById('autoRefreshBtn').innerHTML = '⏱️ AUTO (30s)';
@@ -379,35 +337,12 @@
         showToast('⏸️ Auto-refresh desativado', '#64748b');
     }
 
-    async function refreshNow() {
-        if (!currentLogin) {
-            showToast('⚠️ Crie um email primeiro', '#f59e0b');
-            return;
-        }
-        showToast('🔄 Verificando inbox...', '#3b82f6');
-        await checkInbox(true);
-        showToast('✅ Inbox atualizada', '#10b981');
-    }
-
-    async function newEmail() {
-        stopAutoRefresh();
-        await criarEmailReal();
-        if (autoActive) startAutoRefresh();
-    }
+    document.getElementById('newEmailBtn').onclick = () => { stopAuto(); criarEmail(); if (autoActive) startAuto(); };
+    document.getElementById('refreshBtn').onclick = async () => { if (!currentLogin) { showToast('⚠️ Crie um email primeiro', '#f59e0b'); return; } showToast('🔄 Verificando...', '#3b82f6'); await checkInbox(true); showToast('✅ Atualizado', '#10b981'); };
+    document.getElementById('autoRefreshBtn').onclick = () => { if (!currentLogin) { showToast('⚠️ Crie um email primeiro', '#f59e0b'); return; } autoActive ? stopAuto() : startAuto(); };
 
     if (Notification.permission === 'default') Notification.requestPermission();
-
-    document.getElementById('newEmailBtn').addEventListener('click', newEmail);
-    document.getElementById('refreshBtn').addEventListener('click', refreshNow);
-    document.getElementById('autoRefreshBtn').addEventListener('click', () => {
-        if (!currentLogin) {
-            showToast('⚠️ Crie um email primeiro', '#f59e0b');
-            return;
-        }
-        autoActive ? stopAutoRefresh() : startAutoRefresh();
-    });
-
-    criarEmailReal();
+    criarEmail();
 </script>
 </body>
 </html>
