@@ -1,5 +1,0 @@
-flask
-Pillow
-requests
-flask-cors
-gunicorn
