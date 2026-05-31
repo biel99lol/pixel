@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Discord Creator - Minimiza ao Abrir</title>
+    <title>Discord Creator - Com Iframe</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
-        body { background: transparent; min-height: 100vh; overflow: hidden; }
+        body { background: transparent; overflow: hidden; }
         .floating-app {
             position: fixed;
             bottom: 20px;
@@ -17,14 +17,14 @@
             border-radius: 28px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
             z-index: 99999;
-            transition: all 0.2s ease;
-            cursor: grab;
-            border: 1px solid rgba(88, 101, 242, 0.5);
+            transition: all 0.2s;
+            border: 1px solid #5865F2;
+            display: flex;
+            flex-direction: column;
         }
-        .floating-app:active { cursor: grabbing; }
         .app-header {
             background: #5865F2;
-            padding: 12px 16px;
+            padding: 10px 16px;
             border-radius: 28px 28px 0 0;
             display: flex;
             justify-content: space-between;
@@ -34,30 +34,57 @@
             font-weight: bold;
         }
         .app-header:active { cursor: grabbing; }
-        .app-header h3 { font-size: 16px; margin: 0; display: flex; gap: 8px; }
         .controls { display: flex; gap: 12px; }
         .controls button {
             background: none; border: none; color: white; font-size: 18px;
-            cursor: pointer; padding: 0 4px; font-weight: bold;
+            cursor: pointer; font-weight: bold; padding: 0 6px;
         }
-        .controls button:active { transform: scale(0.9); }
-        .app-content { padding: 16px; transition: all 0.2s; }
-        .floating-app.minimized .app-content { display: none; }
-        .floating-app.minimized { width: auto; border-radius: 40px; }
+        .content {
+            padding: 16px;
+            transition: 0.2s;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        /* Modo iframe: Discord ocupa todo o conteúdo */
+        .iframe-mode .content {
+            padding: 0;
+        }
+        .iframe-mode .discord-iframe {
+            display: block;
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 0 0 28px 28px;
+        }
+        .normal-mode .discord-iframe {
+            display: none;
+        }
+        .normal-mode .normal-content {
+            display: block;
+        }
+        .iframe-mode .normal-content {
+            display: none;
+        }
         .dados-box {
-            background: #1e1e2f; color: #00ff88; padding: 12px; border-radius: 20px;
-            margin: 12px 0; font-family: monospace; font-size: 11px; word-break: break-all;
+            background: #1e1e2f;
+            color: #00ff88;
+            padding: 12px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            font-family: monospace;
+            font-size: 11px;
         }
         button {
             width: 100%; padding: 12px; border: none; border-radius: 40px;
-            font-weight: bold; margin: 6px 0; cursor: pointer; transition: 0.1s;
+            font-weight: bold; margin: 6px 0; cursor: pointer;
         }
         button:active { transform: scale(0.97); }
         .btn-primary { background: #23a55a; color: white; }
         .btn-secondary { background: #1e1e2f; color: #00ff88; border: 1px solid #2a2a3a; }
         .btn-discord { background: #5865F2; color: white; }
-        .flex-buttons { display: flex; gap: 8px; }
-        .flex-buttons button { flex: 1; }
+        .btn-back { background: #faa61a; color: #1e1e2f; margin-top: 8px; }
+        .flex-buttons { display: flex; gap: 8px; margin: 6px 0; }
+        .flex-buttons button { flex: 1; margin: 0; }
         .toast {
             position: fixed; bottom: 20px; left: 20px; background: #1e1e2f;
             color: white; padding: 10px 16px; border-radius: 40px; font-size: 12px;
@@ -67,33 +94,46 @@
     </style>
 </head>
 <body>
-<div id="floatingApp" class="floating-app">
+<div id="floatingApp" class="floating-app normal-mode">
     <div class="app-header" id="appHeader">
         <h3>🎮 Discord Creator</h3>
         <div class="controls">
             <button id="minimizeBtn">─</button>
         </div>
     </div>
-    <div class="app-content">
-        <div class="dados-box">
-            📧 <span id="email">---</span><br>
-            👤 <span id="username">---</span><br>
-            🔐 <span id="password">---</span>
+    <div class="content">
+        <!-- Conteúdo normal (gerador de dados) -->
+        <div class="normal-content">
+            <div class="dados-box">
+                📧 <span id="email">---</span><br>
+                👤 <span id="username">---</span><br>
+                🔐 <span id="password">---</span>
+            </div>
+            <button id="btnGerar" class="btn-primary">✨ GERAR CONTA</button>
+            <div class="flex-buttons">
+                <button id="btnCopiar" class="btn-secondary">📋 COPIAR</button>
+                <button id="btnDiscordInternal" class="btn-discord">🔗 ABRIR DISCORD (IFRAME)</button>
+            </div>
+            <div style="font-size: 10px; text-align: center; margin-top: 8px; color: #aaa;">
+                ↕️ Arraste pela barra azul
+            </div>
         </div>
-        <button id="btnGerar" class="btn-primary">✨ GERAR CONTA</button>
-        <div class="flex-buttons">
-            <button id="btnCopiar" class="btn-secondary">📋 COPIAR</button>
-            <button id="btnDiscord" class="btn-discord">🔗 ABRIR</button>
-        </div>
-        <div style="font-size: 10px; text-align: center; margin-top: 8px; color: #aaa;">
-            ↕️ Arraste pela barra azul
-        </div>
+        <!-- Iframe do Discord (inicialmente oculto) -->
+        <iframe id="discordIframe" class="discord-iframe" src="about:blank" allow="clipboard-write; clipboard-read;"></iframe>
+        <!-- Botão para voltar ao modo normal (aparece quando no modo iframe) -->
+        <button id="btnVoltar" class="btn-back" style="display: none;">⬅ VOLTAR AO GERADOR</button>
     </div>
 </div>
 
 <script>
-    // ========== DADOS DO APP ==========
+    // Dados do app
     let dadosAtuais = { email: '', username: '', password: '' };
+    let isIframeMode = false;
+    const appDiv = document.getElementById('floatingApp');
+    const iframe = document.getElementById('discordIframe');
+    const btnVoltar = document.getElementById('btnVoltar');
+    const btnDiscordInternal = document.getElementById('btnDiscordInternal');
+
     function mostrarToast(msg, cor = '#1e1e2f') {
         const old = document.querySelector('.toast');
         if (old) old.remove();
@@ -104,6 +144,7 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2500);
     }
+
     function gerarDados() {
         const timestamp = Date.now();
         const random = Math.floor(Math.random() * 99999);
@@ -118,6 +159,7 @@
         mostrarToast('✅ Conta gerada!', '#23a55a');
         localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
     }
+
     async function copiarDados() {
         if (!dadosAtuais.email || dadosAtuais.email === '---') {
             mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
@@ -127,24 +169,33 @@
         await navigator.clipboard.writeText(texto);
         mostrarToast('📋 Dados copiados!', '#1e1e2f');
     }
-    function abrirDiscordEMinimizar() {
-        if (!dadosAtuais.email || dadosAtuais.email === '---') {
+
+    // Abrir Discord no iframe (dentro do app)
+    function abrirDiscordNoIframe() {
+        if (!dadosAtuais.email) {
             mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
             return;
         }
-        // Abre o Discord em nova aba
-        window.open('https://discord.com/register', '_blank');
-        mostrarToast('🔗 Discord aberto! App minimizado.', '#5865F2');
-        
-        // MINIMIZA O APP AUTOMATICAMENTE
-        const app = document.getElementById('floatingApp');
-        const minimizeBtn = document.getElementById('minimizeBtn');
-        if (!app.classList.contains('minimized')) {
-            app.classList.add('minimized');
-            minimizeBtn.textContent = '□';
-            isMinimized = true;
-        }
+        // Troca para modo iframe
+        appDiv.classList.remove('normal-mode');
+        appDiv.classList.add('iframe-mode');
+        iframe.src = 'https://discord.com/register';
+        btnVoltar.style.display = 'block';
+        isIframeMode = true;
+        mostrarToast('🔗 Discord carregado dentro do app! Cole os dados no iframe.', '#5865F2');
     }
+
+    // Voltar para o modo normal (gerador)
+    function voltarParaGerador() {
+        appDiv.classList.remove('iframe-mode');
+        appDiv.classList.add('normal-mode');
+        iframe.src = 'about:blank';
+        btnVoltar.style.display = 'none';
+        isIframeMode = false;
+        mostrarToast('✅ Voltei ao gerador de contas.', '#1e1e2f');
+    }
+
+    // Carregar dados salvos
     function carregarDados() {
         const salvos = localStorage.getItem('discord_dados');
         if (salvos) {
@@ -159,42 +210,42 @@
         }
     }
 
-    // ========== FUNÇÕES DE ARRASTAR E MINIMIZAR ==========
-    const app = document.getElementById('floatingApp');
+    // ========== ARRASTAR E MINIMIZAR (igual antes) ==========
     const header = document.getElementById('appHeader');
     let isDragging = false;
     let offsetX, offsetY;
     let isMinimized = false;
+    const minimizeBtn = document.getElementById('minimizeBtn');
 
     header.addEventListener('mousedown', (e) => {
         if (e.target.tagName === 'BUTTON') return;
         isDragging = true;
-        offsetX = e.clientX - app.offsetLeft;
-        offsetY = e.clientY - app.offsetTop;
-        app.style.cursor = 'grabbing';
+        offsetX = e.clientX - appDiv.offsetLeft;
+        offsetY = e.clientY - appDiv.offsetTop;
+        appDiv.style.cursor = 'grabbing';
         e.preventDefault();
     });
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         let left = e.clientX - offsetX;
         let top = e.clientY - offsetY;
-        left = Math.max(10, Math.min(window.innerWidth - app.offsetWidth - 10, left));
-        top = Math.max(10, Math.min(window.innerHeight - app.offsetHeight - 10, top));
-        app.style.left = left + 'px';
-        app.style.right = 'auto';
-        app.style.bottom = 'auto';
-        app.style.top = top + 'px';
+        left = Math.max(10, Math.min(window.innerWidth - appDiv.offsetWidth - 10, left));
+        top = Math.max(10, Math.min(window.innerHeight - appDiv.offsetHeight - 10, top));
+        appDiv.style.left = left + 'px';
+        appDiv.style.right = 'auto';
+        appDiv.style.bottom = 'auto';
+        appDiv.style.top = top + 'px';
     });
     window.addEventListener('mouseup', () => {
         isDragging = false;
-        app.style.cursor = 'grab';
+        appDiv.style.cursor = 'grab';
     });
     // Toque
     header.addEventListener('touchstart', (e) => {
         if (e.target.tagName === 'BUTTON') return;
         const touch = e.touches[0];
-        offsetX = touch.clientX - app.offsetLeft;
-        offsetY = touch.clientY - app.offsetTop;
+        offsetX = touch.clientX - appDiv.offsetLeft;
+        offsetY = touch.clientY - appDiv.offsetTop;
         isDragging = true;
         e.preventDefault();
     });
@@ -203,26 +254,24 @@
         const touch = e.touches[0];
         let left = touch.clientX - offsetX;
         let top = touch.clientY - offsetY;
-        left = Math.max(10, Math.min(window.innerWidth - app.offsetWidth - 10, left));
-        top = Math.max(10, Math.min(window.innerHeight - app.offsetHeight - 10, top));
-        app.style.left = left + 'px';
-        app.style.right = 'auto';
-        app.style.bottom = 'auto';
-        app.style.top = top + 'px';
+        left = Math.max(10, Math.min(window.innerWidth - appDiv.offsetWidth - 10, left));
+        top = Math.max(10, Math.min(window.innerHeight - appDiv.offsetHeight - 10, top));
+        appDiv.style.left = left + 'px';
+        appDiv.style.right = 'auto';
+        appDiv.style.bottom = 'auto';
+        appDiv.style.top = top + 'px';
     });
     window.addEventListener('touchend', () => { isDragging = false; });
 
-    // Botão minimizar manual
-    const minimizeBtn = document.getElementById('minimizeBtn');
     minimizeBtn.addEventListener('click', () => {
         if (isMinimized) {
-            app.classList.remove('minimized');
+            appDiv.classList.remove('minimized');
             minimizeBtn.textContent = '─';
-            app.style.width = '360px';
+            appDiv.style.width = '360px';
         } else {
-            app.classList.add('minimized');
+            appDiv.classList.add('minimized');
             minimizeBtn.textContent = '□';
-            app.style.width = 'auto';
+            appDiv.style.width = 'auto';
         }
         isMinimized = !isMinimized;
     });
@@ -231,13 +280,13 @@
     carregarDados();
     document.getElementById('btnGerar').addEventListener('click', gerarDados);
     document.getElementById('btnCopiar').addEventListener('click', copiarDados);
-    document.getElementById('btnDiscord').addEventListener('click', abrirDiscordEMinimizar);
+    btnDiscordInternal.addEventListener('click', abrirDiscordNoIframe);
+    btnVoltar.addEventListener('click', voltarParaGerador);
 
-    // Posição inicial
-    app.style.left = 'auto';
-    app.style.right = '20px';
-    app.style.bottom = '20px';
-    app.style.top = 'auto';
+    appDiv.style.left = 'auto';
+    appDiv.style.right = '20px';
+    appDiv.style.bottom = '20px';
+    appDiv.style.top = 'auto';
 </script>
 </body>
 </html>
