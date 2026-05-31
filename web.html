@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Discord Creator - Com Iframe</title>
+    <title>Discord Creator - App Flutuante</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
         body { background: transparent; overflow: hidden; }
@@ -40,30 +40,21 @@
             cursor: pointer; font-weight: bold; padding: 0 6px;
         }
         .content {
-            padding: 16px;
             transition: 0.2s;
             max-height: 500px;
             overflow-y: auto;
         }
-        /* Modo iframe: Discord ocupa todo o conteúdo */
-        .iframe-mode .content {
-            padding: 0;
-        }
-        .iframe-mode .discord-iframe {
-            display: block;
+        /* Estilo para o modo normal (gerador) e modo iframe (Discord) */
+        .normal-mode .iframe-content { display: none; }
+        .iframe-mode .normal-content { display: none; }
+        
+        .normal-content, .iframe-content { padding: 16px; }
+        .iframe-content { padding: 0; }
+        .discord-iframe {
             width: 100%;
             height: 500px;
             border: none;
             border-radius: 0 0 28px 28px;
-        }
-        .normal-mode .discord-iframe {
-            display: none;
-        }
-        .normal-mode .normal-content {
-            display: block;
-        }
-        .iframe-mode .normal-content {
-            display: none;
         }
         .dados-box {
             background: #1e1e2f;
@@ -91,6 +82,8 @@
             z-index: 100000; animation: fadeUp 0.2s;
         }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .minimized .content { display: none; }
+        .minimized { width: auto; border-radius: 40px; }
     </style>
 </head>
 <body>
@@ -118,10 +111,11 @@
                 ↕️ Arraste pela barra azul
             </div>
         </div>
-        <!-- Iframe do Discord (inicialmente oculto) -->
-        <iframe id="discordIframe" class="discord-iframe" src="about:blank" allow="clipboard-write; clipboard-read;"></iframe>
-        <!-- Botão para voltar ao modo normal (aparece quando no modo iframe) -->
-        <button id="btnVoltar" class="btn-back" style="display: none;">⬅ VOLTAR AO GERADOR</button>
+        <!-- Conteúdo do iframe (Discord) -->
+        <div class="iframe-content">
+            <iframe id="discordIframe" class="discord-iframe" src="about:blank" allow="clipboard-write; clipboard-read;"></iframe>
+            <button id="btnVoltar" class="btn-back">⬅ VOLTAR AO GERADOR</button>
+        </div>
     </div>
 </div>
 
@@ -180,7 +174,6 @@
         appDiv.classList.remove('normal-mode');
         appDiv.classList.add('iframe-mode');
         iframe.src = 'https://discord.com/register';
-        btnVoltar.style.display = 'block';
         isIframeMode = true;
         mostrarToast('🔗 Discord carregado dentro do app! Cole os dados no iframe.', '#5865F2');
     }
@@ -190,7 +183,6 @@
         appDiv.classList.remove('iframe-mode');
         appDiv.classList.add('normal-mode');
         iframe.src = 'about:blank';
-        btnVoltar.style.display = 'none';
         isIframeMode = false;
         mostrarToast('✅ Voltei ao gerador de contas.', '#1e1e2f');
     }
@@ -210,7 +202,7 @@
         }
     }
 
-    // ========== ARRASTAR E MINIMIZAR (igual antes) ==========
+    // ========== ARRASTAR E MINIMIZAR ==========
     const header = document.getElementById('appHeader');
     let isDragging = false;
     let offsetX, offsetY;
