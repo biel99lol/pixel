@@ -3,23 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Discord Creator - Flutuante e Minimizável</title>
+    <title>Discord Creator - Minimiza ao Abrir</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none; /* Evita seleção ao arrastar */
-        }
-
-        body {
-            background: transparent; /* Fundo transparente para parecer flutuante */
-            min-height: 100vh;
-            position: relative;
-            overflow: hidden; /* Remove scroll da página */
-        }
-
-        /* App flutuante - posicionado no canto inferior direito */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body { background: transparent; min-height: 100vh; overflow: hidden; }
         .floating-app {
             position: fixed;
             bottom: 20px;
@@ -34,12 +21,7 @@
             cursor: grab;
             border: 1px solid rgba(88, 101, 242, 0.5);
         }
-
-        .floating-app:active {
-            cursor: grabbing;
-        }
-
-        /* Cabeçalho arrastável */
+        .floating-app:active { cursor: grabbing; }
         .app-header {
             background: #5865F2;
             padding: 12px 16px;
@@ -51,109 +33,40 @@
             color: white;
             font-weight: bold;
         }
-
-        .app-header:active {
-            cursor: grabbing;
-        }
-
-        .app-header h3 {
-            font-size: 16px;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-        }
-
+        .app-header:active { cursor: grabbing; }
+        .app-header h3 { font-size: 16px; margin: 0; display: flex; gap: 8px; }
+        .controls { display: flex; gap: 12px; }
         .controls button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0 4px;
-            font-weight: bold;
-            transition: transform 0.1s;
+            background: none; border: none; color: white; font-size: 18px;
+            cursor: pointer; padding: 0 4px; font-weight: bold;
         }
-
-        .controls button:active {
-            transform: scale(0.9);
-        }
-
-        /* Conteúdo do app */
-        .app-content {
-            padding: 16px;
-            transition: all 0.2s;
-        }
-
-        /* Estado minimizado */
-        .floating-app.minimized .app-content {
-            display: none;
-        }
-
-        .floating-app.minimized {
-            width: auto;
-            border-radius: 40px;
-        }
-
-        /* Estilos dos elementos internos (igual antes) */
+        .controls button:active { transform: scale(0.9); }
+        .app-content { padding: 16px; transition: all 0.2s; }
+        .floating-app.minimized .app-content { display: none; }
+        .floating-app.minimized { width: auto; border-radius: 40px; }
         .dados-box {
-            background: #1e1e2f;
-            color: #00ff88;
-            padding: 12px;
-            border-radius: 20px;
-            margin: 12px 0;
-            font-family: monospace;
-            font-size: 11px;
-            word-break: break-all;
+            background: #1e1e2f; color: #00ff88; padding: 12px; border-radius: 20px;
+            margin: 12px 0; font-family: monospace; font-size: 11px; word-break: break-all;
         }
-
         button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 40px;
-            font-weight: bold;
-            margin: 6px 0;
-            cursor: pointer;
-            transition: 0.1s;
+            width: 100%; padding: 12px; border: none; border-radius: 40px;
+            font-weight: bold; margin: 6px 0; cursor: pointer; transition: 0.1s;
         }
-
-        button:active {
-            transform: scale(0.97);
-        }
-
+        button:active { transform: scale(0.97); }
         .btn-primary { background: #23a55a; color: white; }
         .btn-secondary { background: #1e1e2f; color: #00ff88; border: 1px solid #2a2a3a; }
         .btn-discord { background: #5865F2; color: white; }
         .flex-buttons { display: flex; gap: 8px; }
         .flex-buttons button { flex: 1; }
-
         .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #1e1e2f;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 40px;
-            font-size: 12px;
-            z-index: 100000;
-            animation: fadeUp 0.2s;
+            position: fixed; bottom: 20px; left: 20px; background: #1e1e2f;
+            color: white; padding: 10px 16px; border-radius: 40px; font-size: 12px;
+            z-index: 100000; animation: fadeUp 0.2s;
         }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-
 <div id="floatingApp" class="floating-app">
     <div class="app-header" id="appHeader">
         <h3>🎮 Discord Creator</h3>
@@ -162,12 +75,11 @@
         </div>
     </div>
     <div class="app-content">
-        <div class="dados-box" id="dadosBox">
+        <div class="dados-box">
             📧 <span id="email">---</span><br>
             👤 <span id="username">---</span><br>
             🔐 <span id="password">---</span>
         </div>
-
         <button id="btnGerar" class="btn-primary">✨ GERAR CONTA</button>
         <div class="flex-buttons">
             <button id="btnCopiar" class="btn-secondary">📋 COPIAR</button>
@@ -180,9 +92,8 @@
 </div>
 
 <script>
-    // ======================= DADOS E FUNÇÕES DO APP =======================
+    // ========== DADOS DO APP ==========
     let dadosAtuais = { email: '', username: '', password: '' };
-
     function mostrarToast(msg, cor = '#1e1e2f') {
         const old = document.querySelector('.toast');
         if (old) old.remove();
@@ -193,7 +104,6 @@
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2500);
     }
-
     function gerarDados() {
         const timestamp = Date.now();
         const random = Math.floor(Math.random() * 99999);
@@ -208,7 +118,6 @@
         mostrarToast('✅ Conta gerada!', '#23a55a');
         localStorage.setItem('discord_dados', JSON.stringify(dadosAtuais));
     }
-
     async function copiarDados() {
         if (!dadosAtuais.email || dadosAtuais.email === '---') {
             mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
@@ -218,16 +127,24 @@
         await navigator.clipboard.writeText(texto);
         mostrarToast('📋 Dados copiados!', '#1e1e2f');
     }
-
-    function abrirDiscord() {
+    function abrirDiscordEMinimizar() {
         if (!dadosAtuais.email || dadosAtuais.email === '---') {
             mostrarToast('⚠️ Gere uma conta primeiro', '#faa61a');
             return;
         }
+        // Abre o Discord em nova aba
         window.open('https://discord.com/register', '_blank');
-        mostrarToast('🔗 Discord aberto! Cole os dados.', '#5865F2');
+        mostrarToast('🔗 Discord aberto! App minimizado.', '#5865F2');
+        
+        // MINIMIZA O APP AUTOMATICAMENTE
+        const app = document.getElementById('floatingApp');
+        const minimizeBtn = document.getElementById('minimizeBtn');
+        if (!app.classList.contains('minimized')) {
+            app.classList.add('minimized');
+            minimizeBtn.textContent = '□';
+            isMinimized = true;
+        }
     }
-
     function carregarDados() {
         const salvos = localStorage.getItem('discord_dados');
         if (salvos) {
@@ -238,31 +155,29 @@
                 document.getElementById('password').innerText = dadosAtuais.password;
             } catch(e) {}
         } else {
-            // Gera automaticamente na primeira vez
             gerarDados();
         }
     }
 
-    // ======================= FUNÇÕES DE ARRASTAR E MINIMIZAR =======================
+    // ========== FUNÇÕES DE ARRASTAR E MINIMIZAR ==========
     const app = document.getElementById('floatingApp');
     const header = document.getElementById('appHeader');
     let isDragging = false;
     let offsetX, offsetY;
+    let isMinimized = false;
 
     header.addEventListener('mousedown', (e) => {
-        if (e.target.tagName === 'BUTTON') return; // Não arrasta se clicar nos botões
+        if (e.target.tagName === 'BUTTON') return;
         isDragging = true;
         offsetX = e.clientX - app.offsetLeft;
         offsetY = e.clientY - app.offsetTop;
         app.style.cursor = 'grabbing';
         e.preventDefault();
     });
-
     window.addEventListener('mousemove', (e) => {
         if (!isDragging) return;
         let left = e.clientX - offsetX;
         let top = e.clientY - offsetY;
-        // Limita para não sair da tela
         left = Math.max(10, Math.min(window.innerWidth - app.offsetWidth - 10, left));
         top = Math.max(10, Math.min(window.innerHeight - app.offsetHeight - 10, top));
         app.style.left = left + 'px';
@@ -270,15 +185,35 @@
         app.style.bottom = 'auto';
         app.style.top = top + 'px';
     });
-
     window.addEventListener('mouseup', () => {
         isDragging = false;
         app.style.cursor = 'grab';
     });
+    // Toque
+    header.addEventListener('touchstart', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        const touch = e.touches[0];
+        offsetX = touch.clientX - app.offsetLeft;
+        offsetY = touch.clientY - app.offsetTop;
+        isDragging = true;
+        e.preventDefault();
+    });
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        let left = touch.clientX - offsetX;
+        let top = touch.clientY - offsetY;
+        left = Math.max(10, Math.min(window.innerWidth - app.offsetWidth - 10, left));
+        top = Math.max(10, Math.min(window.innerHeight - app.offsetHeight - 10, top));
+        app.style.left = left + 'px';
+        app.style.right = 'auto';
+        app.style.bottom = 'auto';
+        app.style.top = top + 'px';
+    });
+    window.addEventListener('touchend', () => { isDragging = false; });
 
-    // Minimizar / Restaurar
+    // Botão minimizar manual
     const minimizeBtn = document.getElementById('minimizeBtn');
-    let isMinimized = false;
     minimizeBtn.addEventListener('click', () => {
         if (isMinimized) {
             app.classList.remove('minimized');
@@ -292,40 +227,13 @@
         isMinimized = !isMinimized;
     });
 
-    // Para toque em dispositivos móveis (arrastar com dedo)
-    header.addEventListener('touchstart', (e) => {
-        if (e.target.tagName === 'BUTTON') return;
-        const touch = e.touches[0];
-        offsetX = touch.clientX - app.offsetLeft;
-        offsetY = touch.clientY - app.offsetTop;
-        isDragging = true;
-        e.preventDefault();
-    });
-
-    window.addEventListener('touchmove', (e) => {
-        if (!isDragging) return;
-        const touch = e.touches[0];
-        let left = touch.clientX - offsetX;
-        let top = touch.clientY - offsetY;
-        left = Math.max(10, Math.min(window.innerWidth - app.offsetWidth - 10, left));
-        top = Math.max(10, Math.min(window.innerHeight - app.offsetHeight - 10, top));
-        app.style.left = left + 'px';
-        app.style.right = 'auto';
-        app.style.bottom = 'auto';
-        app.style.top = top + 'px';
-    });
-
-    window.addEventListener('touchend', () => {
-        isDragging = false;
-    });
-
     // Inicialização
     carregarDados();
     document.getElementById('btnGerar').addEventListener('click', gerarDados);
     document.getElementById('btnCopiar').addEventListener('click', copiarDados);
-    document.getElementById('btnDiscord').addEventListener('click', abrirDiscord);
+    document.getElementById('btnDiscord').addEventListener('click', abrirDiscordEMinimizar);
 
-    // Posicionar no canto inferior direito por padrão
+    // Posição inicial
     app.style.left = 'auto';
     app.style.right = '20px';
     app.style.bottom = '20px';
