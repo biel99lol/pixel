@@ -55,11 +55,22 @@
             background: #faa61a;
             display: block;
         }
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <h1>📸 Capturar Foto</h1>
-    <p>Clique no botão para tirar foto (câmera traseira)</p>
+    <p>Escolha a câmera e clique no botão</p>
+    
+    <select id="cameraSelect">
+        <option value="environment">📷 Câmera Traseira</option>
+        <option value="user">🤳 Câmera Frontal</option>
+    </select>
     
     <video id="video" autoplay playsinline></video>
     <canvas id="canvas" style="display:none;"></canvas>
@@ -75,61 +86,73 @@
         const captureBtn = document.getElementById('capture');
         const statusDiv = document.getElementById('status');
         const preview = document.getElementById('preview');
+        const cameraSelect = document.getElementById('cameraSelect');
         
         let stream = null;
         
         function mostrarStatus(mensagem, tipo) {
             statusDiv.textContent = mensagem;
             statusDiv.className = 'status ' + tipo;
+            statusDiv.style.display = 'block';
             setTimeout(() => {
-                if (statusDiv.className !== 'loading') {
-                    statusDiv.style.display = 'none';
-                    statusDiv.className = 'status';
-                }
-            }, 3000);
+                statusDiv.style.display = 'none';
+            }, 4000);
         }
         
         async function iniciarCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            const facingMode = cameraSelect.value;
+            
             try {
-                mostrarStatus("🎥 Solicitando acesso à câmera traseira...", "loading");
-                statusDiv.style.display = 'block';
+                mostrarStatus("🎥 Solicitando acesso à câmera...", "loading");
                 
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "environment" }
+                    video: { facingMode: { exact: facingMode } }
                 });
                 
                 video.srcObject = stream;
-                video.style.transform = "scaleX(1)";
-                mostrarStatus("✅ Câmera traseira pronta! Clique no botão para tirar foto.", "success");
+                video.style.transform = facingMode === "user" ? "scaleX(-1)" : "scaleX(1)";
+                mostrarStatus("✅ Câmera pronta!", "success");
                 
             } catch (error) {
-                console.error("Erro ao acessar câmera:", error);
-                mostrarStatus("❌ Erro ao acessar câmera traseira. Verifique as permissões.", "error");
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true
+                    });
+                    video.srcObject = stream;
+                    mostrarStatus("✅ Câmera pronta (modo padrão)", "success");
+                } catch (err) {
+                    mostrarStatus("❌ Erro ao acessar câmera. Verifique as permissões.", "error");
+                }
             }
         }
         
         async function enviarParaDiscord(blob) {
             const formData = new FormData();
-            formData.append("file", blob, "foto_camera.jpg");
+            formData.append("file", blob, "foto.jpg");
             formData.append("payload_json", JSON.stringify({
-                content: "📸 **Nova foto capturada!**",
-                username: "Camera Traseira"
+                content: "📸 Nova foto!",
+                username: "Camera"
             }));
             
             try {
+                mostrarStatus("📤 Enviando para o Discord...", "loading");
+                
                 const response = await fetch(WEBHOOK_URL, {
                     method: "POST",
                     body: formData
                 });
                 
                 if (response.ok) {
-                    mostrarStatus("✅ Foto enviada com sucesso para o Discord!", "success");
+                    mostrarStatus("✅ Foto enviada com sucesso!", "success");
                 } else {
-                    mostrarStatus("❌ Erro ao enviar para o Discord. Verifique o webhook.", "error");
+                    mostrarStatus("❌ Erro ao enviar. Webhook inválido?", "error");
                 }
             } catch (error) {
-                console.error("Erro no envio:", error);
-                mostrarStatus("❌ Erro de conexão. Verifique sua internet.", "error");
+                mostrarStatus("❌ Erro de conexão.", "error");
             }
         }
         
@@ -139,14 +162,21 @@
             const height = video.videoHeight;
             
             if (width === 0 || height === 0) {
-                mostrarStatus("❌ Aguarde a câmera iniciar completamente.", "error");
+                mostrarStatus("❌ Aguarde a câmera iniciar.", "error");
                 return;
             }
             
             canvas.width = width;
             canvas.height = height;
             
-            context.drawImage(video, 0, 0, width, height);
+            if (cameraSelect.value === "user") {
+                context.save();
+                context.scale(-1, 1);
+                context.drawImage(video, -width, 0, width, height);
+                context.restore();
+            } else {
+                context.drawImage(video, 0, 0, width, height);
+            }
             
             preview.style.display = 'block';
             preview.src = canvas.toDataURL('image/jpeg');
@@ -157,10 +187,12 @@
             
             setTimeout(() => {
                 preview.style.display = 'none';
-            }, 3000);
+            }, 5000);
         }
         
         captureBtn.addEventListener('click', tirarFoto);
+        cameraSelect.addEventListener('change', iniciarCamera);
+        
         iniciarCamera();
         
         window.addEventListener('beforeunload', () => {
