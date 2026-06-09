@@ -12,370 +12,147 @@
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0a0f;
             height: 100vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
-
-        /* Barra superior */
-        .toolbar {
-            background: #1a1a2a;
-            padding: 6px 10px;
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #2a2a3a;
-            z-index: 100;
-        }
-
-        .url-bar {
+        /* Tela principal */
+        .screen {
             flex: 1;
-            display: flex;
-            gap: 5px;
-            background: #0f0f1a;
-            border-radius: 25px;
-            padding: 3px 10px;
-            align-items: center;
-        }
-
-        .url-bar input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 11px;
-            padding: 5px 0;
-            outline: none;
-        }
-
-        .url-bar button {
-            background: #23a55a;
-            border: none;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .nav-btn {
-            background: #5865F2;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        /* Tabs */
-        .tabs-container {
-            background: #1a1a2a;
-            display: flex;
-            gap: 2px;
-            overflow-x: auto;
-            padding: 4px 4px 0 4px;
-        }
-
-        .tab {
-            background: #0f0f1a;
-            color: white;
-            padding: 4px 10px;
-            border-radius: 10px 10px 0 0;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            min-width: 100px;
-            justify-content: space-between;
-            font-size: 10px;
-        }
-
-        .tab.active {
-            background: #5865F2;
-        }
-
-        .tab button {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 12px;
-            padding: 0 3px;
-        }
-
-        .new-tab {
-            background: #23a55a;
-            border: none;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 15px;
-            cursor: pointer;
-            margin: 4px;
-            font-size: 10px;
-        }
-
-        .content-area {
-            flex: 1;
-            position: relative;
-            min-height: 0;
-        }
-
-        .browser-window {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            background: white;
-        }
-
-        .browser-window.active {
-            display: flex;
-        }
-
-        .browser-toolbar {
-            background: #2a2a3a;
-            padding: 3px 6px;
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .browser-toolbar input {
-            flex: 1;
-            background: #1e1e2f;
-            border: none;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 15px;
-            font-size: 10px;
-        }
-
-        .browser-toolbar button {
-            background: #5865F2;
-            border: none;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 9px;
-        }
-
-        .browser-frame {
-            flex: 1;
-            width: 100%;
-            border: none;
-        }
-
-        /* Página interna para teste */
-        .local-page {
-            flex: 1;
-            background: white;
-            padding: 20px;
+            background: #1e1e2e;
+            margin: 10px;
+            border-radius: 24px;
             overflow-y: auto;
-            font-family: Arial;
+            padding: 20px;
+            position: relative;
         }
-        
-        .local-page textarea, .local-page input {
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 100%;
+        }
+        input, textarea {
             width: 100%;
-            padding: 10px;
+            padding: 14px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
             font-size: 16px;
+            background: #fff;
         }
-        
-        .local-page button {
-            padding: 10px 20px;
+        button {
             background: #5865F2;
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 12px;
             margin: 5px;
+            font-size: 14px;
         }
-
-        /* ========== MOUSE VIRTUAL ========== */
-        .virtual-mouse-container {
+        /* Cursor flutuante */
+        .floating-cursor {
             position: fixed;
-            bottom: 180px;
-            right: 10px;
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            background: rgba(26, 26, 42, 0.95);
-            padding: 10px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            border: 1px solid #5865F2;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            touch-action: none;
-        }
-
-        .virtual-cursor {
-            width: 50px;
-            height: 50px;
-            background: #5865F2;
+            width: 60px;
+            height: 60px;
+            background: rgba(88, 101, 242, 0.9);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            cursor: move;
+            font-size: 32px;
+            z-index: 10000;
+            box-shadow: 0 0 15px rgba(88, 101, 242, 0.5);
+            cursor: grab;
             touch-action: none;
-            box-shadow: 0 0 10px #5865F2;
+            transition: transform 0.05s;
+            backdrop-filter: blur(4px);
+            border: 2px solid white;
         }
-
-        .virtual-cursor:active {
+        .floating-cursor:active {
             transform: scale(0.95);
+            cursor: grabbing;
         }
-
-        .mouse-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .mouse-btn {
-            background: #2a2a3a;
-            border: none;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-weight: bold;
-            font-size: 11px;
-            cursor: pointer;
-        }
-
-        .mouse-btn:active {
-            transform: scale(0.95);
-            background: #eb459e;
-        }
-
-        .mouse-btn.left {
-            background: #23a55a;
-        }
-
-        .mouse-btn.right {
-            background: #ed4245;
-        }
-
-        .mouse-scroll {
-            display: flex;
-            gap: 5px;
-        }
-
-        .scroll-btn {
-            background: #5865F2;
-            border: none;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 9px;
-            cursor: pointer;
-        }
-
-        /* ========== TECLADO VIRTUAL ========== */
-        .virtual-keyboard-container {
+        /* Teclado virtual */
+        .virtual-keyboard {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: rgba(26, 26, 42, 0.98);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-top: 2px solid #5865F2;
-            padding: 8px;
+            padding: 10px;
             z-index: 10001;
-            touch-action: manipulation;
+            transition: transform 0.3s;
         }
-
-        .keyboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 6px;
-            margin-bottom: 6px;
-            border-bottom: 1px solid #2a2a3a;
-        }
-
-        .keyboard-title {
-            color: #eb459e;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .kbd-btn {
-            background: #2a2a3a;
-            border: none;
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            cursor: pointer;
-        }
-
         .keyboard-row {
             display: flex;
             justify-content: center;
-            gap: 3px;
-            margin-bottom: 4px;
+            gap: 4px;
+            margin-bottom: 6px;
             flex-wrap: wrap;
         }
-
         .key {
             background: #2a2a3a;
             border: none;
             color: white;
-            padding: 8px 6px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 10px;
-            min-width: 32px;
+            padding: 12px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            min-width: 45px;
             text-align: center;
+            cursor: pointer;
+            transition: 0.03s linear;
         }
-
         .key:active {
             transform: scale(0.92);
             background: #5865F2;
         }
-
         .key.special {
             background: #eb459e;
-            min-width: 45px;
+            min-width: 60px;
         }
-
         .key.wide {
-            min-width: 65px;
+            min-width: 120px;
         }
-
+        .keyboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 15px;
+            margin-bottom: 10px;
+        }
+        .keyboard-title {
+            color: #eb459e;
+            font-weight: bold;
+        }
+        .minimize-btn {
+            background: #2a2a3a;
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
         .toast {
             position: fixed;
-            bottom: 170px;
-            left: 10px;
-            right: 10px;
+            bottom: 280px;
+            left: 20px;
+            right: 20px;
             background: #1e1e2f;
             color: white;
-            padding: 8px;
-            border-radius: 20px;
+            padding: 10px;
+            border-radius: 25px;
             text-align: center;
             z-index: 10002;
             animation: fadeUp 0.3s;
-            font-size: 11px;
+            font-size: 13px;
         }
-
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -383,38 +160,27 @@
     </style>
 </head>
 <body>
-<div class="toolbar">
-    <div class="url-bar">
-        <input type="text" id="globalUrlInput" placeholder="URL (ex: https://google.com)">
-        <button id="globalGoBtn">IR</button>
-    </div>
-    <button id="globalBackBtn" class="nav-btn">◀</button>
-    <button id="globalForwardBtn" class="nav-btn">▶</button>
-    <button id="globalReloadBtn" class="nav-btn">🔄</button>
-</div>
-
-<div class="tabs-container" id="tabsContainer"></div>
-<button id="newTabBtn" class="new-tab">+ Nova Aba</button>
-<div class="content-area" id="contentArea"></div>
-
-<!-- MOUSE VIRTUAL -->
-<div id="mouseContainer" class="virtual-mouse-container">
-    <div id="virtualCursor" class="virtual-cursor">🖱️</div>
-    <div class="mouse-buttons">
-        <button id="mouseLeftBtn" class="mouse-btn left">CLIQUE</button>
-        <button id="mouseRightBtn" class="mouse-btn right">DIREITO</button>
-    </div>
-    <div class="mouse-scroll">
-        <button id="scrollUpBtn" class="scroll-btn">▲</button>
-        <button id="scrollDownBtn" class="scroll-btn">▼</button>
+<div class="screen">
+    <div class="app-card">
+        <h2>🎮 Mouse + Teclado Virtual</h2>
+        <p style="margin: 10px 0; color: #666;">✅ Funciona DENTRO desta página</p>
+        <input type="text" id="campo1" placeholder="Campo de texto - Clique aqui e digite">
+        <textarea id="campo2" placeholder="Área de texto" rows="3"></textarea>
+        <button onclick="alert('Botão clicado pelo mouse virtual!')">Clique em mim</button>
+        <p style="margin-top: 20px; color: #888; font-size: 12px;">
+            🖱️ Arraste o cursor azul pela tela<br>
+            🖱️ Toque RÁPIDO no cursor = clique<br>
+            ⌨️ Teclado virtual na parte inferior
+        </p>
     </div>
 </div>
 
-<!-- TECLADO VIRTUAL -->
-<div id="keyboardContainer" class="virtual-keyboard-container">
+<div id="cursor" class="floating-cursor">🖱️</div>
+
+<div id="keyboard" class="virtual-keyboard">
     <div class="keyboard-header">
         <span class="keyboard-title">⌨️ TECLADO VIRTUAL</span>
-        <button id="keyboardMinimizeBtn" class="kbd-btn">─</button>
+        <button id="minimizeBtn" class="minimize-btn">─ Minimizar</button>
     </div>
     <div id="keyboardRows">
         <div class="keyboard-row">
@@ -435,12 +201,12 @@
             <button class="key" data-key="j">j</button><button class="key" data-key="k">k</button><button class="key" data-key="l">l</button>
         </div>
         <div class="keyboard-row">
-            <button class="key special" data-key="Shift">⇧</button><button class="key" data-key="z">z</button><button class="key" data-key="x">x</button>
+            <button class="key special" data-key="Shift">⇧ Shift</button><button class="key" data-key="z">z</button><button class="key" data-key="x">x</button>
             <button class="key" data-key="c">c</button><button class="key" data-key="v">v</button><button class="key" data-key="b">b</button>
-            <button class="key" data-key="n">n</button><button class="key" data-key="m">m</button><button class="key special" data-key="Enter">↵</button>
+            <button class="key" data-key="n">n</button><button class="key" data-key="m">m</button><button class="key special" data-key="Enter">↵ Enter</button>
         </div>
         <div class="keyboard-row">
-            <button class="key special wide" data-key="Space">ESPAÇO</button>
+            <button class="key wide" data-key="Space">ESPAÇO</button>
             <button class="key special" data-key="ArrowLeft">←</button>
             <button class="key special" data-key="ArrowRight">→</button>
         </div>
@@ -449,368 +215,30 @@
 
 <script>
     // ==================== VARIÁVEIS ====================
-    let browsers = [];
-    let activeBrowserId = null;
-    let browserCounter = 0;
-    let currentDoc = null; // Guarda referência ao documento atual
-    
-    // Mouse
-    let isDraggingMouse = false;
-    let dragStartX = 0, dragStartY = 0;
     let shiftPressed = false;
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
+    let lastTapTime = 0;
+    let keyboardVisible = true;
     
-    // ==================== PÁGINA LOCAL PARA TESTE ====================
-    function criarPaginaLocal() {
-        return `
-            <div class="local-page">
-                <h2>📱 Teste Mouse + Teclado Virtual</h2>
-                <p>Clique aqui e digite com o teclado virtual:</p>
-                <input type="text" id="campo1" placeholder="Campo de texto 1" style="width:100%; padding:10px; margin:5px 0">
-                <textarea id="campo2" placeholder="Área de texto maior..." rows="4" style="width:100%; padding:10px; margin:5px 0"></textarea>
-                <button onclick="alert('Botão clicado!')">Clique em mim</button>
-                <p style="margin-top:20px; color:#666; font-size:12px">✅ Mouse: arraste o ícone 🖱️ e clique nos botões</p>
-                <p style="color:#666; font-size:12px">⌨️ Teclado: toque nas teclas para digitar</p>
-            </div>
-        `;
-    }
+    // Elementos
+    const cursor = document.getElementById('cursor');
+    const keyboard = document.getElementById('keyboard');
+    const keyboardRows = document.getElementById('keyboardRows');
+    const minimizeBtn = document.getElementById('minimizeBtn');
     
-    // ==================== FUNÇÕES PRINCIPAIS ====================
+    // Posição inicial do cursor
+    let cursorX = window.innerWidth - 100;
+    let cursorY = window.innerHeight - 250;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
     
-    function getCurrentDocument() {
-        // Primeiro tenta pegar do iframe
-        const browser = browsers.find(b => b.id === activeBrowserId);
-        if (browser && browser.iframeId) {
-            const iframe = document.getElementById(browser.iframeId);
-            if (iframe) {
-                try {
-                    const doc = iframe.contentDocument || iframe.contentWindow.document;
-                    if (doc && doc.body) {
-                        currentDoc = doc;
-                        return doc;
-                    }
-                } catch(e) {
-                    console.log('Erro acesso iframe:', e);
-                }
-            }
-        }
-        // Fallback: usa o documento local da página
-        if (!currentDoc) currentDoc = document;
-        return currentDoc;
-    }
+    // ==================== FUNÇÕES ====================
     
-    // ENVIAR CLIQUE
-    async function sendClick(x, y, isRightClick = false) {
-        const doc = getCurrentDocument();
-        if (!doc) {
-            mostrarToast('❌ Nenhuma página disponível', '#ed4245');
-            return;
-        }
-        
-        // Se for o documento local, ajusta coordenadas
-        let targetX = x, targetY = y;
-        let element = null;
-        
-        if (doc === document) {
-            // Documento local
-            element = document.elementFromPoint(x, y);
-        } else {
-            // Iframe remoto
-            const iframe = document.getElementById(browsers.find(b => b.id === activeBrowserId)?.iframeId);
-            if (iframe) {
-                const iframeRect = iframe.getBoundingClientRect();
-                targetX = x - iframeRect.left;
-                targetY = y - iframeRect.top;
-                if (targetX >= 0 && targetY >= 0 && targetX <= iframeRect.width && targetY <= iframeRect.height) {
-                    element = doc.elementFromPoint(targetX, targetY);
-                }
-            }
-        }
-        
-        if (!element) {
-            mostrarToast('⚠️ Nenhum elemento encontrado', '#faa61a');
-            return;
-        }
-        
-        const button = isRightClick ? 2 : 0;
-        
-        const downEvent = new MouseEvent('mousedown', {
-            bubbles: true, cancelable: true, clientX: targetX, clientY: targetY, button: button
-        });
-        element.dispatchEvent(downEvent);
-        
-        await new Promise(r => setTimeout(r, 50));
-        
-        const upEvent = new MouseEvent('mouseup', {
-            bubbles: true, cancelable: true, clientX: targetX, clientY: targetY, button: button
-        });
-        element.dispatchEvent(upEvent);
-        
-        const clickEvent = new MouseEvent('click', {
-            bubbles: true, cancelable: true, clientX: targetX, clientY: targetY, button: button
-        });
-        element.dispatchEvent(clickEvent);
-        
-        mostrarToast(isRightClick ? '🖱️ Clique Direito' : '🖱️ Clique', '#23a55a');
-    }
-    
-    // ENVIAR TECLA
-    function sendKey(key) {
-        const doc = getCurrentDocument();
-        if (!doc) { mostrarToast('❌ Erro', '#ed4245'); return; }
-        
-        let activeElement = doc.activeElement;
-        
-        if (!activeElement || activeElement === doc.body) {
-            const input = doc.querySelector('input, textarea, [contenteditable="true"]');
-            if (input) {
-                input.focus();
-                activeElement = input;
-            } else {
-                mostrarToast('⚠️ Clique em um campo de texto primeiro', '#faa61a');
-                return;
-            }
-        }
-        
-        let finalKey = key;
-        if (shiftPressed && key.length === 1 && /[a-z]/.test(key)) {
-            finalKey = key.toUpperCase();
-        }
-        
-        const downEvent = new KeyboardEvent('keydown', { key: finalKey, bubbles: true, cancelable: true, shiftKey: shiftPressed });
-        activeElement.dispatchEvent(downEvent);
-        
-        if (finalKey.length === 1 && !downEvent.defaultPrevented) {
-            const pressEvent = new KeyboardEvent('keypress', { key: finalKey, bubbles: true });
-            activeElement.dispatchEvent(pressEvent);
-            
-            if (activeElement.value !== undefined && !pressEvent.defaultPrevented) {
-                const start = activeElement.selectionStart || 0;
-                const end = activeElement.selectionEnd || 0;
-                const newValue = activeElement.value.slice(0, start) + finalKey + activeElement.value.slice(end);
-                activeElement.value = newValue;
-                activeElement.selectionStart = activeElement.selectionEnd = start + 1;
-                
-                const inputEvent = new Event('input', { bubbles: true });
-                activeElement.dispatchEvent(inputEvent);
-            }
-        }
-        
-        const upEvent = new KeyboardEvent('keyup', { key: finalKey, bubbles: true });
-        activeElement.dispatchEvent(upEvent);
-        
-        mostrarToast(`⌨️ ${finalKey}`, '#5865F2');
-    }
-    
-    function sendSpecialKey(key) {
-        const doc = getCurrentDocument();
-        if (!doc) return;
-        
-        let activeElement = doc.activeElement;
-        if (!activeElement || activeElement === doc.body) {
-            const input = doc.querySelector('input, textarea');
-            if (input) {
-                input.focus();
-                activeElement = input;
-            } else return;
-        }
-        
-        const event = new KeyboardEvent('keydown', { key: key, bubbles: true, cancelable: true });
-        activeElement.dispatchEvent(event);
-        
-        if (key === 'Backspace' && activeElement.value !== undefined && !event.defaultPrevented) {
-            const start = activeElement.selectionStart || 0;
-            const end = activeElement.selectionEnd || 0;
-            if (start === end && start > 0) {
-                activeElement.value = activeElement.value.slice(0, start - 1) + activeElement.value.slice(end);
-                activeElement.selectionStart = activeElement.selectionEnd = start - 1;
-            } else if (start !== end) {
-                activeElement.value = activeElement.value.slice(0, start) + activeElement.value.slice(end);
-                activeElement.selectionStart = activeElement.selectionEnd = start;
-            }
-            const inputEvent = new Event('input', { bubbles: true });
-            activeElement.dispatchEvent(inputEvent);
-        }
-        
-        if (key === 'Shift') {
-            shiftPressed = !shiftPressed;
-            mostrarToast(shiftPressed ? '🔠 MAIÚSCULAS' : '🔡 minúsculas', '#faa61a');
-        }
-        
-        const upEvent = new KeyboardEvent('keyup', { key: key, bubbles: true });
-        activeElement.dispatchEvent(upEvent);
-        
-        if (key !== 'Shift') mostrarToast(`⌨️ ${key === 'Space' ? 'Espaço' : key}`, '#5865F2');
-    }
-    
-    function sendScroll(deltaY) {
-        const doc = getCurrentDocument();
-        if (!doc) return;
-        
-        const scrollEvent = new WheelEvent('wheel', { deltaY: deltaY, deltaMode: 0, bubbles: true });
-        doc.body.dispatchEvent(scrollEvent);
-        mostrarToast(`📜 ${deltaY > 0 ? 'Scroll ↓' : 'Scroll ↑'}`, '#faa61a');
-    }
-    
-    // ==================== MOUSE ====================
-    function initMouseDrag() {
-        const cursor = document.getElementById('virtualCursor');
-        const container = document.getElementById('mouseContainer');
-        
-        cursor.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            isDraggingMouse = true;
-            const touch = e.touches[0];
-            const rect = container.getBoundingClientRect();
-            dragStartX = touch.clientX - rect.left;
-            dragStartY = touch.clientY - rect.top;
-        });
-        
-        cursor.addEventListener('touchmove', (e) => {
-            if (!isDraggingMouse) return;
-            e.preventDefault();
-            const touch = e.touches[0];
-            let newLeft = touch.clientX - dragStartX;
-            let newTop = touch.clientY - dragStartY;
-            
-            newLeft = Math.max(5, Math.min(window.innerWidth - container.offsetWidth - 5, newLeft));
-            newTop = Math.max(50, Math.min(window.innerHeight - container.offsetHeight - 180, newTop));
-            
-            container.style.right = 'auto';
-            container.style.bottom = 'auto';
-            container.style.left = newLeft + 'px';
-            container.style.top = newTop + 'px';
-        });
-        
-        cursor.addEventListener('touchend', () => { isDraggingMouse = false; });
-        
-        container.style.right = 'auto';
-        container.style.left = window.innerWidth - 80 + 'px';
-        container.style.top = window.innerHeight - 280 + 'px';
-    }
-    
-    // ==================== BROWSER ====================
-    function criarNovaBrowser(url = null) {
-        const browserId = 'browser_' + (++browserCounter);
-        const iframeId = 'iframe_' + browserId;
-        
-        const browserDiv = document.createElement('div');
-        browserDiv.className = 'browser-window';
-        browserDiv.id = browserId;
-        
-        // Se for URL do Google ou externa, usa iframe. Senão, usa página local
-        const isExternal = url && (url.includes('google') || url.includes('http'));
-        
-        if (isExternal) {
-            browserDiv.innerHTML = `
-                <div class="browser-toolbar">
-                    <input type="text" class="browser-url" id="url_${iframeId}" value="${url || 'https://www.google.com'}">
-                    <button class="browser-go" data-browser="${browserId}">IR</button>
-                    <button class="browser-back" data-browser="${browserId}">◀</button>
-                    <button class="browser-forward" data-browser="${browserId}">▶</button>
-                    <button class="browser-reload" data-browser="${browserId}">🔄</button>
-                </div>
-                <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com'}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
-            `;
-        } else {
-            // Página local para teste
-            browserDiv.innerHTML = `
-                <div class="browser-toolbar">
-                    <input type="text" class="browser-url" id="url_${iframeId}" value="Página Local">
-                    <button class="browser-go" data-browser="${browserId}">IR</button>
-                </div>
-                <div id="${iframeId}" class="local-page">${criarPaginaLocal()}</div>
-            `;
-        }
-        
-        document.getElementById('contentArea').appendChild(browserDiv);
-        
-        const tabDiv = document.createElement('div');
-        tabDiv.className = 'tab';
-        tabDiv.id = 'tab_' + browserId;
-        tabDiv.innerHTML = `<span>${isExternal ? (url ? new URL(url).hostname : 'Google') : 'Teste'}</span><button class="close-tab" data-browser="${browserId}">✕</button>`;
-        document.getElementById('tabsContainer').appendChild(tabDiv);
-        
-        browsers.push({ id: browserId, iframeId: iframeId, isExternal: isExternal, url: url, tabId: 'tab_' + browserId });
-        
-        tabDiv.addEventListener('click', (e) => {
-            if (e.target.classList.contains('close-tab')) return;
-            ativarBrowser(browserId);
-        });
-        
-        tabDiv.querySelector('.close-tab').addEventListener('click', (e) => {
-            e.stopPropagation();
-            fecharBrowser(browserId);
-        });
-        
-        if (isExternal) {
-            const iframe = document.getElementById(iframeId);
-            const goBtn = browserDiv.querySelector('.browser-go');
-            const urlInput = browserDiv.querySelector('.browser-url');
-            
-            goBtn.addEventListener('click', () => {
-                let newUrl = urlInput.value;
-                if (!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
-                iframe.src = newUrl;
-                try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
-            });
-            
-            browserDiv.querySelector('.browser-back')?.addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) {} });
-            browserDiv.querySelector('.browser-forward')?.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) {} });
-            browserDiv.querySelector('.browser-reload')?.addEventListener('click', () => { iframe.src = iframe.src; });
-        }
-        
-        ativarBrowser(browserId);
-        return browserId;
-    }
-    
-    function ativarBrowser(browserId) {
-        activeBrowserId = browserId;
-        browsers.forEach(b => {
-            document.getElementById(b.id)?.classList.remove('active');
-            document.getElementById(b.tabId)?.classList.remove('active');
-        });
-        document.getElementById(browserId).classList.add('active');
-        document.getElementById('tab_' + browserId).classList.add('active');
-        
-        // Atualizar documento atual
-        const browser = browsers.find(b => b.id === browserId);
-        if (browser && !browser.isExternal) {
-            currentDoc = document;
-        } else {
-            currentDoc = null;
-        }
-    }
-    
-    function fecharBrowser(browserId) {
-        const index = browsers.findIndex(b => b.id === browserId);
-        if (index === -1) return;
-        const browser = browsers[index];
-        document.getElementById(browser.id)?.remove();
-        document.getElementById(browser.tabId)?.remove();
-        browsers.splice(index, 1);
-        
-        if (browsers.length === 0) {
-            criarNovaBrowser(null);
-        } else if (activeBrowserId === browserId) {
-            ativarBrowser(browsers[Math.max(0, index - 1)].id);
-        }
-    }
-    
-    function irParaUrl() {
-        let url = document.getElementById('globalUrlInput').value;
-        if (!url) return;
-        if (!url.startsWith('http')) {
-            if (url.includes('.')) url = 'https://' + url;
-            else url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-        }
-        criarNovaBrowser(url);
-    }
-    
-    // ==================== EVENTOS ====================
-    function mostrarToast(msg, cor) {
-        const old = document.querySelector('.toast');
-        if (old) old.remove();
-        const toast = document.createElement('div');
+    function mostrarToast(msg, cor = '#5865F2') {
+        let toast = document.querySelector('.toast');
+        if(toast) toast.remove();
+        toast = document.createElement('div');
         toast.className = 'toast';
         toast.style.background = cor;
         toast.innerText = msg;
@@ -818,50 +246,196 @@
         setTimeout(() => toast.remove(), 1500);
     }
     
-    document.getElementById('globalGoBtn').addEventListener('click', irParaUrl);
-    document.getElementById('globalUrlInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') irParaUrl(); });
-    document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser(null));
-    document.getElementById('keyboardMinimizeBtn').addEventListener('click', () => {
-        const rows = document.getElementById('keyboardRows');
-        rows.style.display = rows.style.display === 'none' ? 'flex' : 'none';
-    });
+    // Obter elemento ativo (input/textarea)
+    function getActiveElement() {
+        let active = document.activeElement;
+        if(!active || active === document.body) {
+            let input = document.querySelector('input, textarea');
+            if(input) {
+                input.focus();
+                return input;
+            }
+            mostrarToast('⚠️ Clique em um campo de texto primeiro', '#faa61a');
+            return null;
+        }
+        return active;
+    }
     
-    // Mouse
-    document.getElementById('mouseLeftBtn').addEventListener('click', () => {
-        const container = document.getElementById('mouseContainer');
-        const rect = container.getBoundingClientRect();
-        sendClick(rect.left + 25, rect.top + 25, false);
-    });
-    
-    document.getElementById('mouseRightBtn').addEventListener('click', () => {
-        const container = document.getElementById('mouseContainer');
-        const rect = container.getBoundingClientRect();
-        sendClick(rect.left + 25, rect.top + 25, true);
-    });
-    
-    document.getElementById('scrollUpBtn').addEventListener('click', () => sendScroll(-300));
-    document.getElementById('scrollDownBtn').addEventListener('click', () => sendScroll(300));
-    
-    // Teclado
-    document.querySelectorAll('.key').forEach(key => {
-        key.addEventListener('click', () => {
-            const keyVal = key.getAttribute('data-key');
-            if (keyVal === 'Backspace' || keyVal === 'Enter' || keyVal === 'Shift') {
-                sendSpecialKey(keyVal);
-            } else if (keyVal === 'Space') {
-                sendSpecialKey(' ');
+    // Enviar clique na posição do cursor
+    function sendClick() {
+        const x = cursorX + 30;
+        const y = cursorY + 30;
+        let element = document.elementFromPoint(x, y);
+        
+        if(element) {
+            // Disparar eventos
+            element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: x, clientY: y }));
+            element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: x, clientY: y }));
+            element.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x, clientY: y }));
+            
+            // Se for input, focar
+            if(element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.focus();
+                mostrarToast('🖱️ Campo focado', '#23a55a');
             } else {
-                sendKey(keyVal);
+                mostrarToast('🖱️ Clique', '#5865F2');
+            }
+        }
+    }
+    
+    // Enviar caractere
+    function sendChar(char) {
+        let el = getActiveElement();
+        if(!el) return;
+        
+        let finalChar = shiftPressed && /[a-z]/.test(char) ? char.toUpperCase() : char;
+        
+        let start = el.selectionStart || 0;
+        let end = el.selectionEnd || 0;
+        let newValue = el.value.slice(0, start) + finalChar + el.value.slice(end);
+        el.value = newValue;
+        el.selectionStart = el.selectionEnd = start + 1;
+        
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        mostrarToast(`⌨️ ${finalChar}`, '#23a55a');
+        
+        // Resetar shift após usar
+        if(shiftPressed && /[a-z]/.test(char)) {
+            shiftPressed = false;
+            mostrarToast('🔡 Shift desativado', '#faa61a');
+        }
+    }
+    
+    // Teclas especiais
+    function sendSpecial(key) {
+        let el = getActiveElement();
+        if(!el) return;
+        
+        if(key === 'Backspace') {
+            let start = el.selectionStart || 0;
+            let end = el.selectionEnd || 0;
+            if(start === end && start > 0) {
+                el.value = el.value.slice(0, start-1) + el.value.slice(end);
+                el.selectionStart = el.selectionEnd = start-1;
+            } else if(start !== end) {
+                el.value = el.value.slice(0, start) + el.value.slice(end);
+                el.selectionStart = el.selectionEnd = start;
+            }
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+            mostrarToast('⌨️ Apagar', '#5865F2');
+        }
+        else if(key === 'Enter') {
+            sendChar('\n');
+        }
+        else if(key === 'Shift') {
+            shiftPressed = !shiftPressed;
+            mostrarToast(shiftPressed ? '🔠 MAIÚSCULAS ATIVADO' : '🔡 minúsculas', '#faa61a');
+        }
+        else if(key === 'Space') {
+            sendChar(' ');
+        }
+        else if(key === 'ArrowLeft') {
+            let pos = el.selectionStart || 0;
+            if(pos > 0) {
+                el.selectionStart = el.selectionEnd = pos - 1;
+            }
+        }
+        else if(key === 'ArrowRight') {
+            let pos = el.selectionStart || 0;
+            let max = el.value.length;
+            if(pos < max) {
+                el.selectionStart = el.selectionEnd = pos + 1;
+            }
+        }
+    }
+    
+    function sendScroll(delta) {
+        window.scrollBy(0, delta);
+        mostrarToast(`📜 ${delta > 0 ? 'Scroll ↓' : 'Scroll ↑'}`, '#faa61a');
+    }
+    
+    // ==================== MOUSE DRAG ====================
+    cursor.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = cursor.getBoundingClientRect();
+        dragStartX = touch.clientX - rect.left;
+        dragStartY = touch.clientY - rect.top;
+        isDragging = false;
+        
+        // Detectar tap rápido (clique)
+        const now = Date.now();
+        if(now - lastTapTime < 200) {
+            sendClick();
+            lastTapTime = 0;
+        } else {
+            isDragging = true;
+            lastTapTime = now;
+        }
+    });
+    
+    cursor.addEventListener('touchmove', (e) => {
+        if(!isDragging) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        let newX = touch.clientX - dragStartX;
+        let newY = touch.clientY - dragStartY;
+        
+        newX = Math.max(5, Math.min(window.innerWidth - 70, newX));
+        newY = Math.max(60, Math.min(window.innerHeight - 200, newY));
+        
+        cursorX = newX;
+        cursorY = newY;
+        cursor.style.left = cursorX + 'px';
+        cursor.style.top = cursorY + 'px';
+    });
+    
+    cursor.addEventListener('touchend', () => {
+        isDragging = false;
+    });
+    
+    // ==================== TECLADO ====================
+    function minimizeKeyboard() {
+        keyboardVisible = !keyboardVisible;
+        if(keyboardVisible) {
+            keyboardRows.style.display = 'flex';
+            minimizeBtn.textContent = '─ Minimizar';
+        } else {
+            keyboardRows.style.display = 'none';
+            minimizeBtn.textContent = '□ Maximizar';
+        }
+    }
+    
+    minimizeBtn.addEventListener('click', minimizeKeyboard);
+    
+    // Adicionar eventos às teclas
+    document.querySelectorAll('.key').forEach(btn => {
+        btn.addEventListener('click', () => {
+            let key = btn.getAttribute('data-key');
+            if(key === 'Backspace' || key === 'Enter' || key === 'Shift' || 
+               key === 'Space' || key === 'ArrowLeft' || key === 'ArrowRight') {
+                sendSpecial(key);
+            } else {
+                sendChar(key);
             }
         });
     });
     
-    // INICIAR
-    initMouseDrag();
-    criarNovaBrowser(null); // Abre página local de teste
+    // Scroll buttons (opcional)
+    const scrollUpBtn = document.createElement('button');
+    const scrollDownBtn = document.createElement('button');
+    scrollUpBtn.textContent = '▲';
+    scrollDownBtn.textContent = '▼';
+    scrollUpBtn.style.cssText = 'position:fixed; bottom:200px; right:20px; background:#5865F2; color:white; border:none; border-radius:50%; width:45px; height:45px; font-size:20px; z-index:9999;';
+    scrollDownBtn.style.cssText = 'position:fixed; bottom:140px; right:20px; background:#5865F2; color:white; border:none; border-radius:50%; width:45px; height:45px; font-size:20px; z-index:9999;';
     
-    mostrarToast('✅ Mouse + Teclado Virtual FUNCIONANDO!', '#23a55a');
-    mostrarToast('🖱️ Clique no campo de texto e use o teclado', '#5865F2');
+    scrollUpBtn.onclick = () => sendScroll(-200);
+    scrollDownBtn.onclick = () => sendScroll(200);
+    document.body.appendChild(scrollUpBtn);
+    document.body.appendChild(scrollDownBtn);
+    
+    mostrarToast('✅ Mouse + Teclado Virtual ATIVADOS!', '#23a55a');
+    mostrarToast('🖱️ Arraste o cursor | Toque rápido = clique', '#5865F2');
 </script>
 </body>
 </html>
