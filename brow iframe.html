@@ -64,7 +64,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 
 #mpad{position:fixed;right:12px;bottom:280px;width:170px;
   background:#12121ae6;backdrop-filter:blur(12px);
-  border:1px solid #2a2a3a;border-radius:16px;z-index:9999;
+  border:1px solid #2a2a3a;border-radius:16px;z-index:10000;
   box-shadow:0 10px 40px rgba(0,0,0,0.6)}
 #mhead{padding:8px 12px 4px;display:flex;justify-content:space-between;
   align-items:center;cursor:move}
@@ -89,7 +89,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 
 #kbd{position:fixed;bottom:0;left:0;right:0;background:#111118ee;
   backdrop-filter:blur(10px);border-top:1px solid #2a2a35;
-  padding:4px 4px 8px;z-index:9998}
+  padding:4px 4px 8px;z-index:10001}
 #kbd.koff{display:none}
 #kbar{display:flex;align-items:center;padding:4px 6px 6px;gap:4px;
   border-bottom:1px solid #22222a;overflow-x:auto;scrollbar-width:none}
@@ -167,34 +167,32 @@ let tabs = [];
 let activeTabId = null;
 let tabCounter = 0;
 let activeFrame = null;
+let cursorX = window.innerWidth / 2;
+let cursorY = window.innerHeight / 2;
 
-// Injeção de controle remoto no iframe
-function injectRemoteController(iframe) {
+// Função principal: injeta controle COMPLETO dentro do iframe
+function injectFullControl(iframe) {
   try {
-    const win = iframe.contentWindow;
     const doc = iframe.contentDocument;
+    const win = iframe.contentWindow;
     if(!doc || !win) return false;
+    if(win.__remoteInjected) return true;
     
-    // Remove sandbox temporariamente via clone (só funciona se não for cross-origin)
-    // Para sites cross-origin, usamos postMessage. Mas para funcionar, vamos criar um proxy
-    
-    // Script injetado que cria cursor virtual
-    const injectScript = `
+    const injectCode = `
     (function() {
-      if(window.__remoteControlled) return;
-      window.__remoteControlled = true;
+      if(window.__remoteInjected) return;
+      window.__remoteInjected = true;
       
-      // Cursor virtual
+      // Cursor visual dentro do iframe
       let cursorX = window.innerWidth / 2;
       let cursorY = window.innerHeight / 2;
-      let cursorVisible = true;
       
       const cursorDiv = document.createElement('div');
-      cursorDiv.id = '__remoteCursor';
-      cursorDiv.style.cssText = 'position:fixed;width:0;height:0;border-left:10px solid transparent;border-right:0 solid transparent;border-bottom:18px solid #8ab4f8;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));pointer-events:none;z-index:999999;transform-origin:top left;';
-      const after = document.createElement('style');
-      after.textContent = '#__remoteCursor::after{content:"";position:absolute;top:12px;left:-5px;width:5px;height:12px;background:#8ab4f8;border-radius:0 0 4px 4px}';
-      document.head.appendChild(after);
+      cursorDiv.id = '__virtualCursor';
+      cursorDiv.style.cssText = 'position:fixed;width:0;height:0;border-left:10px solid transparent;border-right:0 solid transparent;border-bottom:18px solid #8ab4f8;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));pointer-events:none;z-index:999999;transform-origin:top left;transition:left 0.02s linear, top 0.02s linear;';
+      const style = document.createElement('style');
+      style.textContent = '#__virtualCursor::after{content:"";position:absolute;top:12px;left:-5px;width:5px;height:12px;background:#8ab4f8;border-radius:0 0 4px 4px} #__virtualCursor.rc{border-bottom-color:#f28b82} #__virtualCursor.rc::after{background:#f28b82}';
+      document.head.appendChild(style);
       document.body.appendChild(cursorDiv);
       
       function updateCursor() {
@@ -202,24 +200,27 @@ function injectRemoteController(iframe) {
         cursorDiv.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
       }
       
-      window.__setCursorPos = function(x, y) {
+      window.__setCursor = function(x, y) {
         cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
         cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
         updateCursor();
       };
       
-      window.__clickAtCursor = function(button) {
+      window.__click = function(button) {
         const elem = document.elementFromPoint(cursorX, cursorY);
-        if(elem) {
-          if(button === 'left') {
-            ['mousedown','mouseup','click'].forEach(type => {
-              const ev = new MouseEvent(type, {view:window,bubbles:true,cancelable:true,clientX:cursorX,clientY:cursorY,button:0});
-              elem.dispatchEvent(ev);
-            });
-          } else {
-            const ctx = new MouseEvent('contextmenu', {view:window,bubbles:true,cancelable:true,clientX:cursorX,clientY:cursorY,button:2});
-            elem.dispatchEvent(ctx);
-          }
+        if(!elem) return;
+        if(button === 'left') {
+          elem.dispatchEvent(new MouseEvent('mousedown', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:0}));
+          elem.dispatchEvent(new MouseEvent('mouseup', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:0}));
+          elem.dispatchEvent(new MouseEvent('click', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:0}));
+          cursorDiv.classList.remove('rc');
+          cursorDiv.classList.add('lc');
+          setTimeout(() => cursorDiv.classList.remove('lc'), 100);
+        } else {
+          elem.dispatchEvent(new MouseEvent('contextmenu', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:2}));
+          cursorDiv.classList.remove('lc');
+          cursorDiv.classList.add('rc');
+          setTimeout(() => cursorDiv.classList.remove('rc'), 150);
         }
       };
       
@@ -231,6 +232,10 @@ function injectRemoteController(iframe) {
           active.dispatchEvent(new KeyboardEvent('keypress', {key, code, bubbles:true}));
         }
         active.dispatchEvent(new KeyboardEvent('keyup', {key, code, bubbles:true}));
+        
+        // Feedback visual no botão
+        if(key === 'Enter') cursorDiv.style.transform = 'scale(0.95)';
+        setTimeout(() => cursorDiv.style.transform = '', 100);
       };
       
       window.__sendText = function(text) {
@@ -242,37 +247,76 @@ function injectRemoteController(iframe) {
           const newVal = val.substring(0, start) + text + val.substring(end);
           if(active.value !== undefined) active.value = newVal;
           else active.innerText = newVal;
-          active.selectionStart = active.selectionEnd = start + text.length;
+          if(active.selectionStart !== undefined) {
+            active.selectionStart = start + text.length;
+            active.selectionEnd = start + text.length;
+          }
           active.dispatchEvent(new InputEvent('input', {bubbles:true, data:text}));
         }
       };
       
       window.__scrollDir = function(dir) {
-        if(dir === 'up') window.scrollBy(0, -200);
-        else if(dir === 'down') window.scrollBy(0, 200);
+        if(dir === 'up') window.scrollBy({top: -300, behavior: 'smooth'});
+        else if(dir === 'down') window.scrollBy({top: 300, behavior: 'smooth'});
       };
       
       updateCursor();
-      console.log('Remote controller injected');
+      console.log('✅ Controle injetado no iframe');
     })();
     `;
     
     const script = doc.createElement('script');
-    script.textContent = injectScript;
+    script.textContent = injectCode;
     doc.head.appendChild(script);
     return true;
   } catch(e) {
-    console.log('Injection failed (cross-origin)');
+    console.log('❌ Injeção falhou (cross-origin):', e);
     return false;
   }
+}
+
+// Comunicação com iframe
+function sendToIframe(cmd, data) {
+  if(!activeFrame) return;
+  try {
+    const win = activeFrame.contentWindow;
+    if(cmd === 'move' && win.__setCursor) win.__setCursor(data.x, data.y);
+    else if(cmd === 'click' && win.__click) win.__click(data);
+    else if(cmd === 'key' && win.__sendKey) win.__sendKey(data.key, data.code, data.ctrl, data.alt, data.shift);
+    else if(cmd === 'text' && win.__sendText) win.__sendText(data);
+    else if(cmd === 'scroll' && win.__scrollDir) win.__scrollDir(data);
+  } catch(e) { console.log('Com erro:', e); }
+}
+
+// Atualiza cursor local (host)
+function updateHostCursor() {
+  // Não precisamos mais de cursor host, apenas enviamos para iframe
+  sendToIframe('move', { x: cursorX, y: cursorY });
+}
+
+function setCursorPosition(x, y) {
+  cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
+  cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
+  updateHostCursor();
+}
+
+function clickAtCursor(button) {
+  sendToIframe('click', button);
+}
+
+function sendKeyToFrame(key, code, modifiers = {}) {
+  sendToIframe('key', { key, code, ctrl: !!modifiers.ctrl, alt: !!modifiers.alt, shift: !!modifiers.shift });
+}
+
+function sendTextToFrame(text) {
+  sendToIframe('text', text);
 }
 
 function createIframe(url, tabId) {
   const iframe = document.createElement('iframe');
   iframe.className = 'contentFrame';
   iframe.style.display = 'none';
-  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write; accelerometer; camera; microphone; geolocation; cross-origin-isolated');
-  // Sem sandbox para permitir controle total (funciona para sites https)
+  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write; accelerometer; camera; microphone; geolocation');
   iframe.src = url;
   
   iframe.onload = () => {
@@ -283,87 +327,24 @@ function createIframe(url, tabId) {
           let title = iframe.contentDocument?.title || new URL(url).hostname || 'Nova aba';
           tab.title = title.substring(0, 35);
           updateTabsUI();
-          // Injeta controle
-          injectRemoteController(iframe);
-          
-          if(activeTabId === tabId) {
-            try {
-              const finalUrl = iframe.contentWindow.location.href;
-              if(finalUrl && finalUrl !== 'about:blank') tab.url = finalUrl;
-              document.getElementById('urlInput').value = tab.url;
-            } catch(e) {}
-          }
         } catch(e) {}
+        
+        // Injeta controle
+        const injected = injectFullControl(iframe);
+        
+        if(activeTabId === tabId) {
+          try {
+            const finalUrl = iframe.contentWindow.location.href;
+            if(finalUrl && finalUrl !== 'about:blank') tab.url = finalUrl;
+            document.getElementById('urlInput').value = tab.url;
+          } catch(e) {}
+          // Sincroniza cursor
+          setTimeout(() => updateHostCursor(), 100);
+        }
       }
-    }, 500);
+    }, 300);
   };
   return iframe;
-}
-
-// Comunicação com iframe via postMessage como fallback
-function sendToFrame(cmd, data) {
-  if(!activeFrame) return;
-  try {
-    const win = activeFrame.contentWindow;
-    if(win.__setCursorPos) {
-      if(cmd === 'move') win.__setCursorPos(data.x, data.y);
-      else if(cmd === 'click') win.__clickAtCursor(data);
-      else if(cmd === 'key') win.__sendKey(data.key, data.code, data.ctrl, data.alt, data.shift);
-      else if(cmd === 'text') win.__sendText(data);
-      else if(cmd === 'scroll') win.__scrollDir(data);
-    } else {
-      // Fallback: evento direto
-      if(cmd === 'click') {
-        try {
-          const rect = activeFrame.getBoundingClientRect();
-          const doc = activeFrame.contentDocument;
-          if(doc) {
-            const elem = doc.elementFromPoint(data.x, data.y);
-            if(elem) {
-              if(data.button === 'left') elem.click();
-              else elem.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true}));
-            }
-          }
-        } catch(e) {}
-      }
-    }
-  } catch(e) { console.log('send err', e); }
-}
-
-// Cursor host
-let cursorX = window.innerWidth / 2;
-let cursorY = window.innerHeight / 2;
-let cursorColor = 'lc';
-
-function updateHostCursor() {
-  const cur = document.getElementById('cur');
-  if(cur) {
-    cur.style.left = Math.max(2, Math.min(window.innerWidth - 12, cursorX - 3)) + 'px';
-    cur.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
-  }
-  // Envia para o iframe
-  sendToFrame('move', { x: cursorX, y: cursorY });
-}
-
-function setCursorPosition(x, y) {
-  cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
-  cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
-  updateHostCursor();
-}
-
-function clickAtCursor(button) {
-  sendToFrame('click', { button: button, x: cursorX, y: cursorY });
-  const cur = document.getElementById('cur');
-  cur.className = button === 'left' ? 'lc' : 'rc';
-  setTimeout(() => cur.className = 'lc', 100);
-}
-
-function sendKeyToFrame(key, code, modifiers = {}) {
-  sendToFrame('key', { key, code, ctrl: !!modifiers.ctrl, alt: !!modifiers.alt, shift: !!modifiers.shift });
-}
-
-function sendTextToFrame(text) {
-  sendToFrame('text', text);
 }
 
 function navigateTo(tabId, rawUrl) {
@@ -402,8 +383,11 @@ function showTabFrame(tabId) {
       if(curUrl && curUrl !== 'about:blank') active.url = curUrl;
     } catch(e) {}
     updateTabsUI();
-    // Re-injecta controle
-    setTimeout(() => injectRemoteController(active.frame), 100);
+    // Reinjeta e sincroniza cursor
+    setTimeout(() => {
+      injectFullControl(active.frame);
+      updateHostCursor();
+    }, 100);
   }
 }
 
@@ -462,8 +446,7 @@ function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'
 
 // Trackpad
 const trackpad = document.getElementById('tpad');
-let trackActive = false;
-let lastX = 0, lastY = 0;
+let trackActive = false, lastX = 0, lastY = 0;
 
 trackpad.addEventListener('touchstart', (e) => {
   e.preventDefault();
@@ -474,8 +457,8 @@ trackpad.addEventListener('touchstart', (e) => {
 trackpad.addEventListener('touchmove', (e) => {
   e.preventDefault();
   if(trackActive) {
-    const dx = (e.touches[0].clientX - lastX) * 2.5;
-    const dy = (e.touches[0].clientY - lastY) * 2.5;
+    const dx = (e.touches[0].clientX - lastX) * 2.2;
+    const dy = (e.touches[0].clientY - lastY) * 2.2;
     setCursorPosition(cursorX + dx, cursorY + dy);
     lastX = e.touches[0].clientX;
     lastY = e.touches[0].clientY;
@@ -493,11 +476,11 @@ document.getElementById('rbtn').addEventListener('touchstart', (e) => {
 });
 document.getElementById('sup').addEventListener('touchstart', (e) => {
   e.preventDefault();
-  sendToFrame('scroll', 'up');
+  sendToIframe('scroll', 'up');
 });
 document.getElementById('sdn').addEventListener('touchstart', (e) => {
   e.preventDefault();
-  sendToFrame('scroll', 'down');
+  sendToIframe('scroll', 'down');
 });
 document.getElementById('smid').addEventListener('touchstart', (e) => {
   e.preventDefault();
@@ -557,7 +540,7 @@ document.querySelectorAll('.qk').forEach(btn => {
   });
 });
 
-// UI Events
+// Navegação
 const urlInput = document.getElementById('urlInput');
 urlInput.addEventListener('keypress', (e) => {
   if(e.key === 'Enter') navigateTo(activeTabId, urlInput.value);
@@ -572,9 +555,9 @@ document.getElementById('reloadBtn').addEventListener('click', () => {
   if(activeFrame) try { activeFrame.contentWindow.location.reload(); } catch(e) {}
 });
 document.getElementById('newTab').addEventListener('click', () => addTab(START_URL));
-document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar'));
-document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar'));
-document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar'));
+document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar (demo)'));
+document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar (demo)'));
+document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar (demo)'));
 
 // Mover mousepad
 const mpad = document.getElementById('mpad');
@@ -611,9 +594,8 @@ document.getElementById('menubtn').addEventListener('click', () => {
   document.getElementById('kbd').classList.toggle('koff', !kbdVisible);
 });
 
-// Toque direto na viewport passa para o iframe
+// Toque na tela = move cursor + clique
 document.getElementById('viewport').addEventListener('touchstart', (e) => {
-  if(!activeFrame) return;
   e.preventDefault();
   const touch = e.touches[0];
   setCursorPosition(touch.clientX, touch.clientY);
@@ -623,20 +605,6 @@ document.getElementById('viewport').addEventListener('touchstart', (e) => {
 buildKeyboard();
 addTab(START_URL);
 setCursorPosition(window.innerWidth/2, window.innerHeight/2);
-updateHostCursor();
-
-setInterval(() => {
-  if(activeFrame) {
-    try {
-      const curUrl = activeFrame.contentWindow?.location?.href;
-      if(curUrl && curUrl !== 'about:blank') {
-        const activeTab = tabs.find(t => t.id === activeTabId);
-        if(activeTab && activeTab.url !== curUrl) activeTab.url = curUrl;
-        document.getElementById('urlInput').value = curUrl;
-      }
-    } catch(e) {}
-  }
-}, 800);
 </script>
 </body>
 </html>
