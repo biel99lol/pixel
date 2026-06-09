@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Chromium CloudMoon</title>
+<title>Chromium Navegador</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -16,60 +16,53 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   touch-action:none;-webkit-user-select:none;user-select:none}
 
 #titlebar{background:var(--bar);height:36px;display:flex;align-items:flex-end;
-  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto}
-#tabsContainer{display:flex;gap:2px;flex:1;overflow-x:auto}
+  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000}
 .tab{background:var(--card);color:var(--dim);padding:5px 10px 4px;
   border-radius:8px 8px 0 0;font-size:11px;display:flex;align-items:center;
-  gap:5px;min-width:90px;max-width:140px;cursor:pointer;
-  border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0}
+  gap:5px;min-width:80px;max-width:160px;cursor:pointer;
+  border:1px solid #000;border-bottom:none;white-space:nowrap;overflow:hidden;flex-shrink:0}
 .tab.active{background:var(--bg);color:var(--txt)}
 .tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
 .tab-x{width:15px;height:15px;display:flex;align-items:center;justify-content:center;
   border-radius:50%;font-size:11px}
 .tab-x:active{background:var(--hover)}
 #newTab{background:transparent;border:none;color:var(--dim);width:26px;height:26px;
-  font-size:18px;cursor:pointer;border-radius:50%;display:flex;
-  align-items:center;justify-content:center;align-self:center;margin-bottom:2px;flex-shrink:0}
-#winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;margin-bottom:7px;flex-shrink:0}
+  font-size:18px;cursor:pointer;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;align-self:center;margin-bottom:2px;flex-shrink:0}
+#winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;margin-bottom:7px}
 .wc{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0}
 .wc.min{background:#f0c132}.wc.max{background:#34c749}.wc.cls{background:#ea4335}
 
 #toolbar{background:var(--bar);padding:5px 8px;display:flex;align-items:center;
   gap:4px;flex-shrink:0;border-bottom:1px solid #000;position:relative}
 #loadbar{position:absolute;bottom:0;left:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),#a78bfa);width:0;pointer-events:none;z-index:5}
+  background:linear-gradient(90deg,var(--blue),#a78bfa);
+  width:0;pointer-events:none;z-index:5}
 .nb{background:transparent;border:none;color:var(--dim);width:30px;height:30px;
   border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;
   justify-content:center;flex-shrink:0}
 .nb:active{background:var(--hover)}
+.nb[disabled]{opacity:.3;pointer-events:none}
 #omnibox{flex:1;display:flex;align-items:center;background:#111;
   border:1.5px solid var(--bdr);border-radius:20px;padding:0 10px;
-  height:30px;gap:6px;cursor:pointer;min-width:0}
-#omnibox:active{border-color:var(--blue)}
+  height:30px;gap:6px;cursor:text;min-width:0}
+#omnibox:focus-within{border-color:var(--blue)}
 #lockico{font-size:12px;flex-shrink:0}
-#urldisp{flex:1;color:var(--txt);font-size:12px;overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
+#urlInput{flex:1;background:transparent;border:none;color:var(--txt);
+  font-size:12px;outline:none;min-width:0}
+#urlInput::placeholder{color:var(--dim)}
 #menubtn{background:transparent;border:none;color:var(--dim);font-size:20px;
   cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;
   align-items:center;justify-content:center;flex-shrink:0}
 #menubtn:active{background:var(--hover)}
 
 #viewport{flex:1;position:relative;overflow:hidden;background:#fff}
-.frame-container{position:absolute;inset:0;width:100%;height:100%;display:none}
-.frame-container.active{display:block}
-.nav-frame{width:100%;height:100%;border:none;background:#fff}
+#iframeContainer{position:absolute;inset:0;width:100%;height:100%}
+.contentFrame{position:absolute;inset:0;width:100%;height:100%;border:none;
+  display:block;background:#fff}
 
-#touchOverlay{position:absolute;inset:0;z-index:20;touch-action:none;background:transparent;pointer-events:auto}
-
-#loadScreen{position:absolute;inset:0;background:var(--bg);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;z-index:15}
-#loadScreen.hide{display:none}
-.spinner{width:36px;height:36px;border:3px solid var(--card);
-  border-top-color:var(--blue);border-radius:50%;
-  animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#loadMsg{color:var(--dim);font-size:12px}
+#touchOverlay{position:absolute;inset:0;z-index:10;touch-action:none;
+  background:transparent;pointer-events:none}
 
 #cur{position:fixed;pointer-events:none;z-index:99999;
   width:0;height:0;
@@ -77,12 +70,61 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   border-right:0 solid transparent;
   border-bottom:15px solid rgba(255,255,255,.93);
   filter:drop-shadow(0 1px 4px rgba(0,0,0,.8));
-  transform-origin:top left}
+  transform-origin:top left;
+  transition:transform 0.05s ease-out}
 #cur::after{content:'';position:absolute;top:9px;left:-4px;
   width:4px;height:9px;background:rgba(255,255,255,.93);
   border-radius:0 0 3px 3px}
 #cur.lc{border-bottom-color:rgba(138,180,248,.95)}
 #cur.rc{border-bottom-color:rgba(242,139,130,.95)}
+
+#mpad{position:fixed;right:8px;bottom:270px;width:162px;
+  background:#12121a;border:1px solid #252535;border-radius:14px;
+  z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.85);touch-action:none}
+#mhead{padding:6px 10px 3px;display:flex;justify-content:space-between;
+  align-items:center;cursor:move;touch-action:none}
+#mhead span:first-child{color:#444;font-size:9px;letter-spacing:1.5px;font-weight:700}
+#mhead span:last-child{color:#2a2a3a;font-size:14px}
+#tpad{margin:0 8px;height:88px;background:#0a0a10;border-radius:8px;
+  border:1px solid #1a1a28;position:relative;overflow:hidden;
+  touch-action:none;cursor:crosshair}
+#tpad::before{content:'TRACKPAD';position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;color:#13131e;
+  font-size:8px;letter-spacing:2px;pointer-events:none}
+#mbtns{display:flex;gap:5px;padding:7px 8px 5px}
+#lbtn,#rbtn{flex:1;height:28px;border:none;border-radius:7px;
+  font-size:10px;font-weight:700;cursor:pointer}
+#lbtn{background:#1a5e35;color:#81c995}#rbtn{background:#5e1a1a;color:#f28b82}
+#lbtn:active{background:#81c995;color:#000}#rbtn:active{background:#f28b82;color:#000}
+#srow{display:flex;gap:5px;padding:0 8px 8px}
+#sup,#sdn,#smid{flex:1;height:24px;background:#0d0d18;border:1px solid #252535;
+  color:#555;border-radius:6px;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000;border-color:var(--blue)}
+
+#kbd{position:fixed;bottom:0;left:0;right:0;background:#111118;
+  border-top:1px solid #252530;padding:3px 2px 6px;
+  z-index:9998;touch-action:none;-webkit-user-select:none;user-select:none}
+#kbd.koff{display:none}
+
+#kbar{display:flex;align-items:center;padding:3px 5px 5px;gap:3px;
+  border-bottom:1px solid #1e1e28;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#kbar::-webkit-scrollbar{display:none}
+.qk{background:#1e1e2a;border:1px solid #2e2e3e;color:#aaa;
+  border-radius:6px;padding:4px 9px;font-size:10px;
+  white-space:nowrap;cursor:pointer;flex-shrink:0}
+.qk:active,.qk.on{background:var(--blue);color:#000;border-color:var(--blue)}
+
+.kr{display:flex;justify-content:center;gap:2px;margin-bottom:2px;padding:0 2px}
+.k{background:#252532;border:1px solid #2e2e3e;color:#ddd;
+  border-radius:5px;height:36px;min-width:26px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;cursor:pointer;padding:0 3px;flex:1 0 auto}
+.k:active{background:var(--blue);color:#000;border-color:var(--blue)}
+.k.wide{flex:1.5}
+.k.space{flex:4}
+.k.back{min-width:42px}
 </style>
 </head>
 <body>
@@ -90,296 +132,510 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 <div id="titlebar">
   <div id="tabsContainer"></div>
   <button id="newTab">+</button>
-  <div id="winctrls"><div class="wc min"></div><div class="wc max"></div><div class="wc cls"></div></div>
+  <div id="winctrls">
+    <div class="wc min"></div>
+    <div class="wc max"></div>
+    <div class="wc cls"></div>
+  </div>
 </div>
 
 <div id="toolbar">
-  <button class="nb" id="backBtn">◀</button>
-  <button class="nb" id="fwdBtn">▶</button>
-  <button class="nb" id="refreshBtn">↻</button>
-  <div id="omnibox"><span id="lockico">🔒</span><div id="urldisp"></div></div>
-  <button id="menubtn">⋮</button>
   <div id="loadbar"></div>
+  <button id="backBtn" class="nb" disabled>◀</button>
+  <button id="forwardBtn" class="nb" disabled>▶</button>
+  <button id="reloadBtn" class="nb">⟳</button>
+  <div id="omnibox">
+    <span id="lockico">🔒</span>
+    <input type="text" id="urlInput" placeholder="Digite URL ou pesquisa">
+  </div>
+  <button id="menubtn">⋮</button>
 </div>
 
 <div id="viewport">
-  <div id="loadScreen"><div class="spinner"></div><div id="loadMsg">Carregando...</div></div>
+  <div id="iframeContainer"></div>
+  <div id="touchOverlay"></div>
 </div>
 
-<div id="cur"></div>
-<div id="touchOverlay"></div>
+<div id="cur" class="lc"></div>
+
+<div id="mpad">
+  <div id="mhead"><span>TRACKPAD</span><span>⎚</span></div>
+  <div id="tpad"></div>
+  <div id="mbtns"><button id="lbtn">LMB</button><button id="rbtn">RMB</button></div>
+  <div id="srow"><button id="sup">▲</button><button id="smid">●</button><button id="sdn">▼</button></div>
+</div>
+
+<div id="kbd">
+  <div id="kbar">
+    <div class="qk" data-key="Tab">Tab</div>
+    <div class="qk" data-key="Enter">Enter</div>
+    <div class="qk" data-key="Escape">Esc</div>
+    <div class="qk" data-key="ArrowUp">↑</div>
+    <div class="qk" data-key="ArrowDown">↓</div>
+    <div class="qk" data-key="ArrowLeft">←</div>
+    <div class="qk" data-key="ArrowRight">→</div>
+    <div class="qk" data-key="Control">Ctrl</div>
+    <div class="qk" data-key="Alt">Alt</div>
+    <div class="qk" data-key="Shift">Shift</div>
+    <div class="qk" data-key="Delete">Del</div>
+  </div>
+  <div class="kr" data-row="1"></div>
+  <div class="kr" data-row="2"></div>
+  <div class="kr" data-row="3"></div>
+</div>
 
 <script>
+// Configuração inicial
+const START_URL = "https://web.cloudmoonapp.com/pt/";
+
 let tabs = [];
 let activeTabId = null;
 let tabCounter = 0;
+let currentCursor = {x: 0, y: 0, button: 'lc'};
+let activeFrame = null;
+let isDraggingPad = false;
+let padOffset = {x: 0, y: 0};
 
-const viewport = document.getElementById('viewport');
-const tabsContainer = document.getElementById('tabsContainer');
-const loadScreen = document.getElementById('loadScreen');
-const urlDisp = document.getElementById('urldisp');
-const backBtn = document.getElementById('backBtn');
-const fwdBtn = document.getElementById('fwdBtn');
-const refreshBtn = document.getElementById('refreshBtn');
-const omnibox = document.getElementById('omnibox');
-const lockico = document.getElementById('lockico');
-const touchOverlay = document.getElementById('touchOverlay');
+// Layout do teclado
+const keyboardLayout = {
+  row1: ['q','w','e','r','t','y','u','i','o','p','[',']'],
+  row2: ['a','s','d','f','g','h','j','k','l',';',"'"],
+  row3: ['z','x','c','v','b','n','m',',','.','/']
+};
 
-function createTabContainer() {
-  const container = document.createElement('div');
-  container.className = 'frame-container';
-  container.id = `frame-${Date.now()}-${tabCounter++}`;
+// Função para criar um iframe
+function createIframe(url, tabId) {
   const iframe = document.createElement('iframe');
-  iframe.className = 'nav-frame';
-  iframe.setAttribute('allow', 'fullscreen; clipboard-read; clipboard-write');
-  container.appendChild(iframe);
-  viewport.appendChild(container);
-  return { container, iframe };
-}
-
-function addTab(url, active = true) {
-  const { container, iframe } = createTabContainer();
-  const tabId = container.id;
-  
-  const tabDiv = document.createElement('div');
-  tabDiv.className = 'tab';
-  tabDiv.dataset.id = tabId;
-  tabDiv.innerHTML = `<span class="tab-ttl">${url.includes('cloudmoon') ? 'CloudMoon' : 'Nova aba'}</span><span class="tab-x">✕</span>`;
-  
-  const tabX = tabDiv.querySelector('.tab-x');
-  tabX.onclick = (e) => {
-    e.stopPropagation();
-    closeTab(tabId);
-  };
-  tabDiv.onclick = () => switchToTab(tabId);
-  
-  tabsContainer.appendChild(tabDiv);
-  
-  tabs.push({
-    id: tabId,
-    container: container,
-    iframe: iframe,
-    tabDiv: tabDiv,
-    url: url
-  });
+  iframe.className = 'contentFrame';
+  iframe.style.display = 'none';
+  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write;');
+  iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-downloads allow-top-navigation-by-user-activation');
   
   iframe.onload = () => {
-    if(activeTabId === tabId) {
-      loadScreen.classList.add('hide');
+    const tab = tabs.find(t => t.id === tabId);
+    if(tab) {
+      try {
+        let title = iframe.contentDocument?.title || url.split('/')[2] || 'Nova aba';
+        tab.title = title.substring(0, 30);
+        updateTabsUI();
+        if(activeTabId === tabId) {
+          document.getElementById('urlInput').value = tab.url;
+          updateNavButtons();
+        }
+      } catch(e) { console.log('CORS restriction'); }
     }
-    updateTabTitle(tabId);
-    if(activeTabId === tabId) {
-      updateUrlBar(tabId);
-      updateNavButtons();
-    }
+    hideLoading();
   };
   
   iframe.onerror = () => {
-    if(activeTabId === tabId) {
-      loadScreen.classList.add('hide');
-    }
+    hideLoading();
   };
   
   iframe.src = url;
-  
-  if(active) {
-    switchToTab(tabId);
-  } else {
-    container.classList.remove('active');
-  }
-  
-  return tabId;
+  return iframe;
 }
 
-function switchToTab(tabId) {
+// Navegação
+function navigateTo(tabId, url) {
+  const tab = tabs.find(t => t.id === tabId);
+  if(!tab) return;
+  
+  let finalUrl = url.trim();
+  if(!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+    if(finalUrl.includes('.') && !finalUrl.includes(' ')) {
+      finalUrl = 'https://' + finalUrl;
+    } else {
+      finalUrl = 'https://www.google.com/search?q=' + encodeURIComponent(finalUrl);
+    }
+  }
+  
+  tab.url = finalUrl;
+  
+  if(tab.frame) {
+    const oldFrame = tab.frame;
+    if(oldFrame.parentNode) oldFrame.parentNode.removeChild(oldFrame);
+  }
+  
+  const newFrame = createIframe(finalUrl, tabId);
+  tab.frame = newFrame;
+  document.getElementById('iframeContainer').appendChild(newFrame);
+  
+  if(activeTabId === tabId) {
+    showTabFrame(tabId);
+    document.getElementById('urlInput').value = finalUrl;
+  }
+  
+  updateTabsUI();
+  updateNavButtons();
+}
+
+function showTabFrame(tabId) {
   tabs.forEach(tab => {
-    tab.container.classList.remove('active');
-    tab.tabDiv.classList.remove('active');
+    if(tab.frame) tab.frame.style.display = 'none';
   });
-  
   const activeTab = tabs.find(t => t.id === tabId);
-  if(activeTab) {
-    activeTab.container.classList.add('active');
-    activeTab.tabDiv.classList.add('active');
-    activeTabId = tabId;
-    updateUrlBar(tabId);
-    updateNavButtons();
-    loadScreen.classList.add('hide');
+  if(activeTab && activeTab.frame) {
+    activeTab.frame.style.display = 'block';
+    activeFrame = activeTab.frame;
+    document.getElementById('urlInput').value = activeTab.url;
   }
 }
 
-function closeTab(tabId) {
-  const index = tabs.findIndex(t => t.id === tabId);
+function addTab(url = START_URL) {
+  const id = ++tabCounter;
+  const newTab = {
+    id: id,
+    url: url,
+    title: 'Carregando...',
+    frame: null
+  };
+  tabs.push(newTab);
+  const frame = createIframe(url, id);
+  newTab.frame = frame;
+  document.getElementById('iframeContainer').appendChild(frame);
+  activeTabId = id;
+  showTabFrame(id);
+  updateTabsUI();
+  updateNavButtons();
+}
+
+function closeTab(id) {
+  const index = tabs.findIndex(t => t.id === id);
   if(index === -1) return;
   
   const tab = tabs[index];
-  tab.container.remove();
-  tab.tabDiv.remove();
+  if(tab.frame && tab.frame.parentNode) tab.frame.parentNode.removeChild(tab.frame);
   tabs.splice(index, 1);
   
   if(tabs.length === 0) {
-    addTab('https://web.cloudmoonapp.com/pt/', true);
-  } else if(activeTabId === tabId) {
-    const newActive = tabs[Math.min(index, tabs.length - 1)];
-    if(newActive) switchToTab(newActive.id);
+    addTab(START_URL);
+  } else if(activeTabId === id) {
+    activeTabId = tabs[Math.min(index, tabs.length-1)].id;
+    showTabFrame(activeTabId);
+    updateNavButtons();
   }
+  updateTabsUI();
 }
 
-function updateTabTitle(tabId) {
-  const tab = tabs.find(t => t.id === tabId);
-  if(!tab) return;
-  try {
-    let title = tab.iframe.contentDocument?.title;
-    if(title && title.length > 25) title = title.slice(0, 22) + '...';
-    if(title) tab.tabDiv.querySelector('.tab-ttl').innerText = title;
-  } catch(e) {}
-}
-
-function updateUrlBar(tabId) {
-  const tab = tabs.find(t => t.id === tabId);
-  if(!tab) return;
-  try {
-    let frameUrl = tab.iframe.contentWindow?.location.href;
-    if(frameUrl && frameUrl !== 'about:blank') {
-      urlDisp.innerText = frameUrl;
-      lockico.innerText = frameUrl.startsWith('https') ? '🔒' : '⚠️';
-    } else {
-      urlDisp.innerText = tab.url;
-    }
-  } catch(e) {
-    urlDisp.innerText = tab.url;
-  }
+function updateTabsUI() {
+  const container = document.getElementById('tabsContainer');
+  container.innerHTML = '';
+  tabs.forEach(tab => {
+    const tabDiv = document.createElement('div');
+    tabDiv.className = 'tab' + (tab.id === activeTabId ? ' active' : '');
+    tabDiv.innerHTML = `
+      <div class="tab-ttl">${escapeHtml(tab.title)}</div>
+      <div class="tab-x">✕</div>
+    `;
+    tabDiv.addEventListener('click', (e) => {
+      if(e.target.classList.contains('tab-x')) {
+        e.stopPropagation();
+        closeTab(tab.id);
+      } else {
+        activeTabId = tab.id;
+        showTabFrame(tab.id);
+        updateTabsUI();
+        updateNavButtons();
+      }
+    });
+    container.appendChild(tabDiv);
+  });
 }
 
 function updateNavButtons() {
+  const backBtn = document.getElementById('backBtn');
+  const forwardBtn = document.getElementById('forwardBtn');
   const activeTab = tabs.find(t => t.id === activeTabId);
-  if(!activeTab) return;
+  if(activeTab && activeTab.frame) {
+    try {
+      backBtn.disabled = !activeTab.frame.contentWindow.history?.length > 0;
+      forwardBtn.disabled = false;
+    } catch(e) { backBtn.disabled = false; forwardBtn.disabled = false; }
+  }
+}
+
+function hideLoading() {
+  const loadbar = document.getElementById('loadbar');
+  loadbar.style.width = '0%';
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>]/g, function(m) {
+    if(m === '&') return '&amp;';
+    if(m === '<') return '&lt;';
+    if(m === '>') return '&gt;';
+    return m;
+  });
+}
+
+// Sistema de cursor e eventos de toque
+function updateCursorPosition(clientX, clientY) {
+  const cur = document.getElementById('cur');
+  currentCursor.x = clientX;
+  currentCursor.y = clientY;
+  cur.style.left = (clientX - 2) + 'px';
+  cur.style.top = (clientY - 12) + 'px';
+}
+
+function injectClickToFrame(x, y, button) {
+  if(!activeFrame) return;
   try {
-    backBtn.disabled = !activeTab.iframe.contentWindow?.history?.length;
-    fwdBtn.disabled = !activeTab.iframe.contentWindow?.history?.length;
-  } catch(e) {
-    backBtn.disabled = false;
-    fwdBtn.disabled = false;
-  }
-}
-
-function loadUrlInActiveTab(url) {
-  const activeTab = tabs.find(t => t.id === activeTabId);
-  if(!activeTab) return;
-  if(!url.startsWith('http')) url = 'https://' + url;
-  activeTab.url = url;
-  loadScreen.classList.remove('hide');
-  activeTab.iframe.src = url;
-}
-
-backBtn.onclick = () => {
-  const activeTab = tabs.find(t => t.id === activeTabId);
-  if(activeTab) try { activeTab.iframe.contentWindow.history.back(); loadScreen.classList.remove('hide'); } catch(e) {}
-};
-fwdBtn.onclick = () => {
-  const activeTab = tabs.find(t => t.id === activeTabId);
-  if(activeTab) try { activeTab.iframe.contentWindow.history.forward(); loadScreen.classList.remove('hide'); } catch(e) {}
-};
-refreshBtn.onclick = () => {
-  const activeTab = tabs.find(t => t.id === activeTabId);
-  if(activeTab) { loadScreen.classList.remove('hide'); activeTab.iframe.src = activeTab.iframe.src; }
-};
-omnibox.onclick = () => {
-  const newUrl = prompt('Digite a URL ou pesquisa:', urlDisp.innerText);
-  if(newUrl && newUrl.trim()) loadUrlInActiveTab(newUrl.trim());
-};
-document.getElementById('newTab').onclick = () => addTab('https://www.google.com', true);
-
-document.querySelector('.wc.min').onclick = () => window.close();
-document.querySelector('.wc.max').onclick = () => alert('Modo tela cheia');
-document.querySelector('.wc.cls').onclick = () => window.close();
-
-const cur = document.getElementById('cur');
-let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
-let targetX = mouseX, targetY = mouseY;
-
-function getActiveIframe() {
-  const activeTab = tabs.find(t => t.id === activeTabId);
-  return activeTab?.iframe;
-}
-
-function sendClickToIframe(x, y, isRightClick = false) {
-  const iframe = getActiveIframe();
-  if(!iframe || !iframe.contentDocument) return;
-  const iframeRect = iframe.getBoundingClientRect();
-  const iframeX = x - iframeRect.left;
-  const iframeY = y - iframeRect.top;
-  if(iframeX >= 0 && iframeX <= iframeRect.width && iframeY >= 0 && iframeY <= iframeRect.height) {
-    const eventType = isRightClick ? 'contextmenu' : 'click';
-    const event = new MouseEvent(eventType, {
-      view: iframe.contentWindow, bubbles: true, cancelable: true,
-      clientX: iframeX, clientY: iframeY,
-      button: isRightClick ? 2 : 0, buttons: isRightClick ? 2 : 1
-    });
-    const targetElem = iframe.contentDocument.elementFromPoint(iframeX, iframeY);
-    if(targetElem) targetElem.dispatchEvent(event);
+    const rect = activeFrame.getBoundingClientRect();
+    const relativeX = (x - rect.left) * (activeFrame.clientWidth / rect.width);
+    const relativeY = (y - rect.top) * (activeFrame.clientHeight / rect.height);
     
-    setTimeout(() => {
-      updateUrlBar(activeTabId);
-      updateNavButtons();
-    }, 100);
-  }
+    const mouseEvent = new MouseEvent(button === 'left' ? 'click' : 'contextmenu', {
+      view: activeFrame.contentWindow,
+      bubbles: true,
+      cancelable: true,
+      clientX: relativeX,
+      clientY: relativeY,
+      button: button === 'left' ? 0 : 2,
+      buttons: button === 'left' ? 1 : 2
+    });
+    activeFrame.contentDocument.elementFromPoint(relativeX, relativeY)?.dispatchEvent(mouseEvent);
+  } catch(e) { console.log('Cannot inject click'); }
 }
 
-document.body.addEventListener('touchmove', (e) => {
-  const touch = e.touches[0];
-  targetX = touch.clientX;
-  targetY = touch.clientY;
-  cur.style.display = 'block';
-});
-
-document.body.addEventListener('touchstart', (e) => {
-  const touch = e.touches[0];
-  targetX = touch.clientX;
-  targetY = touch.clientY;
-  cur.style.display = 'block';
-});
-
-function animateCursor() {
-  mouseX += (targetX - mouseX) * 0.25;
-  mouseY += (targetY - mouseY) * 0.25;
-  cur.style.left = mouseX + 'px';
-  cur.style.top = mouseY + 'px';
-  requestAnimationFrame(animateCursor);
+function sendKeyToFrame(key, code, modifiers = {}) {
+  if(!activeFrame) return;
+  try {
+    const keyEvent = new KeyboardEvent('keydown', {
+      key: key,
+      code: code,
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: modifiers.ctrl || false,
+      altKey: modifiers.alt || false,
+      shiftKey: modifiers.shift || false
+    });
+    activeFrame.contentDocument.dispatchEvent(keyEvent);
+    
+    const keyUpEvent = new KeyboardEvent('keyup', {
+      key: key,
+      code: code,
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: modifiers.ctrl || false,
+      altKey: modifiers.alt || false,
+      shiftKey: modifiers.shift || false
+    });
+    activeFrame.contentDocument.dispatchEvent(keyUpEvent);
+  } catch(e) { console.log('Cannot send key'); }
 }
-animateCursor();
 
-let touchTimer;
-
-touchOverlay.addEventListener('touchstart', (e) => {
+// Touch para cursor
+document.addEventListener('touchstart', (e) => {
   e.preventDefault();
-  e.stopPropagation();
   const touch = e.touches[0];
-  targetX = touch.clientX;
-  targetY = touch.clientY;
-  touchTimer = setTimeout(() => {
-    sendClickToIframe(targetX, targetY, true);
-    cur.className = 'rc';
-    setTimeout(() => cur.className = '', 150);
-  }, 500);
+  updateCursorPosition(touch.clientX, touch.clientY);
+  currentCursor.button = 'lc';
+  document.getElementById('cur').className = 'lc';
+  injectClickToFrame(touch.clientX, touch.clientY, 'left');
 });
 
-touchOverlay.addEventListener('touchmove', (e) => {
-  if(touchTimer) clearTimeout(touchTimer);
+document.addEventListener('touchmove', (e) => {
   e.preventDefault();
+  const touch = e.touches[0];
+  updateCursorPosition(touch.clientX, touch.clientY);
 });
 
-touchOverlay.addEventListener('touchend', (e) => {
+// Botões do mousepad
+document.getElementById('lbtn').addEventListener('touchstart', (e) => {
   e.preventDefault();
-  if(touchTimer) {
-    clearTimeout(touchTimer);
-    sendClickToIframe(targetX, targetY, false);
-    cur.className = 'lc';
-    setTimeout(() => cur.className = '', 150);
+  injectClickToFrame(currentCursor.x, currentCursor.y, 'left');
+});
+
+document.getElementById('rbtn').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  currentCursor.button = 'rc';
+  document.getElementById('cur').className = 'rc';
+  injectClickToFrame(currentCursor.x, currentCursor.y, 'right');
+  setTimeout(() => {
+    document.getElementById('cur').className = 'lc';
+    currentCursor.button = 'lc';
+  }, 200);
+});
+
+// Trackpad para mover cursor
+const trackpad = document.getElementById('tpad');
+let startTouch = null;
+trackpad.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  startTouch = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+});
+
+trackpad.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if(startTouch) {
+    const dx = e.touches[0].clientX - startTouch.x;
+    const dy = e.touches[0].clientY - startTouch.y;
+    updateCursorPosition(currentCursor.x + dx * 1.5, currentCursor.y + dy * 1.5);
+    startTouch = {x: e.touches[0].clientX, y: e.touches[0].clientY};
   }
 });
 
-addTab('https://web.cloudmoonapp.com/pt/', true);
+trackpad.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  startTouch = null;
+});
+
+// Botões de scroll
+document.getElementById('sup').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  sendKeyToFrame('ArrowUp', 'ArrowUp');
+});
+
+document.getElementById('sdn').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  sendKeyToFrame('ArrowDown', 'ArrowDown');
+});
+
+document.getElementById('smid').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  injectClickToFrame(currentCursor.x, currentCursor.y, 'left');
+});
+
+// Teclado virtual
+function buildKeyboard() {
+  for(let i = 1; i <= 3; i++) {
+    const rowDiv = document.querySelector(`.kr[data-row="${i}"]`);
+    rowDiv.innerHTML = '';
+    const keys = keyboardLayout[`row${i}`];
+    keys.forEach(key => {
+      const keyDiv = document.createElement('div');
+      keyDiv.className = 'k';
+      keyDiv.textContent = key;
+      keyDiv.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        sendKeyToFrame(key, `Key${key.toUpperCase()}`);
+      });
+      rowDiv.appendChild(keyDiv);
+    });
+  }
+  
+  const lastRow = document.querySelector('.kr[data-row="3"]');
+  const spaceDiv = document.createElement('div');
+  spaceDiv.className = 'k space';
+  spaceDiv.textContent = 'Espaço';
+  spaceDiv.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    sendKeyToFrame(' ', 'Space');
+  });
+  lastRow.appendChild(spaceDiv);
+  
+  const backDiv = document.createElement('div');
+  backDiv.className = 'k back';
+  backDiv.textContent = '⌫';
+  backDiv.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    sendKeyToFrame('Backspace', 'Backspace');
+  });
+  lastRow.appendChild(backDiv);
+}
+
+// Teclas especiais
+document.querySelectorAll('.qk').forEach(btn => {
+  btn.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    const key = btn.dataset.key;
+    if(key === 'Enter') sendKeyToFrame('Enter', 'Enter');
+    else if(key === 'Tab') sendKeyToFrame('Tab', 'Tab');
+    else if(key === 'Escape') sendKeyToFrame('Escape', 'Escape');
+    else if(key === 'ArrowUp') sendKeyToFrame('ArrowUp', 'ArrowUp');
+    else if(key === 'ArrowDown') sendKeyToFrame('ArrowDown', 'ArrowDown');
+    else if(key === 'ArrowLeft') sendKeyToFrame('ArrowLeft', 'ArrowLeft');
+    else if(key === 'ArrowRight') sendKeyToFrame('ArrowRight', 'ArrowRight');
+    else if(key === 'Delete') sendKeyToFrame('Delete', 'Delete');
+    else if(key === 'Control') sendKeyToFrame('Control', 'ControlLeft', {ctrl: true});
+    else if(key === 'Alt') sendKeyToFrame('Alt', 'AltLeft', {alt: true});
+    else if(key === 'Shift') sendKeyToFrame('Shift', 'ShiftLeft', {shift: true});
+  });
+});
+
+// Barra de URL
+const urlInput = document.getElementById('urlInput');
+urlInput.addEventListener('keypress', (e) => {
+  if(e.key === 'Enter') {
+    const tab = tabs.find(t => t.id === activeTabId);
+    if(tab) navigateTo(activeTabId, urlInput.value);
+  }
+});
+
+urlInput.addEventListener('focus', () => {
+  urlInput.select();
+});
+
+// Botões de navegação
+document.getElementById('backBtn').addEventListener('click', () => {
+  if(activeFrame) {
+    try { activeFrame.contentWindow.history.back(); } catch(e) {}
+  }
+});
+
+document.getElementById('forwardBtn').addEventListener('click', () => {
+  if(activeFrame) {
+    try { activeFrame.contentWindow.history.forward(); } catch(e) {}
+  }
+});
+
+document.getElementById('reloadBtn').addEventListener('click', () => {
+  if(activeFrame) {
+    try { activeFrame.contentWindow.location.reload(); } catch(e) {}
+  }
+});
+
+document.getElementById('newTab').addEventListener('click', () => {
+  addTab(START_URL);
+});
+
+// Minimizar/Fechar
+document.querySelector('.wc.min').addEventListener('click', () => window.close());
+document.querySelector('.wc.cls').addEventListener('click', () => window.close());
+
+// Mover mousepad
+const mpad = document.getElementById('mpad');
+let mpadDrag = false;
+let mpadStart = {x:0, y:0};
+document.getElementById('mhead').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  mpadDrag = true;
+  mpadStart.x = e.touches[0].clientX - mpad.offsetLeft;
+  mpadStart.y = e.touches[0].clientY - mpad.offsetTop;
+});
+
+document.addEventListener('touchmove', (e) => {
+  if(mpadDrag) {
+    e.preventDefault();
+    let newX = e.touches[0].clientX - mpadStart.x;
+    let newY = e.touches[0].clientY - mpadStart.y;
+    newX = Math.min(window.innerWidth - mpad.offsetWidth, Math.max(0, newX));
+    newY = Math.min(window.innerHeight - 300, Math.max(0, newY));
+    mpad.style.left = newX + 'px';
+    mpad.style.right = 'auto';
+    mpad.style.top = newY + 'px';
+    mpad.style.bottom = 'auto';
+  }
+});
+
+document.addEventListener('touchend', () => { mpadDrag = false; });
+
+// Botão de menu (toggle teclado)
+let kbdVisible = true;
+document.getElementById('menubtn').addEventListener('click', () => {
+  const kbd = document.getElementById('kbd');
+  kbdVisible = !kbdVisible;
+  kbd.classList.toggle('koff', !kbdVisible);
+});
+
+// Inicialização
+buildKeyboard();
+addTab(START_URL);
+
+// Posicionar cursor no centro
+setTimeout(() => {
+  updateCursorPosition(window.innerWidth/2, window.innerHeight/2);
+}, 100);
 </script>
 </body>
 </html>
