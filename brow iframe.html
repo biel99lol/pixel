@@ -2,1204 +2,553 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Chromium</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --c1:#202124;--c2:#292a2d;--c3:#35363a;--c4:#3c4043;--c5:#1a1a1f;
-  --blue:#8ab4f8;--green:#81c995;--red:#f28b82;--yellow:#fdd663;--purple:#c58af9;
-  --text:#e8eaed;--sub:#9aa0a6;--border:#3c4043;
+  --bg:#202124;--bar:#292a2d;--card:#35363a;--hover:#3c4043;
+  --blue:#8ab4f8;--green:#81c995;--red:#f28b82;--yellow:#fdd663;
+  --txt:#e8eaed;--dim:#9aa0a6;--bdr:#3c4043;
 }
-html,body{
-  width:100%;height:100%;overflow:hidden;
-  background:var(--c1);
-  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
-  display:flex;flex-direction:column;
-  touch-action:none;
-  -webkit-user-select:none;user-select:none;
-}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
+  font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;
+  touch-action:none;-webkit-user-select:none;user-select:none}
 
-/* ── TITLEBAR ── */
-#titlebar{
-  background:var(--c2);height:38px;display:flex;align-items:flex-end;
-  padding:0 6px;gap:2px;flex-shrink:0;
-  border-bottom:1px solid #111;
-}
-.tab{
-  background:var(--c3);color:var(--sub);
-  padding:5px 10px 4px;border-radius:8px 8px 0 0;
-  font-size:11px;display:flex;align-items:center;gap:5px;
-  min-width:90px;max-width:180px;cursor:pointer;
-  border:1px solid #111;border-bottom:none;
-  white-space:nowrap;overflow:hidden;flex-shrink:0;
-  transition:background .15s;
-}
-.tab.active{background:var(--c1);color:var(--text);}
-.tab-ico{font-size:12px;flex-shrink:0;}
-.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis;font-size:11px;}
-.tab-x{width:16px;height:16px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:12px;color:var(--sub);flex-shrink:0;}
-.tab-x:active{background:rgba(255,255,255,.15);color:#fff;}
-#btnNewTab{
-  background:transparent;border:none;color:var(--sub);
-  width:28px;height:28px;font-size:18px;cursor:pointer;
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  align-self:center;margin-bottom:3px;flex-shrink:0;
-}
-#btnNewTab:active{background:var(--c4);}
-#winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;margin-bottom:7px;}
-.wc{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;}
-.wc.min{background:#f0c132;}.wc.max{background:#34c749;}.wc.cls{background:#ea4335;}
+#titlebar{background:var(--bar);height:36px;display:flex;align-items:flex-end;
+  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000}
+.tab{background:var(--card);color:var(--dim);padding:5px 10px 4px;
+  border-radius:8px 8px 0 0;font-size:11px;display:flex;align-items:center;
+  gap:5px;min-width:80px;max-width:160px;cursor:pointer;
+  border:1px solid #000;border-bottom:none;white-space:nowrap;overflow:hidden;flex-shrink:0}
+.tab.active{background:var(--bg);color:var(--txt)}
+.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
+.tab-x{width:15px;height:15px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:11px}
+.tab-x:active{background:var(--hover)}
+#newTab{background:transparent;border:none;color:var(--dim);width:26px;height:26px;
+  font-size:18px;cursor:pointer;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;align-self:center;margin-bottom:2px;flex-shrink:0}
+#winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;margin-bottom:7px}
+.wc{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0}
+.wc.min{background:#f0c132}.wc.max{background:#34c749}.wc.cls{background:#ea4335}
 
-/* ── TOOLBAR ── */
-#toolbar{
-  background:var(--c2);padding:5px 8px;
-  display:flex;align-items:center;gap:4px;
-  flex-shrink:0;border-bottom:1px solid #111;position:relative;
-}
-#loadbar{
-  position:absolute;bottom:0;left:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),var(--purple));
-  width:0;transition:width .3s ease;pointer-events:none;z-index:10;
-}
-.nb{
-  background:transparent;border:none;color:var(--sub);
-  width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  transition:background .1s;
-}
-.nb:active{background:var(--c4);}
-.nb:disabled{opacity:.3;pointer-events:none;}
-#omni{
-  flex:1;display:flex;align-items:center;
-  background:#111;border:1.5px solid var(--border);
-  border-radius:20px;padding:0 12px;height:32px;gap:6px;
-  cursor:text;transition:border-color .15s;
-}
-#omni.editing{border-color:var(--blue);background:#0a0a10;}
-#lock{font-size:12px;flex-shrink:0;}
-#urltext{
-  flex:1;color:var(--text);font-size:12.5px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  pointer-events:none;
-}
-#urltext.editing-mode{
-  color:var(--blue);white-space:pre;overflow:visible;
-}
-#urlcursor{
-  display:inline-block;width:1px;height:13px;
-  background:var(--blue);margin-left:1px;
-  animation:blink .9s step-end infinite;
-  vertical-align:middle;
-}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
-#urlcursor.hide{display:none;}
-#menubtn{
-  background:transparent;border:none;color:var(--sub);
-  font-size:20px;cursor:pointer;width:32px;height:32px;
-  border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-#menubtn:active{background:var(--c4);}
+#toolbar{background:var(--bar);padding:5px 8px;display:flex;align-items:center;
+  gap:4px;flex-shrink:0;border-bottom:1px solid #000;position:relative}
+#loadbar{position:absolute;bottom:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),#a78bfa);
+  width:0;pointer-events:none;z-index:5}
+.nb{background:transparent;border:none;color:var(--dim);width:30px;height:30px;
+  border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0}
+.nb:active{background:var(--hover)}
+.nb[disabled]{opacity:.3;pointer-events:none}
+#omnibox{flex:1;display:flex;align-items:center;background:#111;
+  border:1.5px solid var(--bdr);border-radius:20px;padding:0 10px;
+  height:30px;gap:6px;cursor:pointer;min-width:0}
+#omnibox:active{border-color:var(--blue)}
+#lockico{font-size:12px;flex-shrink:0}
+#urldisp{flex:1;color:var(--txt);font-size:12px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;pointer-events:none}
+#menubtn{background:transparent;border:none;color:var(--dim);font-size:20px;
+  cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+#menubtn:active{background:var(--hover)}
 
-/* ── VIEWPORT ── */
-#viewport{flex:1;position:relative;overflow:hidden;}
-#siteFrame{
-  position:absolute;inset:0;width:100%;height:100%;
-  border:none;display:block;background:#fff;
-}
+#viewport{flex:1;position:relative;overflow:hidden;background:#fff}
+#rawFrame{position:absolute;inset:0;width:100%;height:100%;border:none;
+  display:block;background:#fff;z-index:1}
+#touchOverlay{position:absolute;inset:0;z-index:10;touch-action:none;
+  background:transparent}
 
-/* ── NOLOAD SCREEN ── */
-#noload{
-  position:absolute;inset:0;display:none;
-  background:var(--c1);flex-direction:column;
-  align-items:center;justify-content:center;gap:16px;
-  padding:28px;z-index:50;
-}
-#noload.show{display:flex;}
-#noload .ico{font-size:56px;}
-#noload h2{color:var(--text);font-size:18px;font-weight:400;text-align:center;}
-#noload p{color:var(--sub);font-size:12px;max-width:300px;line-height:1.65;text-align:center;}
-#noload .dlink{color:var(--blue);font-size:12px;text-decoration:none;}
-.proxybtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px;}
-.proxybtn{
-  background:var(--c3);border:1px solid var(--border);
-  color:var(--text);padding:8px 16px;border-radius:20px;
-  font-size:12px;cursor:pointer;transition:background .15s;
-}
-.proxybtn:active{background:var(--blue);color:#000;border-color:var(--blue);}
-
-/* ── LOADING SPINNER ── */
-#spinner{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  display:none;z-index:40;pointer-events:none;
-}
-#spinner.show{display:block;}
-.spin{
-  width:36px;height:36px;border:3px solid var(--c3);
+#loadScreen{position:absolute;inset:0;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;z-index:20}
+#loadScreen.hide{display:none}
+.spinner{width:36px;height:36px;border:3px solid var(--card);
   border-top-color:var(--blue);border-radius:50%;
-  animation:spin .7s linear infinite;
-}
-@keyframes spin{to{transform:rotate(360deg);}}
+  animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadMsg{color:var(--dim);font-size:12px;max-width:260px;text-align:center;line-height:1.5}
 
-/* ── CURSOR ── */
-#cursor{
-  position:fixed;pointer-events:none;z-index:2147483647;
+#errScreen{position:absolute;inset:0;background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;padding:28px;z-index:20}
+#errScreen.show{display:flex}
+#errScreen .eico{font-size:52px}
+#errScreen h2{color:var(--txt);font-size:17px;font-weight:400;text-align:center}
+#errScreen p{color:var(--dim);font-size:11.5px;max-width:280px;
+  line-height:1.65;text-align:center}
+.pbtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.pbtn{background:var(--card);border:1px solid var(--bdr);color:var(--txt);
+  padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer}
+.pbtn:active{background:var(--blue);color:#000;border-color:var(--blue)}
+
+#cur{position:fixed;pointer-events:none;z-index:99999;
   width:0;height:0;
   border-left:9px solid transparent;
-  border-right:0px solid transparent;
+  border-right:0 solid transparent;
   border-bottom:15px solid rgba(255,255,255,.93);
   filter:drop-shadow(0 1px 4px rgba(0,0,0,.8));
-  transform-origin:top left;
-  transition:none;
-}
-#cursor::after{
-  content:'';position:absolute;top:9px;left:-4px;
-  width:4px;height:9px;
-  background:rgba(255,255,255,.93);
-  border-radius:0 0 3px 3px;
-}
-#cursor.lclick{border-bottom-color:rgba(138,180,248,.95);}
-#cursor.rclick{border-bottom-color:rgba(242,139,130,.95);}
-#cursor.drag{border-bottom-color:rgba(253,214,99,.95);}
+  transform-origin:top left}
+#cur::after{content:'';position:absolute;top:9px;left:-4px;
+  width:4px;height:9px;background:rgba(255,255,255,.93);
+  border-radius:0 0 3px 3px}
+#cur.lc{border-bottom-color:rgba(138,180,248,.95)}
+#cur.rc{border-bottom-color:rgba(242,139,130,.95)}
 
-/* ── MOUSE PAD ── */
-#mousepad{
-  position:fixed;right:8px;bottom:260px;
-  width:160px;background:#13131a;
-  border:1px solid #252535;border-radius:14px;
-  z-index:2147483640;
-  box-shadow:0 8px 32px rgba(0,0,0,.85);
-  touch-action:none;
-}
-#mhead{
-  padding:7px 10px 4px;display:flex;
-  justify-content:space-between;align-items:center;
-  cursor:move;touch-action:none;
-  border-radius:14px 14px 0 0;
-}
-#mhead-label{color:#444;font-size:9px;letter-spacing:1.5px;font-weight:700;}
-#mhead-drag{color:#2a2a3a;font-size:14px;}
-#trackpad{
-  margin:0 8px 0;height:90px;
-  background:#0a0a10;border-radius:8px;
-  border:1px solid #1a1a28;
-  position:relative;overflow:hidden;
-  touch-action:none;cursor:crosshair;
-}
-#trackpad-hint{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  color:#1a1a2a;font-size:8px;letter-spacing:2px;pointer-events:none;
-  flex-direction:column;gap:2px;
-}
-#tpdot{
-  position:absolute;width:6px;height:6px;
-  background:var(--blue);border-radius:50%;
-  transform:translate(-50%,-50%);
-  pointer-events:none;opacity:.6;
-  transition:left .05s,top .05s;
-}
-#mbtns{display:flex;gap:5px;padding:7px 8px 5px;}
-#lbtn,#rbtn{
-  flex:1;height:30px;border:none;border-radius:8px;
-  font-size:10px;font-weight:700;cursor:pointer;
-  letter-spacing:.3px;transition:background .1s;
-}
-#lbtn{background:#1a5e35;color:#81c995;}
-#rbtn{background:#5e1a1a;color:#f28b82;}
-#lbtn:active{background:#81c995;color:#000;}
-#rbtn:active{background:#f28b82;color:#000;}
-#scrollrow{display:flex;gap:5px;padding:0 8px 8px;}
-#sup,#sdn,#smid{
-  flex:1;height:26px;background:#0d0d18;
-  border:1px solid #252535;color:#555;
-  border-radius:7px;font-size:12px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:background .1s;
-}
-#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000;border-color:var(--blue);}
+#mpad{position:fixed;right:8px;bottom:270px;width:162px;
+  background:#12121a;border:1px solid #252535;border-radius:14px;
+  z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.85);touch-action:none}
+#mhead{padding:6px 10px 3px;display:flex;justify-content:space-between;
+  align-items:center;cursor:move;touch-action:none}
+#mhead span:first-child{color:#444;font-size:9px;letter-spacing:1.5px;font-weight:700}
+#mhead span:last-child{color:#2a2a3a;font-size:14px}
+#tpad{margin:0 8px;height:88px;background:#0a0a10;border-radius:8px;
+  border:1px solid #1a1a28;position:relative;overflow:hidden;
+  touch-action:none;cursor:crosshair}
+#tpad::before{content:'TRACKPAD';position:absolute;inset:0;display:flex;
+  align-items:center;justify-content:center;color:#13131e;
+  font-size:8px;letter-spacing:2px;pointer-events:none}
+#mbtns{display:flex;gap:5px;padding:7px 8px 5px}
+#lbtn,#rbtn{flex:1;height:28px;border:none;border-radius:7px;
+  font-size:10px;font-weight:700;cursor:pointer}
+#lbtn{background:#1a5e35;color:#81c995}#rbtn{background:#5e1a1a;color:#f28b82}
+#lbtn:active{background:#81c995;color:#000}#rbtn:active{background:#f28b82;color:#000}
+#srow{display:flex;gap:5px;padding:0 8px 8px}
+#sup,#sdn,#smid{flex:1;height:24px;background:#0d0d18;border:1px solid #252535;
+  color:#555;border-radius:6px;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center}
+#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000;border-color:var(--blue)}
 
-/* ── KEYBOARD ── */
-#kbd{
-  position:fixed;bottom:0;left:0;right:0;
-  background:#111118;border-top:1px solid #252530;
-  padding:3px 2px 8px;
-  z-index:2147483635;
-  touch-action:none;
-  -webkit-user-select:none;user-select:none;
-}
-#kbd.off{display:none;}
+#kbd{position:fixed;bottom:0;left:0;right:0;background:#111118;
+  border-top:1px solid #252530;padding:3px 2px 6px;
+  z-index:9998;touch-action:none;-webkit-user-select:none;user-select:none}
+#kbd.koff{display:none}
 
-/* Quick bar */
-#kbar{
-  display:flex;align-items:center;
-  padding:2px 5px 5px;gap:4px;
-  border-bottom:1px solid #1e1e28;
-  overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-#kbar::-webkit-scrollbar{display:none;}
-.qk{
-  background:#1e1e2a;border:1px solid #2e2e3e;color:#aaa;
+#kbar{display:flex;align-items:center;padding:3px 5px 5px;gap:3px;
+  border-bottom:1px solid #1e1e28;overflow-x:auto;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#kbar::-webkit-scrollbar{display:none}
+.qk{background:#1e1e2a;border:1px solid #2e2e3e;color:#aaa;
   border-radius:6px;padding:4px 9px;font-size:10px;
-  white-space:nowrap;cursor:pointer;flex-shrink:0;
-  transition:background .1s;
-}
-.qk:active,.qk.on{background:var(--blue);color:#000;border-color:var(--blue);}
+  white-space:nowrap;cursor:pointer;flex-shrink:0}
+.qk:active,.qk.on{background:var(--blue);color:#000;border-color:var(--blue)}
 
-/* Key rows */
-.kr{display:flex;justify-content:center;gap:2px;margin-bottom:2px;padding:0 2px;}
-.k{
-  background:#252532;border:1px solid #2e2e3e;color:#ddd;
-  border-radius:6px;height:36px;min-width:26px;
+.kr{display:flex;justify-content:center;gap:2px;margin-bottom:2px;padding:0 2px}
+.k{background:#252532;border:1px solid #2e2e3e;color:#ddd;
+  border-radius:5px;height:36px;min-width:26px;
   display:flex;align-items:center;justify-content:center;
-  font-size:11.5px;cursor:pointer;padding:0 3px;
-  flex-shrink:0;position:relative;
-  touch-action:manipulation;
-  transition:background .07s,transform .07s;
-  -webkit-user-select:none;user-select:none;
-}
-.k:active{background:var(--blue);color:#000;transform:scale(.92);}
-.k sub{position:absolute;top:2px;right:2px;font-size:7px;color:#444;}
-.k.mod{background:#1a1a28;color:#7a8090;font-size:10px;}
-.k.mod:active{background:var(--blue);color:#000;}
-.k.mod.on{background:rgba(138,180,248,.25);color:var(--blue);border-color:var(--blue);}
-.k.w2{min-width:44px;}.k.w3{min-width:56px;}.k.w4{min-width:70px;}.k.w5{min-width:84px;}
-.k.sp{flex:1;max-width:200px;font-size:10px;letter-spacing:.5px;}
-
-/* Layer visibility */
-#lsym{display:none;}#lfn{display:none;}
-
-/* ── URL MODAL ── */
-#urlmodal{
-  position:fixed;inset:0;background:rgba(0,0,0,.7);
-  z-index:2147483648;display:none;
-  align-items:flex-start;justify-content:center;
-  padding-top:60px;
-}
-#urlmodal.show{display:flex;}
-#urlbox{
-  background:var(--c2);border:1px solid var(--blue);
-  border-radius:12px;width:90%;max-width:420px;
-  padding:12px;box-shadow:0 8px 40px rgba(0,0,0,.8);
-}
-#urlbox-input{
-  width:100%;background:#111;border:1px solid var(--border);
-  border-radius:8px;color:var(--text);font-size:13px;
-  padding:10px 12px;outline:none;
-  -webkit-appearance:none;
-}
-#urlbox-input:focus{border-color:var(--blue);}
-#urlbox-hint{color:var(--sub);font-size:10px;margin-top:6px;padding:0 2px;}
-#urlbox-btns{display:flex;gap:8px;margin-top:10px;}
-.ubbtn{
-  flex:1;padding:9px;border:none;border-radius:8px;
-  font-size:12px;cursor:pointer;font-weight:600;
-}
-.ubbtn.go{background:var(--blue);color:#000;}
-.ubbtn.go:active{background:#6a9fd8;}
-.ubbtn.cancel{background:var(--c3);color:var(--text);}
-.ubbtn.cancel:active{background:var(--c4);}
+  font-size:11px;cursor:pointer;padding:0 3px}
+.k:active{background:var(--blue);color:#000;border-color:var(--blue)}
+.k.wide{min-width:42px}
+.k.space{min-width:120px}
 </style>
 </head>
 <body>
 
-<!-- TITLEBAR -->
 <div id="titlebar">
-  <div class="tab active">
-    <span class="tab-ico" id="tabico">🌐</span>
-    <span class="tab-ttl" id="tabttl">Nova aba</span>
-    <span class="tab-x">×</span>
-  </div>
-  <button id="btnNewTab">+</button>
-  <div id="winctrls">
-    <div class="wc min"></div>
-    <div class="wc max"></div>
-    <div class="wc cls"></div>
-  </div>
+  <div class="tab active"><span class="tab-ttl">Nova aba</span><span class="tab-x">✕</span></div>
+  <button id="newTab">+</button>
+  <div id="winctrls"><div class="wc min"></div><div class="wc max"></div><div class="wc cls"></div></div>
 </div>
 
-<!-- TOOLBAR -->
 <div id="toolbar">
-  <div id="loadbar"></div>
-  <button class="nb" id="btnBack" title="Voltar">&#8592;</button>
-  <button class="nb" id="btnFwd" title="Avançar">&#8594;</button>
-  <button class="nb" id="btnReload" title="Recarregar">&#8635;</button>
-  <button class="nb" id="btnHome" title="Início">&#8962;</button>
-  <div id="omni" onclick="openUrlModal()">
-    <span id="lock">🔒</span>
-    <span id="urltext">google.com</span>
-  </div>
+  <button class="nb" id="backBtn">◀</button>
+  <button class="nb" id="fwdBtn">▶</button>
+  <button class="nb" id="refreshBtn">↻</button>
+  <div id="omnibox"><span id="lockico">🔒</span><div id="urldisp">about:blank</div></div>
   <button id="menubtn">⋮</button>
+  <div id="loadbar"></div>
 </div>
 
-<!-- VIEWPORT -->
 <div id="viewport">
-  <iframe id="siteFrame" src="about:blank"
-    allow="*"
-    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-pointer-lock allow-modals allow-top-navigation-by-user-activation">
-  </iframe>
-  <div id="spinner"><div class="spin"></div></div>
-  <div id="noload">
-    <div class="ico">🚫</div>
-    <h2>Site bloqueou o carregamento</h2>
-    <p>Este site usa <strong style="color:var(--red)">X-Frame-Options</strong>, impedindo iframe. Tente via proxy:</p>
-    <div class="proxybtns">
-      <button class="proxybtn" onclick="CB.tryProxy(0)">🔄 Proxy 1</button>
-      <button class="proxybtn" onclick="CB.tryProxy(1)">🔄 Proxy 2</button>
-      <button class="proxybtn" onclick="CB.tryProxy(2)">🔄 Proxy 3</button>
-    </div>
-    <a id="directlink" href="#" target="_blank" class="dlink">🔗 Abrir no navegador</a>
-  </div>
+  <iframe id="rawFrame" src="https://example.com"></iframe>
+  <div id="touchOverlay"></div>
+  <div id="loadScreen"><div class="spinner"></div><div id="loadMsg">Carregando...</div></div>
+  <div id="errScreen"><div class="eico">⚠️</div><h2>Falha ao carregar</h2><p>Verifique sua conexão ou tente novamente</p><div class="pbtns"><button class="pbtn" id="retryBtn">Tentar novamente</button></div></div>
 </div>
 
-<!-- CURSOR -->
-<div id="cursor"></div>
+<div id="cur"></div>
 
-<!-- URL MODAL -->
-<div id="urlmodal" onclick="closeUrlModalOutside(event)">
-  <div id="urlbox">
-    <input id="urlbox-input" type="url" placeholder="https://exemplo.com ou pesquisa..."
-      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-      inputmode="url">
-    <div id="urlbox-hint">Digite um URL ou termo de busca e pressione Ir</div>
-    <div id="urlbox-btns">
-      <button class="ubbtn cancel" onclick="closeUrlModal()">Cancelar</button>
-      <button class="ubbtn go" onclick="submitUrlModal()">Ir ↵</button>
-    </div>
-  </div>
+<div id="mpad">
+  <div id="mhead"><span>TOUCHPAD</span><span>⣿</span></div>
+  <div id="tpad"></div>
+  <div id="mbtns"><button id="lbtn">LMB</button><button id="rbtn">RMB</button></div>
+  <div id="srow"><button id="sup">▲</button><button id="smid">●</button><button id="sdn">▼</button></div>
 </div>
 
-<!-- MOUSE PAD -->
-<div id="mousepad">
-  <div id="mhead">
-    <span id="mhead-label">MOUSE</span>
-    <span id="mhead-drag">&#8759;</span>
-  </div>
-  <div id="trackpad">
-    <div id="trackpad-hint">
-      <span>TRACKPAD</span>
-      <span style="font-size:7px;color:#151520">arraste para mover</span>
-    </div>
-    <div id="tpdot"></div>
-  </div>
-  <div id="mbtns">
-    <button id="lbtn">&#9166; ESQ</button>
-    <button id="rbtn">DIR &#9166;</button>
-  </div>
-  <div id="scrollrow">
-    <button id="sup">▲</button>
-    <button id="smid">●</button>
-    <button id="sdn">▼</button>
-  </div>
-</div>
-
-<!-- KEYBOARD -->
-<div id="kbd">
-  <!-- Quick bar -->
-  <div id="kbar">
-    <div class="qk on" id="qabc"  data-layer="main">ABC</div>
-    <div class="qk"    id="qsym"  data-layer="sym">!@#</div>
-    <div class="qk"    id="qfn"   data-layer="fn">F1-12</div>
-    <div class="qk"    id="qtog"  onclick="CB.toggleKbd()">⌨ Fechar</div>
-    <div class="qk"    onclick="CB.combo('a')">Ctrl+A</div>
-    <div class="qk"    onclick="CB.combo('c')">Ctrl+C</div>
-    <div class="qk"    onclick="CB.combo('v')">Ctrl+V</div>
-    <div class="qk"    onclick="CB.combo('z')">Ctrl+Z</div>
-    <div class="qk"    onclick="CB.combo('x')">Ctrl+X</div>
-    <div class="qk"    onclick="CB.combo('f')">Ctrl+F</div>
-    <div class="qk"    onclick="CB.combo('t')">Ctrl+T</div>
-    <div class="qk"    onclick="CB.combo('r')">Ctrl+R</div>
-  </div>
-
-  <!-- Main QWERTY -->
-  <div id="lmain">
-    <div class="kr">
-      <div class="k mod w2" data-k="Escape">Esc</div>
-      <div class="k" data-k="`">`<sub>~</sub></div>
-      <div class="k" data-k="1">1<sub>!</sub></div>
-      <div class="k" data-k="2">2<sub>@</sub></div>
-      <div class="k" data-k="3">3<sub>#</sub></div>
-      <div class="k" data-k="4">4<sub>$</sub></div>
-      <div class="k" data-k="5">5<sub>%</sub></div>
-      <div class="k" data-k="6">6<sub>^</sub></div>
-      <div class="k" data-k="7">7<sub>&amp;</sub></div>
-      <div class="k" data-k="8">8<sub>*</sub></div>
-      <div class="k" data-k="9">9<sub>(</sub></div>
-      <div class="k" data-k="0">0<sub>)</sub></div>
-      <div class="k" data-k="-">-<sub>_</sub></div>
-      <div class="k" data-k="=">=<sub>+</sub></div>
-      <div class="k mod w3" data-k="Backspace">⌫ Del</div>
-    </div>
-    <div class="kr">
-      <div class="k mod w3" data-k="Tab">Tab</div>
-      <div class="k" data-k="q">q</div><div class="k" data-k="w">w</div>
-      <div class="k" data-k="e">e</div><div class="k" data-k="r">r</div>
-      <div class="k" data-k="t">t</div><div class="k" data-k="y">y</div>
-      <div class="k" data-k="u">u</div><div class="k" data-k="i">i</div>
-      <div class="k" data-k="o">o</div><div class="k" data-k="p">p</div>
-      <div class="k" data-k="[">[<sub>{</sub></div>
-      <div class="k" data-k="]">]<sub>}</sub></div>
-      <div class="k" data-k="\">\<sub>|</sub></div>
-    </div>
-    <div class="kr">
-      <div class="k mod w3" id="kcaps" data-k="CapsLock">Caps</div>
-      <div class="k" data-k="a">a</div><div class="k" data-k="s">s</div>
-      <div class="k" data-k="d">d</div><div class="k" data-k="f">f</div>
-      <div class="k" data-k="g">g</div><div class="k" data-k="h">h</div>
-      <div class="k" data-k="j">j</div><div class="k" data-k="k">k</div>
-      <div class="k" data-k="l">l</div>
-      <div class="k" data-k=";">;<sub>:</sub></div>
-      <div class="k" data-k="'">'<sub>"</sub></div>
-      <div class="k mod w4" data-k="Enter">↵ Enter</div>
-    </div>
-    <div class="kr">
-      <div class="k mod w4" id="kshl" data-k="Shift">⇧ Shift</div>
-      <div class="k" data-k="z">z</div><div class="k" data-k="x">x</div>
-      <div class="k" data-k="c">c</div><div class="k" data-k="v">v</div>
-      <div class="k" data-k="b">b</div><div class="k" data-k="n">n</div>
-      <div class="k" data-k="m">m</div>
-      <div class="k" data-k=",">,<sub>&lt;</sub></div>
-      <div class="k" data-k=".">.<sub>&gt;</sub></div>
-      <div class="k" data-k="/">/</div>
-      <div class="k mod w4" id="kshr" data-k="Shift">⇧ Shift</div>
-    </div>
-    <div class="kr">
-      <div class="k mod w3" id="kctrl" data-k="Control">Ctrl</div>
-      <div class="k mod w2" id="kalt"  data-k="Alt">Alt</div>
-      <div class="k sp mod" data-k=" ">ESPAÇO</div>
-      <div class="k mod w2" data-k="Alt">Alt</div>
-      <div class="k mod" data-k="ArrowLeft">◀</div>
-      <div class="k mod" data-k="ArrowUp">▲</div>
-      <div class="k mod" data-k="ArrowDown">▼</div>
-      <div class="k mod" data-k="ArrowRight">▶</div>
-    </div>
-  </div>
-
-  <!-- Symbol Layer -->
-  <div id="lsym">
-    <div class="kr">
-      <div class="k" data-k="!">!</div><div class="k" data-k="@">@</div>
-      <div class="k" data-k="#">#</div><div class="k" data-k="$">$</div>
-      <div class="k" data-k="%">%</div><div class="k" data-k="^">^</div>
-      <div class="k" data-k="&amp;">&amp;</div><div class="k" data-k="*">*</div>
-      <div class="k" data-k="(">(</div><div class="k" data-k=")">)</div>
-      <div class="k mod w3" data-k="Backspace">⌫</div>
-    </div>
-    <div class="kr">
-      <div class="k" data-k="-">-</div><div class="k" data-k="_">_</div>
-      <div class="k" data-k="=">=</div><div class="k" data-k="+">+</div>
-      <div class="k" data-k="[">[</div><div class="k" data-k="]">]</div>
-      <div class="k" data-k="{">{</div><div class="k" data-k="}">}</div>
-      <div class="k" data-k="|">|</div><div class="k" data-k="~">~</div>
-      <div class="k mod w3" data-k="Enter">↵</div>
-    </div>
-    <div class="kr">
-      <div class="k" data-k=":">:</div><div class="k" data-k='"'>"</div>
-      <div class="k" data-k="'">'</div><div class="k" data-k=",">,</div>
-      <div class="k" data-k=".">.</div><div class="k" data-k="/">/</div>
-      <div class="k" data-k="?">?</div><div class="k" data-k="\\\">\</div>
-      <div class="k" data-k="@">@</div><div class="k" data-k="#">#</div>
-    </div>
-    <div class="kr">
-      <div class="k" data-k="€">€</div><div class="k" data-k="£">£</div>
-      <div class="k" data-k="¥">¥</div><div class="k" data-k="°">°</div>
-      <div class="k" data-k="©">©</div><div class="k" data-k="®">®</div>
-      <div class="k sp mod" data-k=" ">ESPAÇO</div>
-    </div>
-  </div>
-
-  <!-- Fn Layer -->
-  <div id="lfn">
-    <div class="kr">
-      <div class="k w3 mod" data-k="F1">F1</div>
-      <div class="k w3 mod" data-k="F2">F2</div>
-      <div class="k w3 mod" data-k="F3">F3</div>
-      <div class="k w3 mod" data-k="F4">F4</div>
-      <div class="k w3 mod" data-k="F5">F5</div>
-      <div class="k w3 mod" data-k="F6">F6</div>
-    </div>
-    <div class="kr">
-      <div class="k w3 mod" data-k="F7">F7</div>
-      <div class="k w3 mod" data-k="F8">F8</div>
-      <div class="k w3 mod" data-k="F9">F9</div>
-      <div class="k w3 mod" data-k="F10">F10</div>
-      <div class="k w3 mod" data-k="F11">F11</div>
-      <div class="k w3 mod" data-k="F12">F12</div>
-    </div>
-    <div class="kr">
-      <div class="k w3 mod" data-k="Home">Home</div>
-      <div class="k w3 mod" data-k="End">End</div>
-      <div class="k w3 mod" data-k="PageUp">PgUp</div>
-      <div class="k w3 mod" data-k="PageDown">PgDn</div>
-      <div class="k w3 mod" data-k="Insert">Ins</div>
-      <div class="k w3 mod" data-k="Delete">Del</div>
-    </div>
-  </div>
+<div id="kbd" class="koff">
+  <div id="kbar"><button class="qk" data-kbd="hide">🔽</button><button class="qk on" data-lang="en">EN</button><button class="qk" data-lang="pt">PT</button><button class="qk" data-action="paste">📋 Colar</button><button class="qk" data-action="clear">⌫ Limpar</button></div>
+  <div id="kbMain"></div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-//  CHROMIUM CONTROLLER
-// ═══════════════════════════════════════════════════════════
-window.CB = (function(){
-'use strict';
+const iframe = document.getElementById('rawFrame');
+const loadScreen = document.getElementById('loadScreen');
+const errScreen = document.getElementById('errScreen');
+const loadMsg = document.getElementById('loadMsg');
+const urlDisp = document.getElementById('urldisp');
+const backBtn = document.getElementById('backBtn');
+const fwdBtn = document.getElementById('fwdBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+const retryBtn = document.getElementById('retryBtn');
+const loadbar = document.getElementById('loadbar');
+let loadStart = 0;
+let loadInterval;
 
-/* ── DOM refs ── */
-const frame     = document.getElementById('siteFrame');
-const cur       = document.getElementById('cursor');
-const noload    = document.getElementById('noload');
-const loadbar   = document.getElementById('loadbar');
-const spinner   = document.getElementById('spinner');
-const mousepad  = document.getElementById('mousepad');
-const trackpad  = document.getElementById('trackpad');
-const kbd       = document.getElementById('kbd');
-const tpdot     = document.getElementById('tpdot');
-const urltext   = document.getElementById('urltext');
-const lock      = document.getElementById('lock');
-
-/* ── Cursor state ── */
-let cx = window.innerWidth / 2;
-let cy = window.innerHeight / 2;
-
-/* ── Keyboard state ── */
-let shift = false, ctrl = false, altK = false, caps = false;
-let kbdVisible = true;
-let lastFocused = null;
-
-/* ── Nav state ── */
-let currentUrl = '';
-let loadTimer = null;
-
-/* ── Proxies ── */
-const PROXIES = [
-  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-  u => `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(u)}`
-];
-
-/* ═══════════════════════════════════════════
-   CURSOR
-═══════════════════════════════════════════ */
-function moveCur(x, y) {
-  cx = Math.max(0, Math.min(window.innerWidth - 2, x));
-  cy = Math.max(0, Math.min(window.innerHeight - 2, y));
-  cur.style.left = cx + 'px';
-  cur.style.top  = cy + 'px';
-  // Update trackpad dot relative position
-  updateTpDot();
-}
-moveCur(cx, cy);
-
-function updateTpDot() {
-  const r = trackpad.getBoundingClientRect();
-  if (!r.width) return;
-  const fr = frame.getBoundingClientRect();
-  const px = ((cx - fr.left) / fr.width) * r.width;
-  const py = ((cy - fr.top)  / fr.height) * r.height;
-  const clx = Math.max(3, Math.min(r.width - 3, px));
-  const cly = Math.max(3, Math.min(r.height - 3, py));
-  tpdot.style.left = clx + 'px';
-  tpdot.style.top  = cly + 'px';
-}
-
-/* ═══════════════════════════════════════════
-   URL / NAVIGATION
-═══════════════════════════════════════════ */
-function normalizeUrl(raw) {
-  let u = raw.trim();
-  if (!u) return '';
-  if (u.startsWith('http://') || u.startsWith('https://')) return u;
-  // Looks like a domain?
-  if (/^[\w-]+\.[a-z]{2,}(\/|$)/i.test(u)) return 'https://' + u;
-  // Search
-  return 'https://www.google.com/search?q=' + encodeURIComponent(u);
-}
-
-function loadUrl(raw) {
-  const u = normalizeUrl(raw);
-  if (!u) return;
-  currentUrl = u;
-  showUrl(u);
-  document.getElementById('directlink').href = u;
-  noload.classList.remove('show');
-  spinner.classList.add('show');
-  startLoad();
-  frame.src = u;
-}
-
-function showUrl(u) {
+function updateNavButtons() {
   try {
-    const parsed = new URL(u);
-    urltext.textContent = parsed.hostname + parsed.pathname.replace(/\/$/, '') || parsed.hostname;
-    lock.textContent = u.startsWith('https') ? '🔒' : '🔓';
-  } catch {
-    urltext.textContent = u.slice(0, 50);
-    lock.textContent = '🔓';
-  }
+    backBtn.disabled = !iframe.contentWindow?.history?.length;
+    fwdBtn.disabled = !iframe.contentWindow?.history?.length;
+  } catch(e) {}
 }
 
-function startLoad() {
-  clearTimeout(loadTimer);
-  loadbar.style.transition = 'none';
-  loadbar.style.width = '0%';
-  requestAnimationFrame(() => {
-    loadbar.style.transition = 'width 2s ease-out';
-    loadbar.style.width = '75%';
-  });
-  // Fallback timeout
-  loadTimer = setTimeout(() => {
-    endLoad();
-    spinner.classList.remove('show');
-  }, 8000);
-}
-
-function endLoad() {
-  clearTimeout(loadTimer);
-  loadbar.style.transition = 'width .2s ease';
-  loadbar.style.width = '100%';
-  spinner.classList.remove('show');
-  setTimeout(() => {
-    loadbar.style.transition = 'none';
+function setLoading(isLoading) {
+  if(isLoading) {
+    loadStart = Date.now();
+    loadScreen.classList.remove('hide');
+    errScreen.classList.remove('show');
     loadbar.style.width = '0%';
-  }, 300);
-}
-
-function showNoLoad() {
-  noload.classList.add('show');
-  spinner.classList.remove('show');
-  endLoad();
-}
-
-/* iframe events */
-frame.addEventListener('load', () => {
-  endLoad();
-  try {
-    const doc = frame.contentDocument;
-    if (!doc || !doc.body || doc.body.innerHTML.trim() === '') {
-      showNoLoad(); return;
-    }
-    const loc = frame.contentWindow.location.href;
-    if (loc && loc !== 'about:blank') {
-      currentUrl = loc;
-      showUrl(loc);
-      const title = doc.title;
-      document.getElementById('tabttl').textContent = title || loc;
-      document.getElementById('tabico').textContent = '🌐';
-      // Hook clicks/focus inside frame
-      doc.addEventListener('focusin', e => { lastFocused = e.target; }, true);
-      doc.addEventListener('click', e => {
-        const el = e.target;
-        if (el && el.tagName === 'A' && el.href && !el.href.startsWith('javascript')) {
-          e.preventDefault();
-          loadUrl(el.href);
-        }
-      }, true);
-    }
-  } catch(e) {
-    // cross-origin — frame loaded but we can't read it. That's fine.
-    endLoad();
+    if(loadInterval) clearInterval(loadInterval);
+    loadInterval = setInterval(() => {
+      const elapsed = Date.now() - loadStart;
+      const progress = Math.min(85, elapsed / 30);
+      loadbar.style.width = progress + '%';
+    }, 100);
+  } else {
+    if(loadInterval) clearInterval(loadInterval);
+    loadbar.style.width = '100%';
+    setTimeout(() => { loadbar.style.width = '0%'; }, 200);
+    loadScreen.classList.add('hide');
   }
-});
-frame.addEventListener('error', showNoLoad);
-
-/* Toolbar buttons */
-document.getElementById('btnBack').onclick   = () => { try { frame.contentWindow.history.back(); } catch(e) {} };
-document.getElementById('btnFwd').onclick    = () => { try { frame.contentWindow.history.forward(); } catch(e) {} };
-document.getElementById('btnReload').onclick = () => { noload.classList.remove('show'); startLoad(); frame.src = currentUrl || 'https://www.google.com'; };
-document.getElementById('btnHome').onclick   = () => loadUrl('https://www.google.com');
-document.getElementById('btnNewTab').onclick = () => loadUrl('https://www.google.com');
-
-/* ═══════════════════════════════════════════
-   URL MODAL (native input for URL)
-═══════════════════════════════════════════ */
-window.openUrlModal = function() {
-  const modal = document.getElementById('urlmodal');
-  const inp   = document.getElementById('urlbox-input');
-  modal.classList.add('show');
-  inp.value = currentUrl || '';
-  setTimeout(() => inp.focus(), 100);
-};
-
-window.closeUrlModal = function() {
-  document.getElementById('urlmodal').classList.remove('show');
-};
-
-window.closeUrlModalOutside = function(e) {
-  if (e.target === document.getElementById('urlmodal')) closeUrlModal();
-};
-
-window.submitUrlModal = function() {
-  const val = document.getElementById('urlbox-input').value;
-  closeUrlModal();
-  if (val) loadUrl(val);
-};
-
-document.getElementById('urlbox-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') { e.preventDefault(); submitUrlModal(); }
-});
-
-/* ═══════════════════════════════════════════
-   PROXY
-═══════════════════════════════════════════ */
-function tryProxy(idx) {
-  if (idx >= PROXIES.length) return;
-  const p = PROXIES[idx](currentUrl);
-  noload.classList.remove('show');
-  startLoad();
-  frame.src = p;
 }
 
-/* ═══════════════════════════════════════════
-   MOUSE PAD — drag to move
-═══════════════════════════════════════════ */
-let padDrag = false, pdx = 0, pdy = 0;
-
-document.getElementById('mhead').addEventListener('touchstart', e => {
-  e.preventDefault();
-  padDrag = true;
-  const r = mousepad.getBoundingClientRect();
-  pdx = e.touches[0].clientX - r.left;
-  pdy = e.touches[0].clientY - r.top;
-}, { passive: false });
-
-window.addEventListener('touchmove', e => {
-  if (!padDrag) return;
-  e.preventDefault();
-  let nx = e.touches[0].clientX - pdx;
-  let ny = e.touches[0].clientY - pdy;
-  nx = Math.max(0, Math.min(window.innerWidth  - mousepad.offsetWidth,  nx));
-  ny = Math.max(0, Math.min(window.innerHeight - mousepad.offsetHeight, ny));
-  mousepad.style.right = 'auto';
-  mousepad.style.bottom = 'auto';
-  mousepad.style.left = nx + 'px';
-  mousepad.style.top  = ny + 'px';
-}, { passive: false });
-
-window.addEventListener('touchend', () => { padDrag = false; });
-
-/* ═══════════════════════════════════════════
-   TRACKPAD
-═══════════════════════════════════════════ */
-let tpActive = false, tpX = 0, tpY = 0, tpMoved = false;
-let tpStartX = 0, tpStartY = 0;
-const TP_SPEED = 2.6;
-const TP_CLICK_THRESHOLD = 6;
-
-trackpad.addEventListener('touchstart', e => {
-  e.preventDefault();
-  tpActive = true; tpMoved = false;
-  tpX = tpStartX = e.touches[0].clientX;
-  tpY = tpStartY = e.touches[0].clientY;
-}, { passive: false });
-
-trackpad.addEventListener('touchmove', e => {
-  e.preventDefault();
-  if (!tpActive) return;
-  const dx = (e.touches[0].clientX - tpX) * TP_SPEED;
-  const dy = (e.touches[0].clientY - tpY) * TP_SPEED;
-  tpX = e.touches[0].clientX;
-  tpY = e.touches[0].clientY;
-  const totalDx = Math.abs(tpX - tpStartX);
-  const totalDy = Math.abs(tpY - tpStartY);
-  if (totalDx > TP_CLICK_THRESHOLD || totalDy > TP_CLICK_THRESHOLD) tpMoved = true;
-  moveCur(cx + dx, cy + dy);
-  dispatchFrameMouseEvent('mousemove', 0);
-}, { passive: false });
-
-trackpad.addEventListener('touchend', e => {
-  e.preventDefault();
-  if (!tpMoved) doClick(false);
-  tpActive = false;
-}, { passive: false });
-
-/* ═══════════════════════════════════════════
-   MOUSE EVENTS INTO FRAME
-═══════════════════════════════════════════ */
-function getFramePoint() {
-  const r = frame.getBoundingClientRect();
-  return { fx: cx - r.left, fy: cy - r.top, inFrame: cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom };
-}
-
-function dispatchFrameMouseEvent(type, button) {
-  try {
-    const { fx, fy, inFrame } = getFramePoint();
-    if (!inFrame) return null;
-    const doc = frame.contentDocument;
-    if (!doc) return null;
-    const el = doc.elementFromPoint(fx, fy);
-    if (!el) return null;
-    el.dispatchEvent(new MouseEvent(type, {
-      bubbles: true, cancelable: true,
-      button, buttons: button === 0 ? 1 : 2,
-      clientX: fx, clientY: fy,
-      view: frame.contentWindow
-    }));
-    return el;
-  } catch(e) { return null; }
-}
-
-function doClick(right) {
-  cur.classList.add(right ? 'rclick' : 'lclick');
-  setTimeout(() => cur.classList.remove('lclick', 'rclick'), 160);
-
-  // Check if cursor is over host UI element
-  const hostEl = document.elementFromPoint(cx, cy);
-  if (hostEl && hostEl !== frame && hostEl !== document.body) {
-    hostEl.click();
-    return;
+function loadUrl(url) {
+  if(!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
   }
+  setLoading(true);
+  iframe.src = url;
+  urlDisp.innerText = url;
+}
 
-  // Fire into iframe
+iframe.onload = () => {
+  setLoading(false);
+  updateNavButtons();
   try {
-    const { fx, fy, inFrame } = getFramePoint();
-    if (!inFrame) return;
-    const doc = frame.contentDocument;
-    if (!doc) return;
-    const el = doc.elementFromPoint(fx, fy);
-    if (!el) return;
-
-    el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: right?2:0, buttons: right?2:1, clientX: fx, clientY: fy, view: frame.contentWindow }));
-    el.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true, cancelable: true, button: right?2:0, buttons: 0, clientX: fx, clientY: fy, view: frame.contentWindow }));
-
-    if (!right) {
-      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: fx, clientY: fy, view: frame.contentWindow }));
-
-      // Focus inputs
-      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) {
-        el.focus();
-        lastFocused = el;
-      }
-      // Handle anchor navigation
-      const anchor = el.closest('a');
-      if (anchor && anchor.href && !anchor.href.startsWith('javascript')) {
-        loadUrl(anchor.href);
-      }
-      // Submit buttons
-      if (el.type === 'submit') {
-        const form = el.closest('form');
-        if (form) form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-        else el.click();
-      }
-    } else {
-      el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: fx, clientY: fy, view: frame.contentWindow }));
-    }
+    const frameUrl = iframe.contentWindow.location.href;
+    if(frameUrl && frameUrl !== 'about:blank') urlDisp.innerText = frameUrl;
   } catch(e) {}
-}
-
-function doScroll(delta) {
-  try {
-    const { fx, fy, inFrame } = getFramePoint();
-    const doc = frame.contentDocument;
-    if (doc && inFrame) {
-      const el = doc.elementFromPoint(fx, fy);
-      if (el) el.dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: delta, deltaMode: 0, clientX: fx, clientY: fy, view: frame.contentWindow }));
-      frame.contentWindow.scrollBy(0, delta);
-    } else {
-      window.scrollBy(0, delta);
-    }
-  } catch(e) { window.scrollBy(0, delta); }
-}
-
-/* Button bindings */
-const btn = id => document.getElementById(id);
-
-btn('lbtn').addEventListener('touchstart', e => { e.preventDefault(); doClick(false); }, { passive: false });
-btn('rbtn').addEventListener('touchstart', e => { e.preventDefault(); doClick(true);  }, { passive: false });
-btn('sup').addEventListener('touchstart',  e => { e.preventDefault(); doScroll(-130); }, { passive: false });
-btn('sdn').addEventListener('touchstart',  e => { e.preventDefault(); doScroll(130);  }, { passive: false });
-btn('smid').addEventListener('touchstart', e => { e.preventDefault(); doScroll(0);    }, { passive: false });
-
-btn('lbtn').onclick = () => doClick(false);
-btn('rbtn').onclick = () => doClick(true);
-btn('sup').onclick  = () => doScroll(-130);
-btn('sdn').onclick  = () => doScroll(130);
-
-/* ═══════════════════════════════════════════
-   VIRTUAL KEYBOARD ENGINE
-═══════════════════════════════════════════ */
-const SHIFTMAP = {
-  '1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')',
-  '`':'~','-':'_','=':'+','[':'{',']':'}','\\':'|',';':':','\'':'"',',':'<','.':'>','/':'?'
 };
 
-const NAV_KEYS = new Set([
-  'ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
-  'Home','End','PageUp','PageDown','Insert','Delete',
-  'Tab','Escape','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12'
-]);
-
-const KEY_CODES = {
-  ' ':32, Enter:13, Backspace:8, Tab:9, Escape:27, Delete:46, Insert:45,
-  ArrowLeft:37,ArrowUp:38,ArrowRight:39,ArrowDown:40,
-  Home:36,End:35,PageUp:33,PageDown:34, CapsLock:20,
-  Control:17,Shift:16,Alt:18,
-  F1:112,F2:113,F3:114,F4:115,F5:116,F6:117,
-  F7:118,F8:119,F9:120,F10:121,F11:122,F12:123
+iframe.onerror = () => {
+  setLoading(false);
+  errScreen.classList.add('show');
 };
-for (let i = 65; i <= 90; i++) {
-  const ch = String.fromCharCode(i);
-  KEY_CODES[ch.toLowerCase()] = i;
-  KEY_CODES[ch] = i;
-}
-for (let i = 48; i <= 57; i++) KEY_CODES[String.fromCharCode(i)] = i;
 
-function makeKeyEvent(type, key) {
-  const kc = KEY_CODES[key] || KEY_CODES[key.toLowerCase()] || (key.length === 1 ? key.charCodeAt(0) : 0);
-  return new KeyboardEvent(type, {
-    key, keyCode: kc, which: kc,
-    code: 'Key' + (key.length === 1 ? key.toUpperCase() : key),
-    bubbles: true, cancelable: true,
-    shiftKey: shift, ctrlKey: ctrl, altKey: altK,
-    view: window
-  });
-}
+refreshBtn.onclick = () => { iframe.src = iframe.src; setLoading(true); };
+backBtn.onclick = () => { try { iframe.contentWindow.history.back(); setLoading(true); } catch(e){} };
+fwdBtn.onclick = () => { try { iframe.contentWindow.history.forward(); setLoading(true); } catch(e){} };
+retryBtn.onclick = () => { if(iframe.src) loadUrl(iframe.src); };
 
-function makeKeyEventFor(type, key, win) {
-  const kc = KEY_CODES[key] || KEY_CODES[key.toLowerCase()] || (key.length === 1 ? key.charCodeAt(0) : 0);
-  return new KeyboardEvent(type, {
-    key, keyCode: kc, which: kc,
-    code: 'Key' + (key.length === 1 ? key.toUpperCase() : key),
-    bubbles: true, cancelable: true,
-    shiftKey: shift, ctrlKey: ctrl, altKey: altK,
-    view: win
-  });
-}
+const cur = document.getElementById('cur');
+let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
+let targetX = mouseX, targetY = mouseY;
 
-function getActiveTarget() {
-  // Priority: lastFocused in frame > active element in frame > frame body
-  try {
-    const doc = frame.contentDocument;
-    if (!doc) return null;
-    const ae = doc.activeElement;
-    if (ae && ae !== doc.body) return { el: ae, win: frame.contentWindow, doc };
-    if (lastFocused && lastFocused.ownerDocument === doc) return { el: lastFocused, win: frame.contentWindow, doc };
-    return { el: doc.body, win: frame.contentWindow, doc };
-  } catch(e) { return null; }
-}
-
-function insertText(el, doc, ch) {
-  if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-    const s = el.selectionStart != null ? el.selectionStart : el.value.length;
-    const e2 = el.selectionEnd != null ? el.selectionEnd : s;
-    el.value = el.value.slice(0, s) + ch + el.value.slice(e2);
-    el.selectionStart = el.selectionEnd = s + ch.length;
-    el.dispatchEvent(new Event('input',  { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  } else if (el.isContentEditable) {
-    try { doc.execCommand('insertText', false, ch); } catch(e) {}
+function sendClickToIframe(x, y, isRightClick = false) {
+  if(!iframe || !iframe.contentDocument) return;
+  const iframeRect = iframe.getBoundingClientRect();
+  const iframeX = x - iframeRect.left;
+  const iframeY = y - iframeRect.top;
+  if(iframeX >= 0 && iframeX <= iframeRect.width && iframeY >= 0 && iframeY <= iframeRect.height) {
+    const eventType = isRightClick ? 'contextmenu' : 'click';
+    const event = new MouseEvent(eventType, {
+      view: iframe.contentWindow,
+      bubbles: true,
+      cancelable: true,
+      clientX: iframeX,
+      clientY: iframeY,
+      button: isRightClick ? 2 : 0,
+      buttons: isRightClick ? 2 : 1
+    });
+    const targetElem = iframe.contentDocument.elementFromPoint(iframeX, iframeY);
+    if(targetElem) targetElem.dispatchEvent(event);
   }
 }
 
-function deleteChar(el, doc) {
-  if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-    const s  = el.selectionStart != null ? el.selectionStart : el.value.length;
-    const e2 = el.selectionEnd  != null ? el.selectionEnd  : s;
-    if (s === e2 && s > 0) {
-      el.value = el.value.slice(0, s - 1) + el.value.slice(s);
-      el.selectionStart = el.selectionEnd = s - 1;
-    } else if (s !== e2) {
-      el.value = el.value.slice(0, s) + el.value.slice(e2);
-      el.selectionStart = el.selectionEnd = s;
-    }
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-  } else if (el.isContentEditable) {
-    try { doc.execCommand('delete'); } catch(e) {}
-  }
+document.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  targetX = touch.clientX;
+  targetY = touch.clientY;
+  cur.style.display = 'block';
+}, { passive: false });
+
+document.addEventListener('touchstart', (e) => {
+  const touch = e.touches[0];
+  targetX = touch.clientX;
+  targetY = touch.clientY;
+  cur.style.display = 'block';
+});
+
+function animateCursor() {
+  mouseX += (targetX - mouseX) * 0.3;
+  mouseY += (targetY - mouseY) * 0.3;
+  cur.style.left = mouseX + 'px';
+  cur.style.top = mouseY + 'px';
+  requestAnimationFrame(animateCursor);
 }
+animateCursor();
 
-function pressKey(key) {
-  /* ── Modifiers ── */
-  if (key === 'Shift')   { shift = !shift;  updMods(); return; }
-  if (key === 'Control') { ctrl  = !ctrl;   updMods(); return; }
-  if (key === 'Alt')     { altK  = !altK;   updMods(); return; }
-  if (key === 'CapsLock') {
-    caps = !caps;
-    document.getElementById('kcaps').classList.toggle('on', caps);
-    return;
+let touchTimer;
+document.getElementById('touchOverlay').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  touchTimer = setTimeout(() => {
+    sendClickToIframe(touch.clientX, touch.clientY, true);
+    cur.className = 'rc';
+    setTimeout(() => cur.className = '', 150);
+  }, 500);
+});
+
+document.getElementById('touchOverlay').addEventListener('touchmove', (e) => {
+  if(touchTimer) clearTimeout(touchTimer);
+});
+
+document.getElementById('touchOverlay').addEventListener('touchend', (e) => {
+  e.preventDefault();
+  if(touchTimer) {
+    clearTimeout(touchTimer);
+    const changed = e.changedTouches[0];
+    sendClickToIframe(changed.clientX, changed.clientY, false);
+    cur.className = 'lc';
+    setTimeout(() => cur.className = '', 150);
   }
+});
 
-  const tgtInfo = getActiveTarget();
-  if (!tgtInfo) { if (shift) resetMods(); return; }
-  const { el, win, doc } = tgtInfo;
+const mpad = document.getElementById('mpad');
+let mpadVisible = true;
 
-  /* ── Ctrl combos ── */
-  if (ctrl && key.length === 1) {
-    el.dispatchEvent(makeKeyEventFor('keydown', key, win));
+let scrollAccum = 0;
+const tpad = document.getElementById('tpad');
+let tpadActive = false;
+let lastY = 0;
+
+tpad.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  tpadActive = true;
+  lastY = e.touches[0].clientY;
+});
+tpad.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if(!tpadActive) return;
+  const deltaY = lastY - e.touches[0].clientY;
+  scrollAccum += deltaY;
+  const scrollAmount = Math.floor(scrollAccum / 10);
+  if(Math.abs(scrollAmount) > 0) {
     try {
-      const k = key.toLowerCase();
-      if (k === 'a') doc.execCommand('selectAll');
-      else if (k === 'c') doc.execCommand('copy');
-      else if (k === 'v') doc.execCommand('paste');
-      else if (k === 'z') doc.execCommand('undo');
-      else if (k === 'x') doc.execCommand('cut');
+      iframe.contentWindow.scrollBy(0, scrollAmount);
     } catch(e) {}
-    el.dispatchEvent(makeKeyEventFor('keyup', key, win));
-    resetMods(); return;
+    scrollAccum = 0;
   }
+  lastY = e.touches[0].clientY;
+});
+tpad.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  tpadActive = false;
+  scrollAccum = 0;
+});
 
-  /* ── Nav / function keys ── */
-  if (NAV_KEYS.has(key)) {
-    el.dispatchEvent(makeKeyEventFor('keydown', key, win));
-    el.dispatchEvent(makeKeyEventFor('keyup',   key, win));
-    if (shift) resetMods();
-    return;
+document.getElementById('lbtn').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const centerX = window.innerWidth/2;
+  const centerY = window.innerHeight/2;
+  sendClickToIframe(centerX, centerY, false);
+  cur.className = 'lc';
+  setTimeout(() => cur.className = '', 150);
+});
+document.getElementById('rbtn').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const centerX = window.innerWidth/2;
+  const centerY = window.innerHeight/2;
+  sendClickToIframe(centerX, centerY, true);
+  cur.className = 'rc';
+  setTimeout(() => cur.className = '', 150);
+});
+document.getElementById('sup').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  try { iframe.contentWindow.scrollBy(0, -200); } catch(e) {}
+});
+document.getElementById('sdn').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  try { iframe.contentWindow.scrollBy(0, 200); } catch(e) {}
+});
+document.getElementById('smid').addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  try { iframe.contentWindow.scrollTo(0, iframe.contentWindow.scrollY); } catch(e) {}
+});
+
+const kbd = document.getElementById('kbd');
+const kbMain = document.getElementById('kbMain');
+let currentLang = 'en';
+let inputTarget = null;
+
+const keyboards = {
+  en: [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l'],
+    ['Shift','z','x','c','v','b','n','m','⌫'],
+    ['123',' ','Enter']
+  ],
+  pt: [
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l','ç'],
+    ['Shift','z','x','c','v','b','n','m','⌫'],
+    ['123',' ','Enter']
+  ]
+};
+
+function renderKeyboard() {
+  const layout = keyboards[currentLang];
+  kbMain.innerHTML = '';
+  layout.forEach(row => {
+    const kr = document.createElement('div');
+    kr.className = 'kr';
+    row.forEach(key => {
+      const k = document.createElement('div');
+      k.className = 'k';
+      if(key === ' ') k.classList.add('space');
+      if(key === 'Shift' || key === '123') k.classList.add('wide');
+      k.innerText = key === ' ' ? 'espaço' : key;
+      k.onclick = () => handleKey(key);
+      kr.appendChild(k);
+    });
+    kbMain.appendChild(kr);
+  });
+}
+
+function handleKey(key) {
+  if(!inputTarget) return;
+  if(key === '⌫') {
+    const value = inputTarget.value;
+    inputTarget.value = value.slice(0, -1);
+    const event = new Event('input', { bubbles: true });
+    inputTarget.dispatchEvent(event);
+  } else if(key === 'Enter') {
+    const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
+    inputTarget.dispatchEvent(event);
+  } else if(key === 'Shift') {
+    currentLang = currentLang === 'en' ? 'pt' : 'en';
+    renderKeyboard();
+    document.querySelectorAll('.qk[data-lang]').forEach(el => el.classList.remove('on'));
+    document.querySelector(`.qk[data-lang="${currentLang}"]`).classList.add('on');
+  } else if(key === '123') {
+  } else {
+    inputTarget.value += key;
+    const event = new Event('input', { bubbles: true });
+    inputTarget.dispatchEvent(event);
   }
+}
 
-  /* ── Backspace ── */
-  if (key === 'Backspace') {
-    el.dispatchEvent(makeKeyEventFor('keydown', 'Backspace', win));
-    deleteChar(el, doc);
-    el.dispatchEvent(makeKeyEventFor('keyup', 'Backspace', win));
-    return;
+function showKeyboard() {
+  kbd.classList.remove('koff');
+  if(!inputTarget) {
+    inputTarget = document.createElement('input');
+    inputTarget.style.position = 'fixed';
+    inputTarget.style.opacity = '0';
+    inputTarget.style.pointerEvents = 'none';
+    document.body.appendChild(inputTarget);
+    inputTarget.focus();
+  } else {
+    inputTarget.focus();
   }
+}
 
-  /* ── Enter ── */
-  if (key === 'Enter') {
-    el.dispatchEvent(makeKeyEventFor('keydown', 'Enter', win));
-    if (el.tagName === 'TEXTAREA') {
-      insertText(el, doc, '\n');
-    } else if (el.tagName === 'INPUT') {
-      // Try submit form
-      const form = el.closest('form');
-      if (form) {
-        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-        form.dispatchEvent(submitEvent);
-        // Also check if there's a submit button
-        const sb = form.querySelector('[type=submit]');
-        if (sb) sb.click();
-      } else {
-        el.dispatchEvent(makeKeyEventFor('keypress', 'Enter', win));
+function hideKeyboard() {
+  kbd.classList.add('koff');
+}
+
+document.querySelectorAll('.qk[data-lang]').forEach(btn => {
+  btn.onclick = () => {
+    currentLang = btn.getAttribute('data-lang');
+    renderKeyboard();
+    document.querySelectorAll('.qk[data-lang]').forEach(el => el.classList.remove('on'));
+    btn.classList.add('on');
+  };
+});
+document.querySelector('.qk[data-action="paste"]').onclick = async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    if(inputTarget) {
+      inputTarget.value += text;
+      const event = new Event('input', { bubbles: true });
+      inputTarget.dispatchEvent(event);
+    }
+  } catch(e) {}
+};
+document.querySelector('.qk[data-action="clear"]').onclick = () => {
+  if(inputTarget) {
+    inputTarget.value = '';
+    const event = new Event('input', { bubbles: true });
+    inputTarget.dispatchEvent(event);
+  }
+};
+document.querySelector('.qk[data-kbd="hide"]').onclick = () => hideKeyboard();
+
+document.getElementById('omnibox').onclick = () => {
+  const newUrl = prompt('Digite a URL:', urlDisp.innerText);
+  if(newUrl) loadUrl(newUrl);
+};
+
+document.getElementById('menubtn').onclick = () => {
+  mpadVisible = !mpadVisible;
+  mpad.style.display = mpadVisible ? 'block' : 'none';
+};
+
+let dragStartX, dragStartY, mpadStartX, mpadStartY, draggingMpad = false;
+const mhead = document.getElementById('mhead');
+mhead.addEventListener('touchstart', (e) => {
+  draggingMpad = true;
+  dragStartX = e.touches[0].clientX;
+  dragStartY = e.touches[0].clientY;
+  mpadStartX = mpad.offsetLeft;
+  mpadStartY = mpad.offsetTop;
+  e.preventDefault();
+});
+document.addEventListener('touchmove', (e) => {
+  if(draggingMpad) {
+    const dx = e.touches[0].clientX - dragStartX;
+    const dy = e.touches[0].clientY - dragStartY;
+    let newLeft = mpadStartX + dx;
+    let newTop = mpadStartY + dy;
+    newLeft = Math.max(0, Math.min(window.innerWidth - mpad.offsetWidth, newLeft));
+    newTop = Math.max(0, Math.min(window.innerHeight - mpad.offsetHeight, newTop));
+    mpad.style.left = newLeft + 'px';
+    mpad.style.right = 'auto';
+    mpad.style.top = newTop + 'px';
+    mpad.style.bottom = 'auto';
+    e.preventDefault();
+  }
+});
+document.addEventListener('touchend', () => { draggingMpad = false; });
+
+document.querySelectorAll('.tab-x').forEach(el => {
+  el.onclick = (e) => { e.stopPropagation(); };
+});
+
+loadUrl('https://example.com');
+renderKeyboard();
+setInterval(() => {
+  try {
+    if(iframe.contentDocument && iframe.contentDocument.activeElement) {
+      inputTarget = iframe.contentDocument.activeElement;
+      if(inputTarget && (inputTarget.tagName === 'INPUT' || inputTarget.tagName === 'TEXTAREA')) {
+        showKeyboard();
       }
-    } else if (el.isContentEditable) {
-      try { doc.execCommand('insertParagraph'); } catch(e) {}
     }
-    el.dispatchEvent(makeKeyEventFor('keyup', 'Enter', win));
-    if (shift) resetMods();
-    return;
-  }
-
-  /* ── Printable character ── */
-  let ch = key;
-  if (key.length === 1) {
-    if (shift && !caps) {
-      ch = /^[a-z]$/.test(key) ? key.toUpperCase() : (SHIFTMAP[key] || key);
-    } else if (caps && !shift) {
-      ch = /^[a-z]$/.test(key) ? key.toUpperCase() : key;
-    } else if (caps && shift) {
-      ch = /^[a-z]$/.test(key) ? key.toLowerCase() : (SHIFTMAP[key] || key);
-    }
-  }
-
-  el.dispatchEvent(makeKeyEventFor('keydown', key, win));
-  try {
-    el.dispatchEvent(new KeyboardEvent('keypress', {
-      key: ch, keyCode: ch.charCodeAt(0), which: ch.charCodeAt(0),
-      bubbles: true, cancelable: true,
-      shiftKey: shift, ctrlKey: ctrl, altKey: altK,
-      view: win
-    }));
   } catch(e) {}
-  insertText(el, doc, ch);
-  el.dispatchEvent(makeKeyEventFor('keyup', key, win));
-
-  if (shift) resetMods();
-}
-
-/* Combos (Ctrl+key) from quick bar */
-function combo(key) {
-  const tgtInfo = getActiveTarget();
-  if (!tgtInfo) return;
-  const { el, win, doc } = tgtInfo;
-  const kc = KEY_CODES[key] || key.charCodeAt(0);
-  try {
-    el.dispatchEvent(new KeyboardEvent('keydown', { key, keyCode: kc, which: kc, ctrlKey: true, bubbles: true, cancelable: true, view: win }));
-    const k = key.toLowerCase();
-    if (k === 'a') doc.execCommand('selectAll');
-    else if (k === 'c') doc.execCommand('copy');
-    else if (k === 'v') doc.execCommand('paste');
-    else if (k === 'z') doc.execCommand('undo');
-    else if (k === 'x') doc.execCommand('cut');
-    else if (k === 'f') {
-      // focus search in frame
-      const inp = doc.querySelector('input[type=search],input[name=q],input[type=text]');
-      if (inp) { inp.focus(); lastFocused = inp; }
-    } else if (k === 't') { loadUrl('https://www.google.com'); }
-    else if (k === 'r') { frame.src = currentUrl || 'about:blank'; startLoad(); }
-    el.dispatchEvent(new KeyboardEvent('keyup', { key, keyCode: kc, ctrlKey: true, bubbles: true, view: win }));
-  } catch(e) {}
-}
-
-function resetMods() { shift = false; ctrl = false; altK = false; updMods(); }
-
-function updMods() {
-  document.getElementById('kshl').classList.toggle('on', shift);
-  document.getElementById('kshr').classList.toggle('on', shift);
-  document.getElementById('kctrl').classList.toggle('on', ctrl);
-  document.getElementById('kalt').classList.toggle('on', altK);
-}
-
-/* ── Layer switching ── */
-function layer(name) {
-  document.getElementById('lmain').style.display = name === 'main' ? '' : 'none';
-  document.getElementById('lsym').style.display  = name === 'sym'  ? '' : 'none';
-  document.getElementById('lfn').style.display   = name === 'fn'   ? '' : 'none';
-  document.querySelectorAll('#kbar .qk[data-layer]').forEach(el => {
-    el.classList.toggle('on', el.dataset.layer === name);
-  });
-}
-
-/* ── Toggle keyboard ── */
-function toggleKbd() {
-  kbdVisible = !kbdVisible;
-  kbd.classList.toggle('off', !kbdVisible);
-  document.getElementById('qtog').textContent = kbdVisible ? '⌨ Fechar' : '⌨ Abrir';
-}
-
-/* ── Bind keys ── */
-document.querySelectorAll('.k').forEach(btn => {
-  const key = btn.getAttribute('data-k');
-  if (!key) return;
-
-  btn.addEventListener('touchstart', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    pressKey(key);
-  }, { passive: false });
-
-  btn.addEventListener('mousedown', e => {
-    e.preventDefault();
-    pressKey(key);
-  });
-});
-
-/* ── Quick bar layer buttons ── */
-document.querySelectorAll('#kbar .qk[data-layer]').forEach(el => {
-  el.addEventListener('touchstart', e => {
-    e.preventDefault();
-    layer(el.dataset.layer);
-  }, { passive: false });
-  el.addEventListener('click', () => layer(el.dataset.layer));
-});
-
-/* ── Prevent native keyboard on all non-modal inputs ── */
-document.addEventListener('focusin', e => {
-  const t = e.target;
-  if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') {
-    // Only allow native keyboard for the URL modal input
-    if (t.id === 'urlbox-input') return;
-    t.setAttribute('readonly', 'true');
-    setTimeout(() => t.removeAttribute('readonly'), 50);
-    t.blur();
-  }
-}, true);
-
-/* ── Init ── */
-loadUrl('https://www.google.com');
-
-/* ── Public API ── */
-return { tryProxy, layer, toggleKbd, combo, loadUrl };
-})();
+}, 500);
 </script>
 </body>
 </html>
