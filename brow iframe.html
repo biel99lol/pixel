@@ -5,101 +5,78 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Chromium Navegador</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
   --bg:#202124;--bar:#292a2d;--card:#35363a;--hover:#3c4043;
   --blue:#8ab4f8;--green:#81c995;--red:#f28b82;--yellow:#fdd663;
   --txt:#e8eaed;--dim:#9aa0a6;--bdr:#3c4043;
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
-  font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;
-  touch-action:pan-x pan-y}
+  font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column}
 
 #titlebar{background:var(--bar);height:38px;display:flex;align-items:center;
-  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto;
-  overflow-y:hidden;white-space:nowrap;scrollbar-width:thin}
+  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;
+  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
 #titlebar::-webkit-scrollbar{height:3px}
 #tabsContainer{display:flex;align-items:flex-end;gap:2px;height:100%}
 .tab{background:var(--card);color:var(--dim);padding:6px 12px 5px;
   border-radius:10px 10px 0 0;font-size:12px;display:inline-flex;align-items:center;
-  gap:6px;min-width:90px;max-width:170px;cursor:pointer;
+  gap:6px;min-width:90px;max-width:160px;cursor:pointer;
   border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0;
-  height:34px;position:relative;transition:all 0.05s linear}
-.tab.active{background:var(--bg);color:var(--txt);z-index:2}
-.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-.tab-x{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:12px;font-weight:bold;cursor:pointer;flex-shrink:0}
+  height:34px}
+.tab.active{background:var(--bg);color:var(--txt)}
+.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
+.tab-x{width:18px;height:18px;display:inline-flex;align-items:center;
+  justify-content:center;border-radius:50%;font-size:12px}
 .tab-x:active{background:rgba(255,255,255,0.2)}
 #newTab{background:var(--card);border:none;color:var(--txt);width:34px;height:30px;
-  font-size:20px;cursor:pointer;border-radius:12px;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0;margin-bottom:2px}
+  font-size:20px;cursor:pointer;border-radius:12px;display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
 #newTab:active{background:var(--hover)}
 #winctrls{display:flex;gap:8px;align-items:center;margin-left:auto;padding-left:8px;flex-shrink:0}
-.wc{width:14px;height:14px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0}
+.wc{width:14px;height:14px;border-radius:50%;border:none;cursor:pointer}
 .wc.min{background:#f0c132}.wc.max{background:#34c749}.wc.cls{background:#ea4335}
-.wc:active{opacity:0.7}
 
 #toolbar{background:var(--bar);padding:6px 10px;display:flex;align-items:center;
   gap:6px;flex-shrink:0;border-bottom:1px solid #000;position:relative}
 #loadbar{position:absolute;bottom:0;left:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),#a78bfa);
-  width:0;pointer-events:none;z-index:5;transition:width 0.1s}
+  background:linear-gradient(90deg,var(--blue),#a78bfa);width:0;pointer-events:none}
 .nb{background:transparent;border:none;color:var(--dim);width:34px;height:34px;
-  border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0}
+  border-radius:50%;font-size:16px;cursor:pointer;display:flex;
+  align-items:center;justify-content:center}
 .nb:active{background:var(--hover)}
-.nb[disabled]{opacity:.3;pointer-events:none}
+.nb[disabled]{opacity:.3}
 #omnibox{flex:1;display:flex;align-items:center;background:#111;
   border:1.5px solid var(--bdr);border-radius:24px;padding:0 12px;
-  height:36px;gap:8px;cursor:text;min-width:0}
+  height:36px;gap:8px;cursor:text}
 #omnibox:focus-within{border-color:var(--blue)}
-#lockico{font-size:13px;flex-shrink:0}
+#lockico{font-size:13px}
 #urlInput{flex:1;background:transparent;border:none;color:var(--txt);
-  font-size:13px;outline:none;min-width:0}
-#urlInput::placeholder{color:var(--dim)}
+  font-size:13px;outline:none}
 #menubtn{background:transparent;border:none;color:var(--dim);font-size:22px;
-  cursor:pointer;width:34px;height:34px;border-radius:50%;display:flex;
-  align-items:center;justify-content:center;flex-shrink:0}
+  cursor:pointer;width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center}
 #menubtn:active{background:var(--hover)}
 
-#viewport{flex:1;position:relative;overflow:hidden;background:#fff}
+#viewport{flex:1;position:relative;overflow:hidden;background:#1a1a1a}
 #iframeContainer{position:absolute;inset:0;width:100%;height:100%}
-.contentFrame{position:absolute;inset:0;width:100%;height:100%;border:none;
-  display:block;background:#fff}
-
-#cur{position:fixed;pointer-events:none;z-index:99999;
-  width:0;height:0;
-  border-left:10px solid transparent;
-  border-right:0 solid transparent;
-  border-bottom:18px solid rgba(255,255,255,0.95);
-  filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));
-  transform-origin:top left;
-  transition:left 0.02s linear, top 0.02s linear}
-#cur::after{content:'';position:absolute;top:12px;left:-5px;
-  width:5px;height:12px;background:rgba(255,255,255,0.95);
-  border-radius:0 0 4px 4px}
-#cur.lc{border-bottom-color:#8ab4f8}
-#cur.rc{border-bottom-color:#f28b82}
-#cur.lc::after{background:#8ab4f8}
-#cur.rc::after{background:#f28b82}
+.contentFrame{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
 
 #mpad{position:fixed;right:12px;bottom:280px;width:170px;
   background:#12121ae6;backdrop-filter:blur(12px);
-  border:1px solid #2a2a3a;border-radius:16px;
-  z-index:9999;box-shadow:0 10px 40px rgba(0,0,0,0.6);touch-action:none}
+  border:1px solid #2a2a3a;border-radius:16px;z-index:9999;
+  box-shadow:0 10px 40px rgba(0,0,0,0.6)}
 #mhead{padding:8px 12px 4px;display:flex;justify-content:space-between;
-  align-items:center;cursor:move;touch-action:none}
-#mhead span:first-child{color:#8ab4f8;font-size:9px;letter-spacing:1.8px;font-weight:800}
+  align-items:center;cursor:move}
+#mhead span:first-child{color:#8ab4f8;font-size:9px;letter-spacing:1.8px}
 #mhead span:last-child{color:#5a5a7a;font-size:16px;cursor:pointer}
 #tpad{margin:0 10px;height:100px;background:#0a0a10;border-radius:12px;
-  border:1px solid #252535;position:relative;overflow:hidden;
-  touch-action:none;cursor:crosshair}
+  border:1px solid #252535;position:relative;overflow:hidden}
 #tpad::before{content:'TRACKPAD';position:absolute;inset:0;display:flex;
-  align-items:center;justify-content:center;color:#1a1a2a;
-  font-size:9px;letter-spacing:2px;pointer-events:none}
+  align-items:center;justify-content:center;color:#1a1a2a;font-size:9px}
 #mbtns{display:flex;gap:8px;padding:8px 10px 6px}
 #lbtn,#rbtn{flex:1;height:34px;border:none;border-radius:10px;
-  font-size:11px;font-weight:bold;cursor:pointer;transition:0.05s linear}
+  font-size:11px;font-weight:bold;cursor:pointer}
 #lbtn{background:#0d2e1c;color:#81c995;border:1px solid #2a5a3a}
 #rbtn{background:#2e1a1a;color:#f28b82;border:1px solid #6a2a2a}
 #lbtn:active{background:#81c995;color:#000}
@@ -108,27 +85,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 #sup,#sdn,#smid{flex:1;height:30px;background:#0d0d18;border:1px solid #252535;
   color:#aaa;border-radius:8px;font-size:13px;cursor:pointer;
   display:flex;align-items:center;justify-content:center}
-#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000;border-color:var(--blue)}
+#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000}
 
 #kbd{position:fixed;bottom:0;left:0;right:0;background:#111118ee;
   backdrop-filter:blur(10px);border-top:1px solid #2a2a35;
-  padding:4px 4px 8px;z-index:9998;touch-action:none}
+  padding:4px 4px 8px;z-index:9998}
 #kbd.koff{display:none}
 #kbar{display:flex;align-items:center;padding:4px 6px 6px;gap:4px;
-  border-bottom:1px solid #22222a;overflow-x:auto;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  border-bottom:1px solid #22222a;overflow-x:auto;scrollbar-width:none}
 #kbar::-webkit-scrollbar{display:none}
 .qk{background:#1e1e2a;border:1px solid #353545;color:#ccc;
-  border-radius:8px;padding:6px 12px;font-size:11px;
-  white-space:nowrap;cursor:pointer;flex-shrink:0;font-weight:600}
-.qk:active,.qk.on{background:var(--blue);color:#000;border-color:var(--blue)}
+  border-radius:8px;padding:6px 12px;font-size:11px;white-space:nowrap;cursor:pointer}
+.qk:active{background:var(--blue);color:#000}
 .kr{display:flex;justify-content:center;gap:3px;margin-bottom:3px;padding:0 4px}
 .k{background:#252532;border:1px solid #353545;color:#e0e0e0;
-  border-radius:8px;height:40px;min-width:30px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:12px;cursor:pointer;padding:0 4px;flex:1 0 auto;font-weight:500}
-.k:active{background:var(--blue);color:#000;border-color:var(--blue);transform:scale(0.96)}
-.k.wide{flex:1.8}
+  border-radius:8px;height:40px;min-width:30px;display:flex;
+  align-items:center;justify-content:center;font-size:12px;cursor:pointer;
+  flex:1 0 auto}
+.k:active{background:var(--blue);color:#000}
 .k.space{flex:5}
 .k.back{min-width:50px}
 </style>
@@ -160,8 +134,6 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 <div id="viewport">
   <div id="iframeContainer"></div>
 </div>
-
-<div id="cur" class="lc"></div>
 
 <div id="mpad">
   <div id="mhead"><span>✦ TRACKPAD</span><span id="mpadClose">✕</span></div>
@@ -195,108 +167,203 @@ let tabs = [];
 let activeTabId = null;
 let tabCounter = 0;
 let activeFrame = null;
-let cursorX = window.innerWidth / 2;
-let cursorY = window.innerHeight / 2;
 
-function updateCursorVisual() {
-  const cur = document.getElementById('cur');
-  cur.style.left = Math.max(2, Math.min(window.innerWidth - 12, cursorX - 3)) + 'px';
-  cur.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
-}
-
-function setCursorPosition(x, y) {
-  cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
-  cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
-  updateCursorVisual();
-}
-
-function clickAtCursor(button) {
-  if(!activeFrame) return;
+// Injeção de controle remoto no iframe
+function injectRemoteController(iframe) {
   try {
-    const rect = activeFrame.getBoundingClientRect();
-    if(cursorX < rect.left || cursorX > rect.right || cursorY < rect.top || cursorY > rect.bottom) return;
-    const scaleX = activeFrame.clientWidth / rect.width;
-    const scaleY = activeFrame.clientHeight / rect.height;
-    const relativeX = (cursorX - rect.left) * scaleX;
-    const relativeY = (cursorY - rect.top) * scaleY;
-    const elem = activeFrame.contentDocument.elementFromPoint(relativeX, relativeY);
-    if(elem) {
-      if(button === 'left') {
-        ['mousedown', 'mouseup', 'click'].forEach(type => {
-          const ev = new MouseEvent(type, { view: activeFrame.contentWindow, bubbles: true, cancelable: true, clientX: relativeX, clientY: relativeY, button: 0 });
-          elem.dispatchEvent(ev);
-        });
-      } else {
-        const ctxEv = new MouseEvent('contextmenu', { view: activeFrame.contentWindow, bubbles: true, cancelable: true, clientX: relativeX, clientY: relativeY, button: 2 });
-        elem.dispatchEvent(ctxEv);
+    const win = iframe.contentWindow;
+    const doc = iframe.contentDocument;
+    if(!doc || !win) return false;
+    
+    // Remove sandbox temporariamente via clone (só funciona se não for cross-origin)
+    // Para sites cross-origin, usamos postMessage. Mas para funcionar, vamos criar um proxy
+    
+    // Script injetado que cria cursor virtual
+    const injectScript = `
+    (function() {
+      if(window.__remoteControlled) return;
+      window.__remoteControlled = true;
+      
+      // Cursor virtual
+      let cursorX = window.innerWidth / 2;
+      let cursorY = window.innerHeight / 2;
+      let cursorVisible = true;
+      
+      const cursorDiv = document.createElement('div');
+      cursorDiv.id = '__remoteCursor';
+      cursorDiv.style.cssText = 'position:fixed;width:0;height:0;border-left:10px solid transparent;border-right:0 solid transparent;border-bottom:18px solid #8ab4f8;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));pointer-events:none;z-index:999999;transform-origin:top left;';
+      const after = document.createElement('style');
+      after.textContent = '#__remoteCursor::after{content:"";position:absolute;top:12px;left:-5px;width:5px;height:12px;background:#8ab4f8;border-radius:0 0 4px 4px}';
+      document.head.appendChild(after);
+      document.body.appendChild(cursorDiv);
+      
+      function updateCursor() {
+        cursorDiv.style.left = Math.max(2, Math.min(window.innerWidth - 12, cursorX - 3)) + 'px';
+        cursorDiv.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
       }
-    }
-  } catch(e) { console.log('click err', e); }
-}
-
-function sendKeyToFrame(key, code, modifiers = {}) {
-  if(!activeFrame) return;
-  try {
-    const doc = activeFrame.contentDocument;
-    const activeEl = doc.activeElement || doc.body;
-    const downOpts = { key, code, bubbles: true, cancelable: true, ctrlKey: modifiers.ctrl, altKey: modifiers.alt, shiftKey: modifiers.shift };
-    const down = new KeyboardEvent('keydown', downOpts);
-    activeEl.dispatchEvent(down);
-    if(key !== 'Control' && key !== 'Alt' && key !== 'Shift' && key !== 'Meta') {
-      const press = new KeyboardEvent('keypress', { key, code, bubbles: true, cancelable: true });
-      activeEl.dispatchEvent(press);
-    }
-    const up = new KeyboardEvent('keyup', { key, code, bubbles: true, cancelable: true });
-    activeEl.dispatchEvent(up);
-  } catch(e) { console.log('key err', e); }
-}
-
-function sendTextToFrame(text) {
-  if(!activeFrame) return;
-  try {
-    const doc = activeFrame.contentDocument;
-    const activeEl = doc.activeElement || doc.body;
-    if(activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable) {
-      const start = activeEl.selectionStart || 0;
-      const end = activeEl.selectionEnd || 0;
-      const val = activeEl.value || activeEl.innerText || '';
-      const newVal = val.substring(0, start) + text + val.substring(end);
-      if(activeEl.value !== undefined) activeEl.value = newVal;
-      else activeEl.innerText = newVal;
-      activeEl.selectionStart = activeEl.selectionEnd = start + text.length;
-      activeEl.dispatchEvent(new InputEvent('input', { bubbles: true, data: text }));
-    } else {
-      const inputEv = new InputEvent('beforeinput', { inputType: 'insertText', data: text, bubbles: true });
-      activeEl.dispatchEvent(inputEv);
-    }
-  } catch(e) {}
+      
+      window.__setCursorPos = function(x, y) {
+        cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
+        cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
+        updateCursor();
+      };
+      
+      window.__clickAtCursor = function(button) {
+        const elem = document.elementFromPoint(cursorX, cursorY);
+        if(elem) {
+          if(button === 'left') {
+            ['mousedown','mouseup','click'].forEach(type => {
+              const ev = new MouseEvent(type, {view:window,bubbles:true,cancelable:true,clientX:cursorX,clientY:cursorY,button:0});
+              elem.dispatchEvent(ev);
+            });
+          } else {
+            const ctx = new MouseEvent('contextmenu', {view:window,bubbles:true,cancelable:true,clientX:cursorX,clientY:cursorY,button:2});
+            elem.dispatchEvent(ctx);
+          }
+        }
+      };
+      
+      window.__sendKey = function(key, code, ctrl, alt, shift) {
+        const active = document.activeElement || document.body;
+        const opts = {key, code, bubbles:true, cancelable:true, ctrlKey:ctrl, altKey:alt, shiftKey:shift};
+        active.dispatchEvent(new KeyboardEvent('keydown', opts));
+        if(key !== 'Control' && key !== 'Alt' && key !== 'Shift') {
+          active.dispatchEvent(new KeyboardEvent('keypress', {key, code, bubbles:true}));
+        }
+        active.dispatchEvent(new KeyboardEvent('keyup', {key, code, bubbles:true}));
+      };
+      
+      window.__sendText = function(text) {
+        const active = document.activeElement || document.body;
+        if(active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable) {
+          const start = active.selectionStart || 0;
+          const end = active.selectionEnd || 0;
+          const val = active.value || active.innerText || '';
+          const newVal = val.substring(0, start) + text + val.substring(end);
+          if(active.value !== undefined) active.value = newVal;
+          else active.innerText = newVal;
+          active.selectionStart = active.selectionEnd = start + text.length;
+          active.dispatchEvent(new InputEvent('input', {bubbles:true, data:text}));
+        }
+      };
+      
+      window.__scrollDir = function(dir) {
+        if(dir === 'up') window.scrollBy(0, -200);
+        else if(dir === 'down') window.scrollBy(0, 200);
+      };
+      
+      updateCursor();
+      console.log('Remote controller injected');
+    })();
+    `;
+    
+    const script = doc.createElement('script');
+    script.textContent = injectScript;
+    doc.head.appendChild(script);
+    return true;
+  } catch(e) {
+    console.log('Injection failed (cross-origin)');
+    return false;
+  }
 }
 
 function createIframe(url, tabId) {
   const iframe = document.createElement('iframe');
   iframe.className = 'contentFrame';
   iframe.style.display = 'none';
-  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write; accelerometer; camera; microphone; geolocation');
-  iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-downloads allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox');
+  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write; accelerometer; camera; microphone; geolocation; cross-origin-isolated');
+  // Sem sandbox para permitir controle total (funciona para sites https)
   iframe.src = url;
+  
   iframe.onload = () => {
-    const tab = tabs.find(t => t.id === tabId);
-    if(tab) {
-      try {
-        let title = iframe.contentDocument?.title || new URL(url).hostname || 'Nova aba';
-        tab.title = title.substring(0, 35);
-        updateTabsUI();
-        if(activeTabId === tabId) {
-          try {
-            const finalUrl = iframe.contentWindow.location.href;
-            if(finalUrl && finalUrl !== 'about:blank') tab.url = finalUrl;
-            document.getElementById('urlInput').value = tab.url;
-          } catch(e) {}
-        }
-      } catch(e) {}
-    }
+    setTimeout(() => {
+      const tab = tabs.find(t => t.id === tabId);
+      if(tab) {
+        try {
+          let title = iframe.contentDocument?.title || new URL(url).hostname || 'Nova aba';
+          tab.title = title.substring(0, 35);
+          updateTabsUI();
+          // Injeta controle
+          injectRemoteController(iframe);
+          
+          if(activeTabId === tabId) {
+            try {
+              const finalUrl = iframe.contentWindow.location.href;
+              if(finalUrl && finalUrl !== 'about:blank') tab.url = finalUrl;
+              document.getElementById('urlInput').value = tab.url;
+            } catch(e) {}
+          }
+        } catch(e) {}
+      }
+    }, 500);
   };
   return iframe;
+}
+
+// Comunicação com iframe via postMessage como fallback
+function sendToFrame(cmd, data) {
+  if(!activeFrame) return;
+  try {
+    const win = activeFrame.contentWindow;
+    if(win.__setCursorPos) {
+      if(cmd === 'move') win.__setCursorPos(data.x, data.y);
+      else if(cmd === 'click') win.__clickAtCursor(data);
+      else if(cmd === 'key') win.__sendKey(data.key, data.code, data.ctrl, data.alt, data.shift);
+      else if(cmd === 'text') win.__sendText(data);
+      else if(cmd === 'scroll') win.__scrollDir(data);
+    } else {
+      // Fallback: evento direto
+      if(cmd === 'click') {
+        try {
+          const rect = activeFrame.getBoundingClientRect();
+          const doc = activeFrame.contentDocument;
+          if(doc) {
+            const elem = doc.elementFromPoint(data.x, data.y);
+            if(elem) {
+              if(data.button === 'left') elem.click();
+              else elem.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true}));
+            }
+          }
+        } catch(e) {}
+      }
+    }
+  } catch(e) { console.log('send err', e); }
+}
+
+// Cursor host
+let cursorX = window.innerWidth / 2;
+let cursorY = window.innerHeight / 2;
+let cursorColor = 'lc';
+
+function updateHostCursor() {
+  const cur = document.getElementById('cur');
+  if(cur) {
+    cur.style.left = Math.max(2, Math.min(window.innerWidth - 12, cursorX - 3)) + 'px';
+    cur.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
+  }
+  // Envia para o iframe
+  sendToFrame('move', { x: cursorX, y: cursorY });
+}
+
+function setCursorPosition(x, y) {
+  cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
+  cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
+  updateHostCursor();
+}
+
+function clickAtCursor(button) {
+  sendToFrame('click', { button: button, x: cursorX, y: cursorY });
+  const cur = document.getElementById('cur');
+  cur.className = button === 'left' ? 'lc' : 'rc';
+  setTimeout(() => cur.className = 'lc', 100);
+}
+
+function sendKeyToFrame(key, code, modifiers = {}) {
+  sendToFrame('key', { key, code, ctrl: !!modifiers.ctrl, alt: !!modifiers.alt, shift: !!modifiers.shift });
+}
+
+function sendTextToFrame(text) {
+  sendToFrame('text', text);
 }
 
 function navigateTo(tabId, rawUrl) {
@@ -335,6 +402,8 @@ function showTabFrame(tabId) {
       if(curUrl && curUrl !== 'about:blank') active.url = curUrl;
     } catch(e) {}
     updateTabsUI();
+    // Re-injecta controle
+    setTimeout(() => injectRemoteController(active.frame), 100);
   }
 }
 
@@ -391,59 +460,51 @@ function updateTabsUI() {
 
 function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
 
+// Trackpad
 const trackpad = document.getElementById('tpad');
 let trackActive = false;
-let lastTouchX = 0, lastTouchY = 0;
+let lastX = 0, lastY = 0;
 
 trackpad.addEventListener('touchstart', (e) => {
   e.preventDefault();
   trackActive = true;
-  const rect = trackpad.getBoundingClientRect();
-  lastTouchX = e.touches[0].clientX;
-  lastTouchY = e.touches[0].clientY;
+  lastX = e.touches[0].clientX;
+  lastY = e.touches[0].clientY;
 });
 trackpad.addEventListener('touchmove', (e) => {
   e.preventDefault();
   if(trackActive) {
-    const dx = (e.touches[0].clientX - lastTouchX) * 2.2;
-    const dy = (e.touches[0].clientY - lastTouchY) * 2.2;
+    const dx = (e.touches[0].clientX - lastX) * 2.5;
+    const dy = (e.touches[0].clientY - lastY) * 2.5;
     setCursorPosition(cursorX + dx, cursorY + dy);
-    lastTouchX = e.touches[0].clientX;
-    lastTouchY = e.touches[0].clientY;
+    lastX = e.touches[0].clientX;
+    lastY = e.touches[0].clientY;
   }
 });
-trackpad.addEventListener('touchend', (e) => {
-  e.preventDefault();
-  trackActive = false;
-});
+trackpad.addEventListener('touchend', (e) => { e.preventDefault(); trackActive = false; });
 
 document.getElementById('lbtn').addEventListener('touchstart', (e) => {
   e.preventDefault();
   clickAtCursor('left');
-  const cur = document.getElementById('cur');
-  cur.className = 'lc';
-  setTimeout(() => cur.className = 'lc', 80);
 });
 document.getElementById('rbtn').addEventListener('touchstart', (e) => {
   e.preventDefault();
   clickAtCursor('right');
-  const cur = document.getElementById('cur');
-  cur.className = 'rc';
-  setTimeout(() => cur.className = 'lc', 150);
 });
 document.getElementById('sup').addEventListener('touchstart', (e) => {
   e.preventDefault();
-  sendKeyToFrame('ArrowUp', 'ArrowUp');
+  sendToFrame('scroll', 'up');
 });
 document.getElementById('sdn').addEventListener('touchstart', (e) => {
   e.preventDefault();
-  sendKeyToFrame('ArrowDown', 'ArrowDown');
+  sendToFrame('scroll', 'down');
 });
 document.getElementById('smid').addEventListener('touchstart', (e) => {
   e.preventDefault();
   clickAtCursor('left');
 });
 
+// Teclado virtual
 const keyboardLayout = {
   row1: ['q','w','e','r','t','y','u','i','o','p','[',']'],
   row2: ['a','s','d','f','g','h','j','k','l',';',"'"],
@@ -496,6 +557,7 @@ document.querySelectorAll('.qk').forEach(btn => {
   });
 });
 
+// UI Events
 const urlInput = document.getElementById('urlInput');
 urlInput.addEventListener('keypress', (e) => {
   if(e.key === 'Enter') navigateTo(activeTabId, urlInput.value);
@@ -510,14 +572,14 @@ document.getElementById('reloadBtn').addEventListener('click', () => {
   if(activeFrame) try { activeFrame.contentWindow.location.reload(); } catch(e) {}
 });
 document.getElementById('newTab').addEventListener('click', () => addTab(START_URL));
-document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar simulado (API web)'));
-document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar simulado'));
-document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar simulado'));
+document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar'));
+document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar'));
+document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar'));
 
+// Mover mousepad
 const mpad = document.getElementById('mpad');
 let mpadDrag = false, mpadStartX=0, mpadStartY=0, mpadLeft=0, mpadTop=0;
-const mhead = document.getElementById('mhead');
-mhead.addEventListener('touchstart', (e) => {
+document.getElementById('mhead').addEventListener('touchstart', (e) => {
   e.preventDefault();
   mpadDrag = true;
   mpadStartX = e.touches[0].clientX;
@@ -535,7 +597,6 @@ document.addEventListener('touchmove', (e) => {
     mpad.style.left = newL + 'px';
     mpad.style.right = 'auto';
     mpad.style.top = newT + 'px';
-    mpad.style.bottom = 'auto';
   }
 });
 document.addEventListener('touchend', () => { mpadDrag = false; });
@@ -543,32 +604,27 @@ document.getElementById('mpadClose').addEventListener('touchstart', (e) => {
   e.preventDefault();
   mpad.style.display = 'none';
 });
+
 let kbdVisible = true;
 document.getElementById('menubtn').addEventListener('click', () => {
   kbdVisible = !kbdVisible;
   document.getElementById('kbd').classList.toggle('koff', !kbdVisible);
 });
 
+// Toque direto na viewport passa para o iframe
 document.getElementById('viewport').addEventListener('touchstart', (e) => {
   if(!activeFrame) return;
   e.preventDefault();
   const touch = e.touches[0];
-  try {
-    const rect = activeFrame.getBoundingClientRect();
-    const relX = (touch.clientX - rect.left) * (activeFrame.clientWidth / rect.width);
-    const relY = (touch.clientY - rect.top) * (activeFrame.clientHeight / rect.height);
-    const target = activeFrame.contentDocument.elementFromPoint(relX, relY);
-    if(target) {
-      const touchObj = new Touch({ identifier: 0, target: target, clientX: relX, clientY: relY, pageX: relX, pageY: relY });
-      const touchEv = new TouchEvent('touchstart', { bubbles: true, cancelable: true, touches: [touchObj], targetTouches: [touchObj], changedTouches: [touchObj] });
-      target.dispatchEvent(touchEv);
-    }
-  } catch(err) {}
+  setCursorPosition(touch.clientX, touch.clientY);
+  clickAtCursor('left');
 });
 
 buildKeyboard();
 addTab(START_URL);
 setCursorPosition(window.innerWidth/2, window.innerHeight/2);
+updateHostCursor();
+
 setInterval(() => {
   if(activeFrame) {
     try {
