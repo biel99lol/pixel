@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>CloudMoon Browser</title>
+<title>Chromium CloudMoon</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -16,20 +16,20 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
   touch-action:none;-webkit-user-select:none;user-select:none}
 
 #titlebar{background:var(--bar);height:36px;display:flex;align-items:flex-end;
-  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto;overflow-y:hidden}
-#tabsContainer{display:flex;gap:2px;flex:1;overflow-x:auto;overflow-y:hidden;height:100%}
+  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto}
+#tabsContainer{display:flex;gap:2px;flex:1;overflow-x:auto}
 .tab{background:var(--card);color:var(--dim);padding:5px 10px 4px;
   border-radius:8px 8px 0 0;font-size:11px;display:flex;align-items:center;
-  gap:5px;min-width:100px;max-width:160px;cursor:pointer;
+  gap:5px;min-width:90px;max-width:140px;cursor:pointer;
   border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0}
 .tab.active{background:var(--bg);color:var(--txt)}
 .tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
 .tab-x{width:15px;height:15px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:11px;cursor:pointer}
+  border-radius:50%;font-size:11px}
 .tab-x:active{background:var(--hover)}
 #newTab{background:transparent;border:none;color:var(--dim);width:26px;height:26px;
-  font-size:18px;cursor:pointer;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;align-self:center;margin-bottom:2px;flex-shrink:0}
+  font-size:18px;cursor:pointer;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;align-self:center;margin-bottom:2px;flex-shrink:0}
 #winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;margin-bottom:7px;flex-shrink:0}
 .wc{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0}
 .wc.min{background:#f0c132}.wc.max{background:#34c749}.wc.cls{background:#ea4335}
@@ -37,13 +37,11 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 #toolbar{background:var(--bar);padding:5px 8px;display:flex;align-items:center;
   gap:4px;flex-shrink:0;border-bottom:1px solid #000;position:relative}
 #loadbar{position:absolute;bottom:0;left:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),#a78bfa);
-  width:0;pointer-events:none;z-index:5}
+  background:linear-gradient(90deg,var(--blue),#a78bfa);width:0;pointer-events:none;z-index:5}
 .nb{background:transparent;border:none;color:var(--dim);width:30px;height:30px;
   border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;
   justify-content:center;flex-shrink:0}
 .nb:active{background:var(--hover)}
-.nb[disabled]{opacity:.3;pointer-events:none}
 #omnibox{flex:1;display:flex;align-items:center;background:#111;
   border:1.5px solid var(--bdr);border-radius:20px;padding:0 10px;
   height:30px;gap:6px;cursor:pointer;min-width:0}
@@ -61,17 +59,17 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
 .frame-container.active{display:block}
 .nav-frame{width:100%;height:100%;border:none;background:#fff}
 
-#touchOverlay{position:absolute;inset:0;z-index:10;touch-action:none;background:transparent}
+#touchOverlay{position:absolute;inset:0;z-index:20;touch-action:none;background:transparent;pointer-events:auto}
 
 #loadScreen{position:absolute;inset:0;background:var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:14px;z-index:20}
+  gap:14px;z-index:15}
 #loadScreen.hide{display:none}
 .spinner{width:36px;height:36px;border:3px solid var(--card);
   border-top-color:var(--blue);border-radius:50%;
   animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#loadMsg{color:var(--dim);font-size:12px;max-width:260px;text-align:center;line-height:1.5}
+#loadMsg{color:var(--dim);font-size:12px}
 
 #cur{position:fixed;pointer-events:none;z-index:99999;
   width:0;height:0;
@@ -119,13 +117,13 @@ let tabCounter = 0;
 const viewport = document.getElementById('viewport');
 const tabsContainer = document.getElementById('tabsContainer');
 const loadScreen = document.getElementById('loadScreen');
-const loadMsg = document.getElementById('loadMsg');
 const urlDisp = document.getElementById('urldisp');
 const backBtn = document.getElementById('backBtn');
 const fwdBtn = document.getElementById('fwdBtn');
 const refreshBtn = document.getElementById('refreshBtn');
 const omnibox = document.getElementById('omnibox');
 const lockico = document.getElementById('lockico');
+const touchOverlay = document.getElementById('touchOverlay');
 
 function createTabContainer() {
   const container = document.createElement('div');
@@ -133,7 +131,7 @@ function createTabContainer() {
   container.id = `frame-${Date.now()}-${tabCounter++}`;
   const iframe = document.createElement('iframe');
   iframe.className = 'nav-frame';
-  iframe.allow = 'fullscreen; clipboard-read; clipboard-write';
+  iframe.setAttribute('allow', 'fullscreen; clipboard-read; clipboard-write');
   container.appendChild(iframe);
   viewport.appendChild(container);
   return { container, iframe };
@@ -146,14 +144,13 @@ function addTab(url, active = true) {
   const tabDiv = document.createElement('div');
   tabDiv.className = 'tab';
   tabDiv.dataset.id = tabId;
-  tabDiv.innerHTML = `<span class="tab-ttl">Nova aba</span><span class="tab-x">✕</span>`;
+  tabDiv.innerHTML = `<span class="tab-ttl">${url.includes('cloudmoon') ? 'CloudMoon' : 'Nova aba'}</span><span class="tab-x">✕</span>`;
   
   const tabX = tabDiv.querySelector('.tab-x');
   tabX.onclick = (e) => {
     e.stopPropagation();
     closeTab(tabId);
   };
-  
   tabDiv.onclick = () => switchToTab(tabId);
   
   tabsContainer.appendChild(tabDiv);
@@ -163,7 +160,7 @@ function addTab(url, active = true) {
     container: container,
     iframe: iframe,
     tabDiv: tabDiv,
-    url: url || 'https://www.google.com'
+    url: url
   });
   
   iframe.onload = () => {
@@ -180,12 +177,10 @@ function addTab(url, active = true) {
   iframe.onerror = () => {
     if(activeTabId === tabId) {
       loadScreen.classList.add('hide');
-      loadMsg.innerText = 'Erro ao carregar página';
-      setTimeout(() => { loadMsg.innerText = 'Carregando...'; }, 1500);
     }
   };
   
-  iframe.src = url || 'https://www.google.com';
+  iframe.src = url;
   
   if(active) {
     switchToTab(tabId);
@@ -209,12 +204,7 @@ function switchToTab(tabId) {
     activeTabId = tabId;
     updateUrlBar(tabId);
     updateNavButtons();
-    
-    if(activeTab.iframe.src && !activeTab.iframe.src.includes('about:blank')) {
-      loadScreen.classList.add('hide');
-    } else {
-      loadScreen.classList.remove('hide');
-    }
+    loadScreen.classList.add('hide');
   }
 }
 
@@ -228,7 +218,7 @@ function closeTab(tabId) {
   tabs.splice(index, 1);
   
   if(tabs.length === 0) {
-    addTab('https://www.google.com', true);
+    addTab('https://web.cloudmoonapp.com/pt/', true);
   } else if(activeTabId === tabId) {
     const newActive = tabs[Math.min(index, tabs.length - 1)];
     if(newActive) switchToTab(newActive.id);
@@ -238,46 +228,32 @@ function closeTab(tabId) {
 function updateTabTitle(tabId) {
   const tab = tabs.find(t => t.id === tabId);
   if(!tab) return;
-  
   try {
     let title = tab.iframe.contentDocument?.title;
-    if(title && title.length > 30) title = title.slice(0, 27) + '...';
-    if(title) {
-      tab.tabDiv.querySelector('.tab-ttl').innerText = title;
-    } else {
-      const url = tab.url || tab.iframe.src;
-      if(url.includes('google.com')) tab.tabDiv.querySelector('.tab-ttl').innerText = 'Google';
-      else if(url.includes('cloudmoon')) tab.tabDiv.querySelector('.tab-ttl').innerText = 'CloudMoon';
-      else tab.tabDiv.querySelector('.tab-ttl').innerText = 'Nova aba';
-    }
-  } catch(e) {
-    if(tab.url && tab.url.includes('cloudmoon')) tab.tabDiv.querySelector('.tab-ttl').innerText = 'CloudMoon';
-    else if(tab.url && tab.url.includes('google')) tab.tabDiv.querySelector('.tab-ttl').innerText = 'Google';
-  }
+    if(title && title.length > 25) title = title.slice(0, 22) + '...';
+    if(title) tab.tabDiv.querySelector('.tab-ttl').innerText = title;
+  } catch(e) {}
 }
 
 function updateUrlBar(tabId) {
   const tab = tabs.find(t => t.id === tabId);
   if(!tab) return;
-  
   try {
     let frameUrl = tab.iframe.contentWindow?.location.href;
     if(frameUrl && frameUrl !== 'about:blank') {
       urlDisp.innerText = frameUrl;
-      if(frameUrl.startsWith('https')) lockico.innerText = '🔒';
-      else lockico.innerText = '⚠️';
-    } else if(tab.url) {
+      lockico.innerText = frameUrl.startsWith('https') ? '🔒' : '⚠️';
+    } else {
       urlDisp.innerText = tab.url;
     }
   } catch(e) {
-    if(tab.url) urlDisp.innerText = tab.url;
+    urlDisp.innerText = tab.url;
   }
 }
 
 function updateNavButtons() {
   const activeTab = tabs.find(t => t.id === activeTabId);
   if(!activeTab) return;
-  
   try {
     backBtn.disabled = !activeTab.iframe.contentWindow?.history?.length;
     fwdBtn.disabled = !activeTab.iframe.contentWindow?.history?.length;
@@ -290,91 +266,74 @@ function updateNavButtons() {
 function loadUrlInActiveTab(url) {
   const activeTab = tabs.find(t => t.id === activeTabId);
   if(!activeTab) return;
-  
-  if(!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('file://')) {
-    if(url.includes('.') && !url.includes(' ')) {
-      url = 'https://' + url;
-    } else {
-      url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-    }
-  }
-  
+  if(!url.startsWith('http')) url = 'https://' + url;
   activeTab.url = url;
   loadScreen.classList.remove('hide');
   activeTab.iframe.src = url;
 }
 
-function navigateBack() {
+backBtn.onclick = () => {
   const activeTab = tabs.find(t => t.id === activeTabId);
-  if(activeTab) {
-    try { activeTab.iframe.contentWindow.history.back(); loadScreen.classList.remove('hide'); } catch(e) {}
-  }
-}
-
-function navigateForward() {
+  if(activeTab) try { activeTab.iframe.contentWindow.history.back(); loadScreen.classList.remove('hide'); } catch(e) {}
+};
+fwdBtn.onclick = () => {
   const activeTab = tabs.find(t => t.id === activeTabId);
-  if(activeTab) {
-    try { activeTab.iframe.contentWindow.history.forward(); loadScreen.classList.remove('hide'); } catch(e) {}
-  }
-}
-
-function refreshPage() {
+  if(activeTab) try { activeTab.iframe.contentWindow.history.forward(); loadScreen.classList.remove('hide'); } catch(e) {}
+};
+refreshBtn.onclick = () => {
   const activeTab = tabs.find(t => t.id === activeTabId);
-  if(activeTab) {
-    loadScreen.classList.remove('hide');
-    activeTab.iframe.src = activeTab.iframe.src;
-  }
-}
-
-backBtn.onclick = navigateBack;
-fwdBtn.onclick = navigateForward;
-refreshBtn.onclick = refreshPage;
+  if(activeTab) { loadScreen.classList.remove('hide'); activeTab.iframe.src = activeTab.iframe.src; }
+};
 omnibox.onclick = () => {
   const newUrl = prompt('Digite a URL ou pesquisa:', urlDisp.innerText);
   if(newUrl && newUrl.trim()) loadUrlInActiveTab(newUrl.trim());
 };
 document.getElementById('newTab').onclick = () => addTab('https://www.google.com', true);
 
+document.querySelector('.wc.min').onclick = () => window.close();
+document.querySelector('.wc.max').onclick = () => alert('Modo tela cheia');
+document.querySelector('.wc.cls').onclick = () => window.close();
+
 const cur = document.getElementById('cur');
 let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
 let targetX = mouseX, targetY = mouseY;
 
-function sendClickToIframe(x, y, isRightClick = false) {
+function getActiveIframe() {
   const activeTab = tabs.find(t => t.id === activeTabId);
-  if(!activeTab || !activeTab.iframe.contentDocument) return;
-  
-  const iframeRect = activeTab.iframe.getBoundingClientRect();
+  return activeTab?.iframe;
+}
+
+function sendClickToIframe(x, y, isRightClick = false) {
+  const iframe = getActiveIframe();
+  if(!iframe || !iframe.contentDocument) return;
+  const iframeRect = iframe.getBoundingClientRect();
   const iframeX = x - iframeRect.left;
   const iframeY = y - iframeRect.top;
-  
   if(iframeX >= 0 && iframeX <= iframeRect.width && iframeY >= 0 && iframeY <= iframeRect.height) {
     const eventType = isRightClick ? 'contextmenu' : 'click';
     const event = new MouseEvent(eventType, {
-      view: activeTab.iframe.contentWindow,
-      bubbles: true,
-      cancelable: true,
-      clientX: iframeX,
-      clientY: iframeY,
-      button: isRightClick ? 2 : 0,
-      buttons: isRightClick ? 2 : 1
+      view: iframe.contentWindow, bubbles: true, cancelable: true,
+      clientX: iframeX, clientY: iframeY,
+      button: isRightClick ? 2 : 0, buttons: isRightClick ? 2 : 1
     });
-    const targetElem = activeTab.iframe.contentDocument.elementFromPoint(iframeX, iframeY);
+    const targetElem = iframe.contentDocument.elementFromPoint(iframeX, iframeY);
     if(targetElem) targetElem.dispatchEvent(event);
     
-    setTimeout(() => updateUrlBar(activeTabId), 100);
-    setTimeout(() => updateNavButtons(), 100);
+    setTimeout(() => {
+      updateUrlBar(activeTabId);
+      updateNavButtons();
+    }, 100);
   }
 }
 
-document.addEventListener('touchmove', (e) => {
-  e.preventDefault();
+document.body.addEventListener('touchmove', (e) => {
   const touch = e.touches[0];
   targetX = touch.clientX;
   targetY = touch.clientY;
   cur.style.display = 'block';
-}, { passive: false });
+});
 
-document.addEventListener('touchstart', (e) => {
+document.body.addEventListener('touchstart', (e) => {
   const touch = e.touches[0];
   targetX = touch.clientX;
   targetY = touch.clientY;
@@ -382,8 +341,8 @@ document.addEventListener('touchstart', (e) => {
 });
 
 function animateCursor() {
-  mouseX += (targetX - mouseX) * 0.3;
-  mouseY += (targetY - mouseY) * 0.3;
+  mouseX += (targetX - mouseX) * 0.25;
+  mouseY += (targetY - mouseY) * 0.25;
   cur.style.left = mouseX + 'px';
   cur.style.top = mouseY + 'px';
   requestAnimationFrame(animateCursor);
@@ -391,15 +350,15 @@ function animateCursor() {
 animateCursor();
 
 let touchTimer;
-const touchOverlay = document.getElementById('touchOverlay');
 
 touchOverlay.addEventListener('touchstart', (e) => {
   e.preventDefault();
+  e.stopPropagation();
   const touch = e.touches[0];
   targetX = touch.clientX;
   targetY = touch.clientY;
   touchTimer = setTimeout(() => {
-    sendClickToIframe(touch.clientX, touch.clientY, true);
+    sendClickToIframe(targetX, targetY, true);
     cur.className = 'rc';
     setTimeout(() => cur.className = '', 150);
   }, 500);
@@ -414,16 +373,11 @@ touchOverlay.addEventListener('touchend', (e) => {
   e.preventDefault();
   if(touchTimer) {
     clearTimeout(touchTimer);
-    const changed = e.changedTouches[0];
-    sendClickToIframe(changed.clientX, changed.clientY, false);
+    sendClickToIframe(targetX, targetY, false);
     cur.className = 'lc';
     setTimeout(() => cur.className = '', 150);
   }
 });
-
-document.querySelector('.wc.min').onclick = () => window.close();
-document.querySelector('.wc.max').onclick = () => alert('Modo tela cheia: use o botão do navegador');
-document.querySelector('.wc.cls').onclick = () => window.close();
 
 addTab('https://web.cloudmoonapp.com/pt/', true);
 </script>
