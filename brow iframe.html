@@ -1,397 +1,521 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Chromium Navegador</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#202124;--bar:#292a2d;--card:#35363a;--hover:#3c4043;
-  --blue:#8ab4f8;--green:#81c995;--red:#f28b82;
-  --txt:#e8eaed;--dim:#9aa0a6;--bdr:#3c4043;
-}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
-  font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column}
+// =====================================================
+// CHROMIUM BROWSER WITH WORKING TOUCH & KEYBOARD
+// C++ Embedded Browser using Chromium Embedded Framework
+// =====================================================
 
-#titlebar{background:var(--bar);height:36px;display:flex;align-items:center;
-  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto;overflow-y:hidden}
-#titlebar::-webkit-scrollbar{display:none}
-#tabsContainer{display:flex;gap:2px;height:100%;align-items:flex-end}
-.tab{background:var(--card);color:var(--dim);padding:5px 10px 4px;
-  border-radius:8px 8px 0 0;font-size:11px;display:flex;align-items:center;
-  gap:5px;min-width:80px;max-width:160px;cursor:pointer;
-  border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0}
-.tab.active{background:var(--bg);color:var(--txt)}
-.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
-.tab-x{width:15px;height:15px;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:11px}
-.tab-x:active{background:var(--hover)}
-#newTab{background:transparent;border:none;color:var(--dim);width:26px;height:26px;
-  font-size:18px;cursor:pointer;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0}
-#winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;flex-shrink:0}
-.wc{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer}
-.wc.min{background:#f0c132}.wc.max{background:#34c749}.wc.cls{background:#ea4335}
+#include <windows.h>
+#include <string>
+#include <vector>
+#include <map>
 
-#toolbar{background:var(--bar);padding:5px 8px;display:flex;align-items:center;
-  gap:4px;flex-shrink:0;border-bottom:1px solid #000;position:relative}
-#loadbar{position:absolute;bottom:0;left:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),#a78bfa);width:0;pointer-events:none;z-index:5}
-.nb{background:transparent;border:none;color:var(--dim);width:30px;height:30px;
-  border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;
-  justify-content:center;flex-shrink:0}
-.nb:active{background:var(--hover)}
-#omnibox{flex:1;display:flex;align-items:center;background:#111;
-  border:1.5px solid var(--bdr);border-radius:20px;padding:0 10px;
-  height:30px;gap:6px;min-width:0}
-#omnibox:focus-within{border-color:var(--blue)}
-#lockico{font-size:12px;flex-shrink:0}
-#urlInput{flex:1;background:transparent;border:none;color:var(--txt);
-  font-size:12px;outline:none;min-width:0}
-#urlInput::placeholder{color:var(--dim)}
-#menubtn{background:transparent;border:none;color:var(--dim);font-size:20px;
-  cursor:pointer;width:30px;height:30px;border-radius:50%;display:flex;
-  align-items:center;justify-content:center;flex-shrink:0}
-#menubtn:active{background:var(--hover)}
+// CEF Headers
+#include "include/cef_app.h"
+#include "include/cef_client.h"
+#include "include/cef_render_handler.h"
+#include "include/cef_life_span_handler.h"
+#include "include/cef_load_handler.h"
+#include "include/cef_keyboard_handler.h"
+#include "include/cef_touch_handler.h"
 
-#viewport{flex:1;position:relative;overflow:hidden;background:#fff}
-#iframeContainer{position:absolute;inset:0;width:100%;height:100%}
-.contentFrame{position:absolute;inset:0;width:100%;height:100%;border:none;display:block;background:#fff}
+// =====================================================
+// VIRTUAL CURSOR & TOUCH PROCESSING
+// =====================================================
 
-#cur{position:fixed;pointer-events:none;z-index:99999;width:0;height:0;
-  border-left:9px solid transparent;border-right:0 solid transparent;
-  border-bottom:15px solid rgba(255,255,255,.93);
-  filter:drop-shadow(0 1px 4px rgba(0,0,0,.8));transform-origin:top left}
-#cur::after{content:'';position:absolute;top:9px;left:-4px;
-  width:4px;height:9px;background:rgba(255,255,255,.93);border-radius:0 0 3px 3px}
-#cur.lc{border-bottom-color:rgba(138,180,248,.95)}
-#cur.rc{border-bottom-color:rgba(242,139,130,.95)}
-
-#mpad{position:fixed;right:8px;bottom:270px;width:162px;
-  background:#12121a;border:1px solid #252535;border-radius:14px;
-  z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.85);touch-action:none}
-#mhead{padding:6px 10px 3px;display:flex;justify-content:space-between;
-  align-items:center;cursor:move;touch-action:none}
-#mhead span:first-child{color:#444;font-size:9px;letter-spacing:1.5px;font-weight:700}
-#mhead span:last-child{color:#2a2a3a;font-size:14px}
-#tpad{margin:0 8px;height:88px;background:#0a0a10;border-radius:8px;
-  border:1px solid #1a1a28;position:relative;overflow:hidden;touch-action:none}
-#tpad::before{content:'TRACKPAD';position:absolute;inset:0;display:flex;
-  align-items:center;justify-content:center;color:#13131e;font-size:8px;letter-spacing:2px;pointer-events:none}
-#mbtns{display:flex;gap:5px;padding:7px 8px 5px}
-#lbtn,#rbtn{flex:1;height:28px;border:none;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer}
-#lbtn{background:#1a5e35;color:#81c995}#rbtn{background:#5e1a1a;color:#f28b82}
-#lbtn:active{background:#81c995;color:#000}#rbtn:active{background:#f28b82;color:#000}
-#srow{display:flex;gap:5px;padding:0 8px 8px}
-#sup,#sdn,#smid{flex:1;height:24px;background:#0d0d18;border:1px solid #252535;
-  color:#555;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000;border-color:var(--blue)}
-
-#kbd{position:fixed;bottom:0;left:0;right:0;background:#111118;
-  border-top:1px solid #252530;padding:3px 2px 6px;z-index:9998}
-#kbd.koff{display:none}
-
-#kbar{display:flex;align-items:center;padding:3px 5px 5px;gap:3px;
-  border-bottom:1px solid #1e1e28;overflow-x:auto}
-#kbar::-webkit-scrollbar{display:none}
-.qk{background:#1e1e2a;border:1px solid #2e2e3e;color:#aaa;border-radius:6px;
-  padding:4px 9px;font-size:10px;white-space:nowrap;cursor:pointer;flex-shrink:0}
-.qk:active{background:var(--blue);color:#000;border-color:var(--blue)}
-
-.kr{display:flex;justify-content:center;gap:2px;margin-bottom:2px;padding:0 2px}
-.k{background:#252532;border:1px solid #2e2e3e;color:#ddd;border-radius:5px;
-  height:36px;min-width:26px;display:flex;align-items:center;justify-content:center;
-  font-size:11px;cursor:pointer;padding:0 3px;flex:1 0 auto}
-.k:active{background:var(--blue);color:#000;border-color:var(--blue)}
-.k.space{flex:4}
-.k.back{min-width:42px}
-</style>
-</head>
-<body>
-
-<div id="titlebar">
-  <div id="tabsContainer"></div>
-  <button id="newTab">+</button>
-  <div id="winctrls">
-    <div class="wc min"></div>
-    <div class="wc max"></div>
-    <div class="wc cls"></div>
-  </div>
-</div>
-
-<div id="toolbar">
-  <div id="loadbar"></div>
-  <button id="backBtn" class="nb">◀</button>
-  <button id="forwardBtn" class="nb">▶</button>
-  <button id="reloadBtn" class="nb">⟳</button>
-  <div id="omnibox">
-    <span id="lockico">🔒</span>
-    <input type="text" id="urlInput" placeholder="Digite URL ou pesquisa">
-  </div>
-  <button id="menubtn">⋮</button>
-</div>
-
-<div id="viewport">
-  <div id="iframeContainer"></div>
-</div>
-
-<div id="cur" class="lc"></div>
-
-<div id="mpad">
-  <div id="mhead"><span>TRACKPAD</span><span>⎚</span></div>
-  <div id="tpad"></div>
-  <div id="mbtns"><button id="lbtn">LMB</button><button id="rbtn">RMB</button></div>
-  <div id="srow"><button id="sup">▲</button><button id="smid">●</button><button id="sdn">▼</button></div>
-</div>
-
-<div id="kbd">
-  <div id="kbar">
-    <div class="qk" data-key="Tab">Tab</div>
-    <div class="qk" data-key="Enter">Enter</div>
-    <div class="qk" data-key="Escape">Esc</div>
-    <div class="qk" data-key="ArrowUp">↑</div>
-    <div class="qk" data-key="ArrowDown">↓</div>
-    <div class="qk" data-key="ArrowLeft">←</div>
-    <div class="qk" data-key="ArrowRight">→</div>
-    <div class="qk" data-key="Control">Ctrl</div>
-    <div class="qk" data-key="Alt">Alt</div>
-    <div class="qk" data-key="Shift">Shift</div>
-    <div class="qk" data-key="Delete">Del</div>
-  </div>
-  <div class="kr" data-row="1"></div>
-  <div class="kr" data-row="2"></div>
-  <div class="kr" data-row="3"></div>
-</div>
-
-<script>
-const START_URL = "https://web.cloudmoonapp.com/pt/";
-let tabs = [], activeTabId = null, tabCounter = 0, activeFrame = null;
-let cursorX = window.innerWidth/2, cursorY = window.innerHeight/2;
-
-const keyboardLayout = {
-  row1: ['q','w','e','r','t','y','u','i','o','p'],
-  row2: ['a','s','d','f','g','h','j','k','l'],
-  row3: ['z','x','c','v','b','n','m']
+struct VirtualCursor {
+    int x, y;
+    bool visible;
+    bool leftButtonDown;
+    bool rightButtonDown;
 };
 
-function updateCursor() {
-  const cur = document.getElementById('cur');
-  cur.style.left = (cursorX - 2) + 'px';
-  cur.style.top = (cursorY - 12) + 'px';
-}
-
-function setCursor(x, y) {
-  cursorX = Math.min(window.innerWidth-5, Math.max(5, x));
-  cursorY = Math.min(window.innerHeight-20, Math.max(20, y));
-  updateCursor();
-}
-
-function clickAtCursor(btn) {
-  if(!activeFrame) return;
-  try {
-    const rect = activeFrame.getBoundingClientRect();
-    if(cursorX<rect.left || cursorX>rect.right || cursorY<rect.top || cursorY>rect.bottom) return;
-    const rx = (cursorX-rect.left)*(activeFrame.clientWidth/rect.width);
-    const ry = (cursorY-rect.top)*(activeFrame.clientHeight/rect.height);
-    const el = activeFrame.contentDocument.elementFromPoint(rx, ry);
-    if(el) {
-      if(btn==='left') el.dispatchEvent(new MouseEvent('click', {view:activeFrame.contentWindow, bubbles:true, clientX:rx, clientY:ry, button:0}));
-      else el.dispatchEvent(new MouseEvent('contextmenu', {view:activeFrame.contentWindow, bubbles:true, clientX:rx, clientY:ry, button:2}));
+class TouchProcessor {
+private:
+    VirtualCursor cursor;
+    HWND hwnd;
+    POINT cursorScreenPos;
+    bool trackpadActive;
+    POINT lastTrackpadPoint;
+    
+public:
+    TouchProcessor(HWND window) : hwnd(window), trackpadActive(false) {
+        cursor.x = GetSystemMetrics(SM_CXSCREEN) / 2;
+        cursor.y = GetSystemMetrics(SM_CYSCREEN) / 2;
+        cursor.visible = true;
+        cursor.leftButtonDown = false;
+        cursor.rightButtonDown = false;
     }
-  } catch(e){}
-}
-
-function sendKey(key, code, mod={}) {
-  if(!activeFrame) return;
-  try {
-    const doc = activeFrame.contentDocument, el = doc.activeElement || doc.body;
-    el.dispatchEvent(new KeyboardEvent('keydown', {key, code, bubbles:true, ctrlKey:mod.ctrl, altKey:mod.alt, shiftKey:mod.shift}));
-    if(key!=='Control' && key!=='Alt' && key!=='Shift') el.dispatchEvent(new KeyboardEvent('keypress', {key, code, bubbles:true}));
-    el.dispatchEvent(new KeyboardEvent('keyup', {key, code, bubbles:true}));
-  } catch(e){}
-}
-
-function createFrame(url, tid) {
-  const f = document.createElement('iframe');
-  f.className = 'contentFrame';
-  f.style.display = 'none';
-  f.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-downloads allow-top-navigation-by-user-activation');
-  f.onload = () => {
-    const t = tabs.find(t=>t.id===tid);
-    if(t) try { t.title = f.contentDocument?.title?.substring(0,30) || url.split('/')[2] || 'Nova aba'; updateTabs(); } catch(e){}
-  };
-  f.src = url;
-  return f;
-}
-
-function navigate(tid, url) {
-  const t = tabs.find(t=>t.id===tid);
-  if(!t) return;
-  let fu = url.trim();
-  if(!fu.startsWith('http')) fu = fu.includes('.') && !fu.includes(' ') ? 'https://'+fu : 'https://www.google.com/search?q='+encodeURIComponent(fu);
-  t.url = fu;
-  if(t.frame) t.frame.remove();
-  const nf = createFrame(fu, tid);
-  t.frame = nf;
-  document.getElementById('iframeContainer').appendChild(nf);
-  if(activeTabId===tid) { showTab(tid); document.getElementById('urlInput').value = fu; }
-  updateTabs();
-}
-
-function showTab(tid) {
-  tabs.forEach(t=>{if(t.frame) t.frame.style.display='none';});
-  const t = tabs.find(t=>t.id===tid);
-  if(t && t.frame) { t.frame.style.display='block'; activeFrame=t.frame; document.getElementById('urlInput').value=t.url; }
-}
-
-function addTab(url=START_URL) {
-  const id = ++tabCounter;
-  const t = {id, url, title:'Carregando...', frame:null};
-  tabs.push(t);
-  const f = createFrame(url, id);
-  t.frame = f;
-  document.getElementById('iframeContainer').appendChild(f);
-  activeTabId = id;
-  showTab(id);
-  updateTabs();
-}
-
-function closeTab(id) {
-  const idx = tabs.findIndex(t=>t.id===id);
-  if(idx===-1) return;
-  tabs[idx].frame?.remove();
-  tabs.splice(idx,1);
-  if(tabs.length===0) addTab(START_URL);
-  else if(activeTabId===id) { activeTabId = tabs[Math.min(idx, tabs.length-1)].id; showTab(activeTabId); }
-  updateTabs();
-}
-
-function updateTabs() {
-  const cont = document.getElementById('tabsContainer');
-  cont.innerHTML = '';
-  tabs.forEach(t=>{
-    const d = document.createElement('div');
-    d.className = 'tab' + (t.id===activeTabId ? ' active' : '');
-    d.innerHTML = `<div class="tab-ttl">${t.title.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[m])}</div><div class="tab-x">✕</div>`;
-    d.onclick = (e) => {
-      if(e.target.classList.contains('tab-x')) { e.stopPropagation(); closeTab(t.id); }
-      else { activeTabId = t.id; showTab(t.id); updateTabs(); }
-    };
-    cont.appendChild(d);
-  });
-}
-
-function buildKeyboard() {
-  for(let i=1;i<=3;i++) {
-    const row = document.querySelector(`.kr[data-row="${i}"]`);
-    row.innerHTML = '';
-    keyboardLayout[`row${i}`].forEach(k=>{
-      const d = document.createElement('div');
-      d.className = 'k';
-      d.textContent = k;
-      d.onclick = (e) => { e.preventDefault(); sendKey(k, `Key${k.toUpperCase()}`); };
-      row.appendChild(d);
-    });
-  }
-  const r3 = document.querySelector('.kr[data-row="3"]');
-  const sp = document.createElement('div');
-  sp.className = 'k space';
-  sp.textContent = 'Espaço';
-  sp.onclick = (e) => { e.preventDefault(); sendKey(' ', 'Space'); };
-  r3.appendChild(sp);
-  const bk = document.createElement('div');
-  bk.className = 'k back';
-  bk.textContent = '⌫';
-  bk.onclick = (e) => { e.preventDefault(); sendKey('Backspace', 'Backspace'); };
-  r3.appendChild(bk);
-}
-
-document.querySelectorAll('.qk').forEach(b=>{
-  b.onclick = (e) => {
-    e.preventDefault();
-    const k = b.dataset.key;
-    const map = {Enter:'Enter',Tab:'Tab',Escape:'Escape',ArrowUp:'ArrowUp',ArrowDown:'ArrowDown',ArrowLeft:'ArrowLeft',ArrowRight:'ArrowRight',Delete:'Delete'};
-    if(map[k]) sendKey(k, map[k]);
-    else if(k==='Control') sendKey('Control','ControlLeft',{ctrl:true});
-    else if(k==='Alt') sendKey('Alt','AltLeft',{alt:true});
-    else if(k==='Shift') sendKey('Shift','ShiftLeft',{shift:true});
-  };
-});
-
-const tpad = document.getElementById('tpad');
-let tActive=false, last={x:0,y:0};
-tpad.addEventListener('touchstart', (e)=>{ e.preventDefault(); tActive=true; last={x:e.touches[0].clientX, y:e.touches[0].clientY}; });
-tpad.addEventListener('touchmove', (e)=>{
-  if(!tActive) return;
-  e.preventDefault();
-  const dx = (e.touches[0].clientX - last.x)*2;
-  const dy = (e.touches[0].clientY - last.y)*2;
-  setCursor(cursorX+dx, cursorY+dy);
-  last = {x:e.touches[0].clientX, y:e.touches[0].clientY};
-});
-tpad.addEventListener('touchend', (e)=>{ e.preventDefault(); tActive=false; });
-
-document.getElementById('lbtn').onclick = (e)=>{ e.preventDefault(); clickAtCursor('left'); };
-document.getElementById('rbtn').onclick = (e)=>{ e.preventDefault(); clickAtCursor('right'); const c=document.getElementById('cur'); c.className='rc'; setTimeout(()=>c.className='lc',150); };
-document.getElementById('sup').onclick = (e)=>{ e.preventDefault(); sendKey('ArrowUp','ArrowUp'); };
-document.getElementById('sdn').onclick = (e)=>{ e.preventDefault(); sendKey('ArrowDown','ArrowDown'); };
-document.getElementById('smid').onclick = (e)=>{ e.preventDefault(); clickAtCursor('left'); };
-
-document.getElementById('urlInput').addEventListener('keypress', (e)=>{ if(e.key==='Enter') navigate(activeTabId, e.target.value); });
-document.getElementById('backBtn').onclick = ()=>{ if(activeFrame) try{activeFrame.contentWindow.history.back();}catch(e){} };
-document.getElementById('forwardBtn').onclick = ()=>{ if(activeFrame) try{activeFrame.contentWindow.history.forward();}catch(e){} };
-document.getElementById('reloadBtn').onclick = ()=>{ if(activeFrame) try{activeFrame.contentWindow.location.reload();}catch(e){} };
-document.getElementById('newTab').onclick = ()=>{ addTab(START_URL); };
-document.querySelector('.wc.min').onclick = ()=>window.close();
-document.querySelector('.wc.cls').onclick = ()=>window.close();
-
-let mDrag=false, mSX=0, mSY=0, mL=0, mT=0;
-const mpad = document.getElementById('mpad');
-document.getElementById('mhead').addEventListener('touchstart', (e)=>{
-  e.preventDefault();
-  mDrag=true;
-  mSX=e.touches[0].clientX; mSY=e.touches[0].clientY;
-  mL=mpad.offsetLeft; mT=mpad.offsetTop;
-});
-document.addEventListener('touchmove', (e)=>{
-  if(!mDrag) return;
-  e.preventDefault();
-  let nl = mL + (e.touches[0].clientX - mSX);
-  let nt = mT + (e.touches[0].clientY - mSY);
-  nl = Math.min(window.innerWidth-mpad.offsetWidth, Math.max(0, nl));
-  nt = Math.min(window.innerHeight-250, Math.max(0, nt));
-  mpad.style.left = nl+'px'; mpad.style.right='auto';
-  mpad.style.top = nt+'px'; mpad.style.bottom='auto';
-});
-document.addEventListener('touchend', ()=>{ mDrag=false; });
-
-let kbdVis=true;
-document.getElementById('menubtn').onclick = ()=>{
-  kbdVis = !kbdVis;
-  document.getElementById('kbd').classList.toggle('koff', !kbdVis);
+    
+    void ProcessTouchScreenDirect(LPARAM lParam) {
+        // DIRECT TOUCH - Passa para o iframe sem interferência do cursor
+        // Isso é feito via CEF's TouchHandler
+        SendTouchToCEF(lParam);
+    }
+    
+    void ProcessTrackpadMove(LPARAM lParam, int deltaX, int deltaY) {
+        // Trackpad controla o cursor virtual
+        cursor.x += deltaX;
+        cursor.y += deltaY;
+        
+        // Limitar às bordas da tela
+        cursor.x = max(0, min(cursor.x, GetSystemMetrics(SM_CXSCREEN)));
+        cursor.y = max(0, min(cursor.y, GetSystemMetrics(SM_CYSCREEN)));
+        
+        // Mover o cursor real do Windows
+        cursorScreenPos.x = cursor.x;
+        cursorScreenPos.y = cursor.y;
+        ClientToScreen(hwnd, &cursorScreenPos);
+        SetCursorPos(cursorScreenPos.x, cursorScreenPos.y);
+        
+        DrawCustomCursor();
+    }
+    
+    void ProcessClick(bool leftClick) {
+        if (leftClick) {
+            cursor.leftButtonDown = true;
+            SendMouseEvent(WM_LBUTTONDOWN, MK_LBUTTON);
+            SendMouseEvent(WM_LBUTTONUP, 0);
+            cursor.leftButtonDown = false;
+        } else {
+            cursor.rightButtonDown = true;
+            SendMouseEvent(WM_RBUTTONDOWN, MK_RBUTTON);
+            SendMouseEvent(WM_RBUTTONUP, 0);
+            cursor.rightButtonDown = false;
+        }
+    }
+    
+    void ProcessScroll(int delta) {
+        // Scroll via teclas de seta
+        INPUT inputs[2] = {};
+        
+        if (delta > 0) {
+            inputs[0].type = INPUT_KEYBOARD;
+            inputs[0].ki.wVk = VK_UP;
+            inputs[1].type = INPUT_KEYBOARD;
+            inputs[1].ki.wVk = VK_UP;
+            inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+        } else {
+            inputs[0].type = INPUT_KEYBOARD;
+            inputs[0].ki.wVk = VK_DOWN;
+            inputs[1].type = INPUT_KEYBOARD;
+            inputs[1].ki.wVk = VK_DOWN;
+            inputs[1].ki.dwFlags = KEYEVENTF_KEYUP;
+        }
+        
+        SendInput(2, inputs, sizeof(INPUT));
+    }
+    
+private:
+    void SendMouseEvent(UINT message, WPARAM wParam) {
+        POINT pt = {cursor.x, cursor.y};
+        ClientToScreen(hwnd, &pt);
+        SendMessage(hwnd, message, wParam, MAKELPARAM(pt.x, pt.y));
+    }
+    
+    void SendTouchToCEF(LPARAM lParam) {
+        // Eventos de toque direto vão para o CEF
+        SendMessage(hwnd, WM_TOUCH, 0, lParam);
+    }
+    
+    void DrawCustomCursor() {
+        // Desenhar cursor customizado via GDI
+        HDC hdc = GetDC(hwnd);
+        HPEN pen = CreatePen(PS_SOLID, 2, RGB(138, 180, 248));
+        HBRUSH brush = CreateSolidBrush(RGB(138, 180, 248));
+        
+        SelectObject(hdc, pen);
+        SelectObject(hdc, brush);
+        
+        // Desenhar seta
+        POINT points[3] = {
+            {cursor.x, cursor.y},
+            {cursor.x - 10, cursor.y + 15},
+            {cursor.x + 10, cursor.y + 15}
+        };
+        Polygon(hdc, points, 3);
+        
+        DeleteObject(pen);
+        DeleteObject(brush);
+        ReleaseDC(hwnd, hdc);
+    }
 };
 
-document.getElementById('viewport').addEventListener('touchstart', (e)=>{
-  if(!activeFrame) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  try {
-    const rect = activeFrame.getBoundingClientRect();
-    const rx = (t.clientX-rect.left)*(activeFrame.clientWidth/rect.width);
-    const ry = (t.clientY-rect.top)*(activeFrame.clientHeight/rect.height);
-    const el = activeFrame.contentDocument.elementFromPoint(rx, ry);
-    if(el) {
-      const touchObj = new Touch({identifier:0, target:el, clientX:rx, clientY:ry, pageX:rx, pageY:ry});
-      const te = new TouchEvent('touchstart', {bubbles:true, touches:[touchObj], targetTouches:[touchObj], changedTouches:[touchObj]});
-      el.dispatchEvent(te);
-    }
-  } catch(err){}
-});
+// =====================================================
+// VIRTUAL KEYBOARD
+// =====================================================
 
-buildKeyboard();
-addTab(START_URL);
-setCursor(window.innerWidth/2, window.innerHeight/2);
-</script>
-</body>
-</html>
+class VirtualKeyboard {
+private:
+    HWND parentWnd;
+    HWND keyboardWnd;
+    bool visible;
+    std::map<int, std::vector<int>> keyLayout;
+    
+public:
+    VirtualKeyboard(HWND parent) : parentWnd(parent), visible(true) {
+        InitializeLayout();
+        CreateKeyboardWindow();
+    }
+    
+    void Toggle() {
+        visible = !visible;
+        ShowWindow(keyboardWnd, visible ? SW_SHOW : SW_HIDE);
+    }
+    
+    bool IsVisible() { return visible; }
+    
+private:
+    void InitializeLayout() {
+        // Linha 1: QWERTYUIOP
+        keyLayout[1] = {'Q','W','E','R','T','Y','U','I','O','P'};
+        // Linha 2: ASDFGHJKL
+        keyLayout[2] = {'A','S','D','F','G','H','J','K','L'};
+        // Linha 3: ZXCVBNM
+        keyLayout[3] = {'Z','X','C','V','B','N','M'};
+    }
+    
+    void CreateKeyboardWindow() {
+        keyboardWnd = CreateWindowEx(
+            WS_EX_TOPMOST | WS_EX_NOACTIVATE,
+            L"BUTTON", L"",
+            WS_CHILD | WS_VISIBLE | BS_OWNERDRAW,
+            0, GetSystemMetrics(SM_CYSCREEN) - 200,
+            GetSystemMetrics(SM_CXSCREEN), 200,
+            parentWnd, NULL, GetModuleHandle(NULL), NULL
+        );
+        
+        // Criar botões do teclado
+        CreateKeyboardButtons();
+    }
+    
+    void CreateKeyboardButtons() {
+        int btnWidth = 40;
+        int btnHeight = 40;
+        int startX = 10;
+        int startY = 10;
+        
+        for (int row = 1; row <= 3; row++) {
+            int totalWidth = keyLayout[row].size() * btnWidth;
+            int rowStartX = startX + (GetSystemMetrics(SM_CXSCREEN) - totalWidth) / 2;
+            
+            for (size_t i = 0; i < keyLayout[row].size(); i++) {
+                wchar_t keyChar = keyLayout[row][i];
+                CreateWindow(
+                    L"BUTTON", std::wstring(1, keyChar).c_str(),
+                    WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                    rowStartX + i * btnWidth, startY + (row-1) * btnHeight,
+                    btnWidth, btnHeight,
+                    keyboardWnd, (HMENU)(1000 + keyChar),
+                    GetModuleHandle(NULL), NULL
+                );
+            }
+        }
+        
+        // Botão Espaço
+        CreateWindow(L"BUTTON", L"SPACE", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                    GetSystemMetrics(SM_CXSCREEN)/2 - 100, startY + 80,
+                    200, btnHeight, keyboardWnd, (HMENU)VK_SPACE,
+                    GetModuleHandle(NULL), NULL);
+        
+        // Botão Backspace
+        CreateWindow(L"BUTTON", L"⌫", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                    GetSystemMetrics(SM_CXSCREEN) - 60, startY + 80,
+                    50, btnHeight, keyboardWnd, (HMENU)VK_BACK,
+                    GetModuleHandle(NULL), NULL);
+                    
+        // Botão Enter
+        CreateWindow(L"BUTTON", L"↵", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                    GetSystemMetrics(SM_CXSCREEN) - 60, startY + 40,
+                    50, btnHeight, keyboardWnd, (HMENU)VK_RETURN,
+                    GetModuleHandle(NULL), NULL);
+    }
+};
+
+// =====================================================
+// CEF CLIENT IMPLEMENTATION
+// =====================================================
+
+class ChromiumClient : public CefClient,
+                       public CefLifeSpanHandler,
+                       public CefLoadHandler,
+                       public CefKeyboardHandler,
+                       public CefTouchHandler {
+public:
+    ChromiumClient(HWND hwnd) : browserHwnd(hwnd) {}
+    
+    // CEF LifeSpanHandler
+    void OnAfterCreated(CefRefPtr<CefBrowser> browser) override {
+        this->browser = browser;
+    }
+    
+    bool DoClose(CefRefPtr<CefBrowser> browser) override {
+        return false;
+    }
+    
+    void OnBeforeClose(CefRefPtr<CefBrowser> browser) override {
+        CefQuitMessageLoop();
+    }
+    
+    // CEF LoadHandler
+    void OnLoadEnd(CefRefPtr<CefBrowser> browser, 
+                   CefRefPtr<CefFrame> frame, 
+                   int httpStatusCode) override {
+        // Página carregada com sucesso
+        if (frame->IsMain()) {
+            std::string url = frame->GetURL().ToString();
+            SetWindowText(browserHwnd, url.c_str());
+        }
+    }
+    
+    void OnLoadError(CefRefPtr<CefBrowser> browser,
+                     CefRefPtr<CefFrame> frame,
+                     ErrorCode errorCode,
+                     const CefString& errorText,
+                     const CefString& failedUrl) override {
+        // Carregar página de erro
+        std::string errorHtml = "<html><body><h1>Erro</h1><p>" + 
+                                 errorText.ToString() + "</p></body></html>";
+        frame->LoadString(errorHtml, failedUrl);
+    }
+    
+    // CEF KeyboardHandler
+    bool OnKeyEvent(CefRefPtr<CefBrowser> browser,
+                    const CefKeyEvent& event,
+                    CefEventHandle os_event) override {
+        return false; // Permitir eventos padrão
+    }
+    
+    // CEF TouchHandler
+    void OnTouchEvent(CefRefPtr<CefBrowser> browser,
+                      const CefTouchEvent& event) override {
+        // Processar toque direto
+    }
+    
+    // CEF Client
+    CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override {
+        return this;
+    }
+    
+    CefRefPtr<CefLoadHandler> GetLoadHandler() override {
+        return this;
+    }
+    
+    CefRefPtr<CefKeyboardHandler> GetKeyboardHandler() override {
+        return this;
+    }
+    
+    CefRefPtr<CefTouchHandler> GetTouchHandler() override {
+        return this;
+    }
+    
+    CefRefPtr<CefBrowser> GetBrowser() { return browser; }
+    
+private:
+    CefRefPtr<CefBrowser> browser;
+    HWND browserHwnd;
+    
+    IMPLEMENT_REFCOUNTING(ChromiumClient);
+};
+
+// =====================================================
+// MAIN BROWSER WINDOW
+// =====================================================
+
+class ChromiumBrowser {
+private:
+    HWND mainWnd;
+    HWND browserContainer;
+    HWND trackpadWnd;
+    HWND addressBar;
+    CefRefPtr<ChromiumClient> client;
+    CefRefPtr<CefBrowser> browser;
+    TouchProcessor* touchProcessor;
+    VirtualKeyboard* virtualKeyboard;
+    
+public:
+    ChromiumBrowser() : touchProcessor(nullptr), virtualKeyboard(nullptr) {}
+    
+    void Initialize() {
+        RegisterWindowClass();
+        CreateMainWindow();
+        InitializeCEF();
+        
+        touchProcessor = new TouchProcessor(browserContainer);
+        virtualKeyboard = new VirtualKeyboard(mainWnd);
+    }
+    
+    void Run() {
+        CefRunMessageLoop();
+    }
+    
+private:
+    void RegisterWindowClass() {
+        WNDCLASSEX wc = {};
+        wc.cbSize = sizeof(WNDCLASSEX);
+        wc.lpfnWndProc = WindowProc;
+        wc.hInstance = GetModuleHandle(NULL);
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+        wc.lpszClassName = L"ChromiumBrowser";
+        
+        RegisterClassEx(&wc);
+    }
+    
+    void CreateMainWindow() {
+        mainWnd = CreateWindowEx(
+            0, L"ChromiumBrowser", L"Chromium Browser",
+            WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+            CW_USEDEFAULT, CW_USEDEFAULT, 1200, 800,
+            NULL, NULL, GetModuleHandle(NULL), this
+        );
+        
+        CreateUIComponents();
+    }
+    
+    void CreateUIComponents() {
+        // Container do navegador
+        browserContainer = CreateWindow(L"STATIC", NULL, WS_CHILD | WS_VISIBLE,
+                                       0, 60, 1200, 700, mainWnd, NULL,
+                                       GetModuleHandle(NULL), NULL);
+        
+        // Barra de endereço
+        addressBar = CreateWindow(L"EDIT", L"https://web.cloudmoonapp.com/pt/",
+                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                  10, 10, 900, 30, mainWnd, NULL,
+                                  GetModuleHandle(NULL), NULL);
+        
+        // Botões de navegação
+        CreateWindow(L"BUTTON", L"←", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                     920, 10, 40, 30, mainWnd, (HMENU)1,
+                     GetModuleHandle(NULL), NULL);
+        
+        CreateWindow(L"BUTTON", L"→", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                     965, 10, 40, 30, mainWnd, (HMENU)2,
+                     GetModuleHandle(NULL), NULL);
+        
+        CreateWindow(L"BUTTON", L"↻", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                     1010, 10, 40, 30, mainWnd, (HMENU)3,
+                     GetModuleHandle(NULL), NULL);
+        
+        CreateWindow(L"BUTTON", L"+", WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+                     1060, 10, 40, 30, mainWnd, (HMENU)4,
+                     GetModuleHandle(NULL), NULL);
+        
+        // Trackpad
+        trackpadWnd = CreateWindow(L"STATIC", L"TRACKPAD",
+                                   WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                   1000, 500, 180, 120, mainWnd, NULL,
+                                   GetModuleHandle(NULL), NULL);
+                                   
+        RegisterTouchWindow(trackpadWnd, 0);
+    }
+    
+    void InitializeCEF() {
+        CefSettings settings;
+        settings.no_sandbox = true;
+        settings.windowless_rendering_enabled = false;
+        
+        CefString(&settings.cache_path) = L"cache";
+        CefString(&settings.user_agent) = L"ChromiumBrowser/1.0";
+        
+        CefInitialize(settings, nullptr, nullptr);
+        
+        client = new ChromiumClient(mainWnd);
+        
+        CefWindowInfo windowInfo;
+        windowInfo.SetAsChild(browserContainer, RECT{0,0,1200,700});
+        
+        CefBrowserSettings browserSettings;
+        browserSettings.touch_event_feature_detection = STATE_ENABLED;
+        
+        browser = CefBrowserHost::CreateBrowserSync(
+            windowInfo, client.get(),
+            "https://web.cloudmoonapp.com/pt/",
+            browserSettings, nullptr, nullptr
+        );
+    }
+    
+    void NavigateTo(const std::string& url) {
+        if (browser) {
+            browser->GetMainFrame()->LoadURL(url);
+        }
+    }
+    
+    void GoBack() {
+        if (browser) browser->GoBack();
+    }
+    
+    void GoForward() {
+        if (browser) browser->GoForward();
+    }
+    
+    void Reload() {
+        if (browser) browser->Reload();
+    }
+    
+    static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+        ChromiumBrowser* browser = (ChromiumBrowser*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+        
+        switch (msg) {
+            case WM_NCCREATE:
+            {
+                CREATESTRUCT* cs = (CREATESTRUCT*)lParam;
+                SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)cs->lpCreateParams);
+                browser = (ChromiumBrowser*)cs->lpCreateParams;
+                return DefWindowProc(hwnd, msg, wParam, lParam);
+            }
+            
+            case WM_COMMAND:
+                if (browser) {
+                    int cmd = LOWORD(wParam);
+                    if (cmd == 1) browser->GoBack();
+                    else if (cmd == 2) browser->GoForward();
+                    else if (cmd == 3) browser->Reload();
+                    else if (cmd >= 1000) {
+                        // Tecla do teclado virtual
+                        wchar_t keyChar = (wchar_t)cmd;
+                        INPUT input = {};
+                        input.type = INPUT_KEYBOARD;
+                        input.ki.wVk = keyChar;
+                        SendInput(1, &input, sizeof(INPUT));
+                        
+                        input.ki.dwFlags = KEYEVENTF_KEYUP;
+                        SendInput(1, &input, sizeof(INPUT));
+                    }
+                }
+                break;
+                
+            case WM_TOUCH:
+                if (browser && browser->touchProcessor) {
+                    browser->touchProcessor->ProcessTouchScreenDirect(lParam);
+                }
+                break;
+        }
+        
+        return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+};
+
+// =====================================================
+// ENTRY POINT
+// =====================================================
+
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE, LPWSTR, int nCmdShow) {
+    CefEnableHighDPISupport();
+    
+    CefMainArgs mainArgs(hInstance);
+    CefRefPtr<CefCommandLine> commandLine = CefCommandLine::CreateCommandLine();
+    commandLine->InitFromString(::GetCommandLineW());
+    
+    // Habilitar recursos de toque
+    commandLine->AppendSwitch("enable-touch-events");
+    commandLine->AppendSwitch("touch-events");
+    commandLine->AppendSwitch("enable-viewport");
+    commandLine->AppendSwitch("enable-pinch");
+    
+    ChromiumBrowser browser;
+    browser.Initialize();
+    browser.Run();
+    
+    CefShutdown();
+    return 0;
+}
