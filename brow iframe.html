@@ -1,441 +1,792 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Mouse + Teclado Virtual - Funcional</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: #0a0a0f;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-        }
-        /* Tela principal */
-        .screen {
-            flex: 1;
-            background: #1e1e2e;
-            margin: 10px;
-            border-radius: 24px;
-            overflow-y: auto;
-            padding: 20px;
-            position: relative;
-        }
-        .app-card {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            min-height: 100%;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 14px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            font-size: 16px;
-            background: #fff;
-        }
-        button {
-            background: #5865F2;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin: 5px;
-            font-size: 14px;
-        }
-        /* Cursor flutuante */
-        .floating-cursor {
-            position: fixed;
-            width: 60px;
-            height: 60px;
-            background: rgba(88, 101, 242, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            z-index: 10000;
-            box-shadow: 0 0 15px rgba(88, 101, 242, 0.5);
-            cursor: grab;
-            touch-action: none;
-            transition: transform 0.05s;
-            backdrop-filter: blur(4px);
-            border: 2px solid white;
-        }
-        .floating-cursor:active {
-            transform: scale(0.95);
-            cursor: grabbing;
-        }
-        /* Teclado virtual */
-        .virtual-keyboard {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(26, 26, 42, 0.98);
-            backdrop-filter: blur(15px);
-            border-top: 2px solid #5865F2;
-            padding: 10px;
-            z-index: 10001;
-            transition: transform 0.3s;
-        }
-        .keyboard-row {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            margin-bottom: 6px;
-            flex-wrap: wrap;
-        }
-        .key {
-            background: #2a2a3a;
-            border: none;
-            color: white;
-            padding: 12px 10px;
-            border-radius: 10px;
-            font-size: 14px;
-            min-width: 45px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.03s linear;
-        }
-        .key:active {
-            transform: scale(0.92);
-            background: #5865F2;
-        }
-        .key.special {
-            background: #eb459e;
-            min-width: 60px;
-        }
-        .key.wide {
-            min-width: 120px;
-        }
-        .keyboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 15px;
-            margin-bottom: 10px;
-        }
-        .keyboard-title {
-            color: #eb459e;
-            font-weight: bold;
-        }
-        .minimize-btn {
-            background: #2a2a3a;
-            border: none;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-        }
-        .toast {
-            position: fixed;
-            bottom: 280px;
-            left: 20px;
-            right: 20px;
-            background: #1e1e2f;
-            color: white;
-            padding: 10px;
-            border-radius: 25px;
-            text-align: center;
-            z-index: 10002;
-            animation: fadeUp 0.3s;
-            font-size: 13px;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Cloud Phone</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+
+:root {
+  --bg: #0d0d14;
+  --panel: #13131f;
+  --border: #1e1e30;
+  --accent: #5865f2;
+  --green: #23a55a;
+  --red: #ed4245;
+  --amber: #f0a500;
+  --text: #e0e0f0;
+  --sub: #8888aa;
+  --key-bg: #1a1a2e;
+  --key-hover: #22223a;
+}
+
+html, body {
+  width:100%; height:100%; overflow:hidden;
+  background:var(--bg); font-family:'Segoe UI',Arial,sans-serif;
+  display:flex; flex-direction:column;
+}
+
+/* TOOLBAR */
+#toolbar {
+  background:var(--panel);
+  border-bottom:1px solid var(--border);
+  padding:6px 8px;
+  display:flex; align-items:center; gap:6px;
+  flex-shrink:0; z-index:100;
+}
+
+#nav-back, #nav-fwd, #nav-reload {
+  background:var(--key-bg); border:1px solid var(--border);
+  color:var(--text); width:32px; height:32px;
+  border-radius:8px; font-size:15px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+#nav-back:active, #nav-fwd:active, #nav-reload:active { background:var(--accent); }
+
+#url-wrap {
+  flex:1; display:flex; align-items:center;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:20px; padding:0 12px; height:32px; gap:6px;
+}
+#urlInput {
+  flex:1; background:transparent; border:none; outline:none;
+  color:var(--text); font-size:12px;
+}
+#goBtn {
+  background:var(--accent); border:none; color:#fff;
+  padding:4px 12px; border-radius:14px; font-size:11px; cursor:pointer;
+}
+
+#toggleKbd {
+  background:var(--key-bg); border:1px solid var(--border);
+  color:var(--text); padding:4px 10px; border-radius:8px; font-size:11px; cursor:pointer;
+}
+
+/* VIEWPORT */
+#viewport {
+  flex:1; position:relative; overflow:hidden;
+}
+
+#siteFrame {
+  width:100%; height:100%; border:none; display:block;
+  background:#fff;
+}
+
+/* CURSOR DOT */
+#cursorDot {
+  position:absolute; width:22px; height:22px;
+  border-radius:50%; background:rgba(88,101,242,0.85);
+  border:2px solid #fff;
+  pointer-events:none; z-index:9000;
+  transform:translate(-50%,-50%);
+  transition:background 0.08s;
+  box-shadow:0 0 8px rgba(88,101,242,0.7);
+  left:50%; top:50%;
+}
+#cursorDot.clicking { background:rgba(35,165,90,0.9); transform:translate(-50%,-50%) scale(0.7); }
+#cursorDot.rclicking { background:rgba(237,66,69,0.9); transform:translate(-50%,-50%) scale(0.7); }
+
+/* MOUSE PAD */
+#mousePad {
+  position:absolute; bottom:4px; right:4px;
+  width:170px; background:var(--panel);
+  border:1px solid var(--border); border-radius:16px;
+  z-index:9100; touch-action:none;
+  box-shadow:0 4px 20px rgba(0,0,0,0.6);
+}
+
+#padHeader {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 10px 4px;
+  cursor:move; touch-action:none;
+}
+#padLabel { color:var(--sub); font-size:10px; font-weight:600; letter-spacing:.5px; }
+#padDrag { color:var(--sub); font-size:14px; }
+
+#touchPad {
+  margin:0 8px;
+  height:100px; background:var(--key-bg);
+  border-radius:10px; border:1px solid var(--border);
+  position:relative; overflow:hidden; touch-action:none;
+}
+#touchPad::after {
+  content:'TRACKPAD';
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  color:var(--border); font-size:9px; letter-spacing:2px; pointer-events:none;
+}
+
+#padButtons {
+  display:flex; gap:6px; padding:8px;
+}
+#btnLeft, #btnRight {
+  flex:1; height:34px; border:none; border-radius:10px;
+  font-size:11px; font-weight:700; cursor:pointer; letter-spacing:.5px;
+}
+#btnLeft  { background:var(--green); color:#fff; }
+#btnRight { background:var(--red); color:#fff; }
+#btnLeft:active  { filter:brightness(1.2); transform:scale(0.95); }
+#btnRight:active { filter:brightness(1.2); transform:scale(0.95); }
+
+#scrollBtns {
+  display:flex; gap:6px; padding:0 8px 8px;
+}
+#scrollUp, #scrollDown, #btnMiddle {
+  flex:1; height:28px; background:var(--key-bg);
+  border:1px solid var(--border); color:var(--text);
+  border-radius:8px; font-size:13px; cursor:pointer;
+}
+#scrollUp:active, #scrollDown:active, #btnMiddle:active { background:var(--accent); }
+
+/* KEYBOARD */
+#keyboard {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--panel); border-top:1px solid var(--border);
+  padding:6px 4px 10px; z-index:9200;
+  transition:transform 0.25s ease;
+}
+#keyboard.hidden { transform:translateY(100%); }
+
+.krow {
+  display:flex; justify-content:center;
+  gap:3px; margin-bottom:3px;
+}
+
+.k {
+  background:var(--key-bg); border:1px solid var(--border);
+  color:var(--text); border-radius:7px;
+  font-size:12px; font-weight:500;
+  min-width:30px; height:36px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; padding:0 4px; flex-shrink:0;
+  position:relative; transition:background 0.06s;
+}
+.k:active, .k.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+.k.fn  { background:#1a1a35; color:var(--sub); font-size:10px; }
+.k.mod { background:#16162a; color:#aaa; }
+.k.wide2 { min-width:54px; }
+.k.wide3 { min-width:70px; }
+.k.wide4 { min-width:90px; }
+.k.space { flex:1; max-width:180px; }
+.k .sub { position:absolute; top:2px; right:3px; font-size:7px; color:var(--sub); }
+
+#kbdTopRow {
+  display:flex; justify-content:space-between; padding:0 2px; margin-bottom:2px;
+}
+.kbdTopBtn {
+  background:transparent; border:none; color:var(--sub);
+  font-size:10px; cursor:pointer; padding:2px 6px;
+}
+.kbdTopBtn:active { color:var(--accent); }
+
+#symbolLayer  { display:none; }
+#fnLayer      { display:none; }
+</style>
 </head>
 <body>
-<div class="screen">
-    <div class="app-card">
-        <h2>🎮 Mouse + Teclado Virtual</h2>
-        <p style="margin: 10px 0; color: #666;">✅ Funciona DENTRO desta página</p>
-        <input type="text" id="campo1" placeholder="Campo de texto - Clique aqui e digite">
-        <textarea id="campo2" placeholder="Área de texto" rows="3"></textarea>
-        <button onclick="alert('Botão clicado pelo mouse virtual!')">Clique em mim</button>
-        <p style="margin-top: 20px; color: #888; font-size: 12px;">
-            🖱️ Arraste o cursor azul pela tela<br>
-            🖱️ Toque RÁPIDO no cursor = clique<br>
-            ⌨️ Teclado virtual na parte inferior
-        </p>
-    </div>
+
+<!-- TOOLBAR -->
+<div id="toolbar">
+  <button id="nav-back">&#8592;</button>
+  <button id="nav-fwd">&#8594;</button>
+  <button id="nav-reload">&#8635;</button>
+  <div id="url-wrap">
+    <input id="urlInput" type="text" placeholder="Digite um URL..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <button id="goBtn">IR</button>
+  </div>
+  <button id="toggleKbd">⌨️</button>
 </div>
 
-<div id="cursor" class="floating-cursor">🖱️</div>
+<!-- VIEWPORT -->
+<div id="viewport">
+  <iframe id="siteFrame" src="about:blank" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"></iframe>
+  <div id="cursorDot"></div>
 
-<div id="keyboard" class="virtual-keyboard">
-    <div class="keyboard-header">
-        <span class="keyboard-title">⌨️ TECLADO VIRTUAL</span>
-        <button id="minimizeBtn" class="minimize-btn">─ Minimizar</button>
+  <!-- MOUSE PAD -->
+  <div id="mousePad">
+    <div id="padHeader">
+      <span id="padLabel">MOUSE</span>
+      <span id="padDrag">&#8759;</span>
     </div>
-    <div id="keyboardRows">
-        <div class="keyboard-row">
-            <button class="key" data-key="1">1</button><button class="key" data-key="2">2</button><button class="key" data-key="3">3</button>
-            <button class="key" data-key="4">4</button><button class="key" data-key="5">5</button><button class="key" data-key="6">6</button>
-            <button class="key" data-key="7">7</button><button class="key" data-key="8">8</button><button class="key" data-key="9">9</button>
-            <button class="key" data-key="0">0</button><button class="key special" data-key="Backspace">⌫</button>
-        </div>
-        <div class="keyboard-row">
-            <button class="key" data-key="q">q</button><button class="key" data-key="w">w</button><button class="key" data-key="e">e</button>
-            <button class="key" data-key="r">r</button><button class="key" data-key="t">t</button><button class="key" data-key="y">y</button>
-            <button class="key" data-key="u">u</button><button class="key" data-key="i">i</button><button class="key" data-key="o">o</button>
-            <button class="key" data-key="p">p</button>
-        </div>
-        <div class="keyboard-row">
-            <button class="key" data-key="a">a</button><button class="key" data-key="s">s</button><button class="key" data-key="d">d</button>
-            <button class="key" data-key="f">f</button><button class="key" data-key="g">g</button><button class="key" data-key="h">h</button>
-            <button class="key" data-key="j">j</button><button class="key" data-key="k">k</button><button class="key" data-key="l">l</button>
-        </div>
-        <div class="keyboard-row">
-            <button class="key special" data-key="Shift">⇧ Shift</button><button class="key" data-key="z">z</button><button class="key" data-key="x">x</button>
-            <button class="key" data-key="c">c</button><button class="key" data-key="v">v</button><button class="key" data-key="b">b</button>
-            <button class="key" data-key="n">n</button><button class="key" data-key="m">m</button><button class="key special" data-key="Enter">↵ Enter</button>
-        </div>
-        <div class="keyboard-row">
-            <button class="key wide" data-key="Space">ESPAÇO</button>
-            <button class="key special" data-key="ArrowLeft">←</button>
-            <button class="key special" data-key="ArrowRight">→</button>
-        </div>
+    <div id="touchPad"></div>
+    <div id="padButtons">
+      <button id="btnLeft">L</button>
+      <button id="btnRight">R</button>
     </div>
+    <div id="scrollBtns">
+      <button id="scrollUp">▲</button>
+      <button id="btnMiddle">●</button>
+      <button id="scrollDown">▼</button>
+    </div>
+  </div>
+</div>
+
+<!-- KEYBOARD -->
+<div id="keyboard">
+  <div id="kbdTopRow">
+    <button class="kbdTopBtn" id="switchMain">ABC</button>
+    <button class="kbdTopBtn" id="switchSym">!@#</button>
+    <button class="kbdTopBtn" id="switchFn">F1-F12</button>
+    <button class="kbdTopBtn" id="ctrlABtn">Ctrl+A</button>
+    <button class="kbdTopBtn" id="ctrlCBtn">Ctrl+C</button>
+    <button class="kbdTopBtn" id="ctrlVBtn">Ctrl+V</button>
+    <button class="kbdTopBtn" id="ctrlZBtn">Ctrl+Z</button>
+    <button class="kbdTopBtn" id="ctrlXBtn">Ctrl+X</button>
+  </div>
+
+  <!-- MAIN LAYER -->
+  <div id="mainLayer">
+    <div class="krow">
+      <div class="k fn" data-key="Escape">Esc</div>
+      <div class="k" data-key="`">`<span class="sub">~</span></div>
+      <div class="k" data-key="1">1<span class="sub">!</span></div>
+      <div class="k" data-key="2">2<span class="sub">@</span></div>
+      <div class="k" data-key="3">3<span class="sub">#</span></div>
+      <div class="k" data-key="4">4<span class="sub">$</span></div>
+      <div class="k" data-key="5">5<span class="sub">%</span></div>
+      <div class="k" data-key="6">6<span class="sub">^</span></div>
+      <div class="k" data-key="7">7<span class="sub">&amp;</span></div>
+      <div class="k" data-key="8">8<span class="sub">*</span></div>
+      <div class="k" data-key="9">9<span class="sub">(</span></div>
+      <div class="k" data-key="0">0<span class="sub">)</span></div>
+      <div class="k" data-key="-">-<span class="sub">_</span></div>
+      <div class="k" data-key="=">=<span class="sub">+</span></div>
+      <div class="k wide2 mod" data-key="Backspace">⌫</div>
+    </div>
+    <div class="krow">
+      <div class="k wide2 fn" data-key="Tab">Tab</div>
+      <div class="k" data-key="q">q</div>
+      <div class="k" data-key="w">w</div>
+      <div class="k" data-key="e">e</div>
+      <div class="k" data-key="r">r</div>
+      <div class="k" data-key="t">t</div>
+      <div class="k" data-key="y">y</div>
+      <div class="k" data-key="u">u</div>
+      <div class="k" data-key="i">i</div>
+      <div class="k" data-key="o">o</div>
+      <div class="k" data-key="p">p</div>
+      <div class="k" data-key="[">[<span class="sub">{</span></div>
+      <div class="k" data-key="]">]<span class="sub">}</span></div>
+      <div class="k" data-key="\">\<span class="sub">|</span></div>
+    </div>
+    <div class="krow">
+      <div class="k wide3 mod" id="capsKey" data-key="CapsLock">Caps</div>
+      <div class="k" data-key="a">a</div>
+      <div class="k" data-key="s">s</div>
+      <div class="k" data-key="d">d</div>
+      <div class="k" data-key="f">f</div>
+      <div class="k" data-key="g">g</div>
+      <div class="k" data-key="h">h</div>
+      <div class="k" data-key="j">j</div>
+      <div class="k" data-key="k">k</div>
+      <div class="k" data-key="l">l</div>
+      <div class="k" data-key=";">;<span class="sub">:</span></div>
+      <div class="k" data-key="'">'<span class="sub">"</span></div>
+      <div class="k wide3 mod" data-key="Enter">↵ Enter</div>
+    </div>
+    <div class="krow">
+      <div class="k wide4 mod" id="shiftKeyL" data-key="Shift">⇧ Shift</div>
+      <div class="k" data-key="z">z</div>
+      <div class="k" data-key="x">x</div>
+      <div class="k" data-key="c">c</div>
+      <div class="k" data-key="v">v</div>
+      <div class="k" data-key="b">b</div>
+      <div class="k" data-key="n">n</div>
+      <div class="k" data-key="m">m</div>
+      <div class="k" data-key=",">,<span class="sub">&lt;</span></div>
+      <div class="k" data-key=".">.<span class="sub">&gt;</span></div>
+      <div class="k" data-key="/">/</div>
+      <div class="k wide4 mod" id="shiftKeyR" data-key="Shift">⇧ Shift</div>
+    </div>
+    <div class="krow">
+      <div class="k wide2 mod" id="ctrlKeyL" data-key="Control">Ctrl</div>
+      <div class="k wide2 mod" id="altKeyL" data-key="Alt">Alt</div>
+      <div class="k space mod" data-key=" ">ESPAÇO</div>
+      <div class="k wide2 mod" id="altKeyR" data-key="Alt">Alt</div>
+      <div class="k mod" data-key="ArrowLeft">←</div>
+      <div class="k mod" data-key="ArrowUp">↑</div>
+      <div class="k mod" data-key="ArrowDown">↓</div>
+      <div class="k mod" data-key="ArrowRight">→</div>
+    </div>
+  </div>
+
+  <!-- SYMBOL LAYER -->
+  <div id="symbolLayer">
+    <div class="krow">
+      <div class="k" data-key="!">!</div><div class="k" data-key="@">@</div>
+      <div class="k" data-key="#">#</div><div class="k" data-key="$">$</div>
+      <div class="k" data-key="%">%</div><div class="k" data-key="^">^</div>
+      <div class="k" data-key="&">&amp;</div><div class="k" data-key="*">*</div>
+      <div class="k" data-key="(">(</div><div class="k" data-key=")">)</div>
+      <div class="k wide2 mod" data-key="Backspace">⌫</div>
+    </div>
+    <div class="krow">
+      <div class="k" data-key="-">-</div><div class="k" data-key="_">_</div>
+      <div class="k" data-key="=">=</div><div class="k" data-key="+">+</div>
+      <div class="k" data-key="[">[</div><div class="k" data-key="]">]</div>
+      <div class="k" data-key="{">{</div><div class="k" data-key="}">}</div>
+      <div class="k" data-key="|">|</div><div class="k" data-key="\\">\\</div>
+    </div>
+    <div class="krow">
+      <div class="k" data-key=";">"</div><div class="k" data-key=":"">:</div>
+      <div class="k" data-key="'">'</div><div class="k" data-key='"'>"</div>
+      <div class="k" data-key=",">,</div><div class="k" data-key=".">.</div>
+      <div class="k" data-key="<">&lt;</div><div class="k" data-key=">">&gt;</div>
+      <div class="k" data-key="/">/</div><div class="k" data-key="?">?</div>
+      <div class="k wide2 mod" data-key="Enter">↵</div>
+    </div>
+    <div class="krow">
+      <div class="k" data-key="~">~</div><div class="k" data-key="`">`</div>
+      <div class="k" data-key="@">@</div><div class="k" data-key="#">#</div>
+      <div class="k" data-key="€">€</div><div class="k" data-key="£">£</div>
+      <div class="k" data-key="¥">¥</div><div class="k" data-key="©">©</div>
+      <div class="k" data-key="®">®</div><div class="k" data-key="°">°</div>
+    </div>
+    <div class="krow">
+      <div class="k space mod" data-key=" ">ESPAÇO</div>
+    </div>
+  </div>
+
+  <!-- FN LAYER -->
+  <div id="fnLayer">
+    <div class="krow">
+      <div class="k wide2 fn" data-key="F1">F1</div>
+      <div class="k wide2 fn" data-key="F2">F2</div>
+      <div class="k wide2 fn" data-key="F3">F3</div>
+      <div class="k wide2 fn" data-key="F4">F4</div>
+      <div class="k wide2 fn" data-key="F5">F5</div>
+      <div class="k wide2 fn" data-key="F6">F6</div>
+    </div>
+    <div class="krow">
+      <div class="k wide2 fn" data-key="F7">F7</div>
+      <div class="k wide2 fn" data-key="F8">F8</div>
+      <div class="k wide2 fn" data-key="F9">F9</div>
+      <div class="k wide2 fn" data-key="F10">F10</div>
+      <div class="k wide2 fn" data-key="F11">F11</div>
+      <div class="k wide2 fn" data-key="F12">F12</div>
+    </div>
+    <div class="krow">
+      <div class="k wide2 fn" data-key="Home">Home</div>
+      <div class="k wide2 fn" data-key="End">End</div>
+      <div class="k wide2 fn" data-key="PageUp">PgUp</div>
+      <div class="k wide2 fn" data-key="PageDown">PgDn</div>
+      <div class="k wide2 fn" data-key="Insert">Ins</div>
+      <div class="k wide2 fn" data-key="Delete">Del</div>
+    </div>
+    <div class="krow">
+      <div class="k wide2 fn" data-key="PrintScreen">PrtSc</div>
+      <div class="k wide2 fn" data-key="ScrollLock">ScrLk</div>
+      <div class="k wide2 fn" data-key="Pause">Pause</div>
+    </div>
+  </div>
 </div>
 
 <script>
-    // ==================== VARIÁVEIS ====================
-    let shiftPressed = false;
-    let isDragging = false;
-    let dragStartX = 0, dragStartY = 0;
-    let lastTapTime = 0;
-    let keyboardVisible = true;
-    
-    // Elementos
-    const cursor = document.getElementById('cursor');
-    const keyboard = document.getElementById('keyboard');
-    const keyboardRows = document.getElementById('keyboardRows');
-    const minimizeBtn = document.getElementById('minimizeBtn');
-    
-    // Posição inicial do cursor
-    let cursorX = window.innerWidth - 100;
-    let cursorY = window.innerHeight - 250;
-    cursor.style.left = cursorX + 'px';
-    cursor.style.top = cursorY + 'px';
-    
-    // ==================== FUNÇÕES ====================
-    
-    function mostrarToast(msg, cor = '#5865F2') {
-        let toast = document.querySelector('.toast');
-        if(toast) toast.remove();
-        toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.style.background = cor;
-        toast.innerText = msg;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 1500);
-    }
-    
-    // Obter elemento ativo (input/textarea)
-    function getActiveElement() {
-        let active = document.activeElement;
-        if(!active || active === document.body) {
-            let input = document.querySelector('input, textarea');
-            if(input) {
-                input.focus();
-                return input;
-            }
-            mostrarToast('⚠️ Clique em um campo de texto primeiro', '#faa61a');
-            return null;
+(function(){
+  const frame    = document.getElementById('siteFrame');
+  const dot      = document.getElementById('cursorDot');
+  const viewport = document.getElementById('viewport');
+  const urlInput = document.getElementById('urlInput');
+  const keyboard = document.getElementById('keyboard');
+  const touchPad = document.getElementById('touchPad');
+  const mousePad = document.getElementById('mousePad');
+  const padHeader= document.getElementById('padHeader');
+
+  let curX = window.innerWidth / 2;
+  let curY = window.innerHeight / 2;
+  let shiftOn = false, ctrlOn = false, altOn = false, capsOn = false;
+  let kbdHidden = false;
+
+  function moveCursor(dx, dy) {
+    const rect = viewport.getBoundingClientRect();
+    curX = Math.max(rect.left, Math.min(rect.right,  curX + dx));
+    curY = Math.max(rect.top,  Math.min(rect.bottom, curY + dy));
+    dot.style.left = (curX - rect.left) + 'px';
+    dot.style.top  = (curY - rect.top)  + 'px';
+  }
+
+  function framePoint() {
+    const rect = frame.getBoundingClientRect();
+    return { x: curX - rect.left, y: curY - rect.top };
+  }
+
+  function sendMouseEvent(type, x, y, button) {
+    try {
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const el = doc.elementFromPoint(x, y);
+      if (!el) return;
+      const evt = new MouseEvent(type, {
+        bubbles:true, cancelable:true,
+        clientX: x, clientY: y,
+        screenX: x, screenY: y,
+        button: button || 0, buttons: button === 2 ? 2 : 1,
+        view: frame.contentWindow
+      });
+      el.dispatchEvent(evt);
+      return el;
+    } catch(e) {}
+  }
+
+  function doClick(right) {
+    const {x, y} = framePoint();
+    dot.classList.add(right ? 'rclicking' : 'clicking');
+    setTimeout(() => dot.classList.remove('clicking', 'rclicking'), 180);
+    try {
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const el = doc.elementFromPoint(x, y);
+      if (!el) return;
+      sendMouseEvent('mousedown', x, y, right ? 2 : 0);
+      sendMouseEvent('mouseup',   x, y, right ? 2 : 0);
+      if (!right) {
+        sendMouseEvent('click', x, y, 0);
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) {
+          el.focus();
         }
-        return active;
-    }
-    
-    // Enviar clique na posição do cursor
-    function sendClick() {
-        const x = cursorX + 30;
-        const y = cursorY + 30;
-        let element = document.elementFromPoint(x, y);
-        
-        if(element) {
-            // Disparar eventos
-            element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, clientX: x, clientY: y }));
-            element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, clientX: x, clientY: y }));
-            element.dispatchEvent(new MouseEvent('click', { bubbles: true, clientX: x, clientY: y }));
-            
-            // Se for input, focar
-            if(element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.focus();
-                mostrarToast('🖱️ Campo focado', '#23a55a');
-            } else {
-                mostrarToast('🖱️ Clique', '#5865F2');
-            }
+        if (el.tagName === 'A' && el.href) {
+          const href = el.href;
+          loadUrl(href);
         }
-    }
-    
-    // Enviar caractere
-    function sendChar(char) {
-        let el = getActiveElement();
-        if(!el) return;
-        
-        let finalChar = shiftPressed && /[a-z]/.test(char) ? char.toUpperCase() : char;
-        
-        let start = el.selectionStart || 0;
-        let end = el.selectionEnd || 0;
-        let newValue = el.value.slice(0, start) + finalChar + el.value.slice(end);
-        el.value = newValue;
-        el.selectionStart = el.selectionEnd = start + 1;
-        
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        mostrarToast(`⌨️ ${finalChar}`, '#23a55a');
-        
-        // Resetar shift após usar
-        if(shiftPressed && /[a-z]/.test(char)) {
-            shiftPressed = false;
-            mostrarToast('🔡 Shift desativado', '#faa61a');
+        if (el.tagName === 'BUTTON' || el.type === 'submit') {
+          el.click();
         }
-    }
-    
-    // Teclas especiais
-    function sendSpecial(key) {
-        let el = getActiveElement();
-        if(!el) return;
-        
-        if(key === 'Backspace') {
-            let start = el.selectionStart || 0;
-            let end = el.selectionEnd || 0;
-            if(start === end && start > 0) {
-                el.value = el.value.slice(0, start-1) + el.value.slice(end);
-                el.selectionStart = el.selectionEnd = start-1;
-            } else if(start !== end) {
-                el.value = el.value.slice(0, start) + el.value.slice(end);
-                el.selectionStart = el.selectionEnd = start;
-            }
-            el.dispatchEvent(new Event('input', { bubbles: true }));
-            mostrarToast('⌨️ Apagar', '#5865F2');
-        }
-        else if(key === 'Enter') {
-            sendChar('\n');
-        }
-        else if(key === 'Shift') {
-            shiftPressed = !shiftPressed;
-            mostrarToast(shiftPressed ? '🔠 MAIÚSCULAS ATIVADO' : '🔡 minúsculas', '#faa61a');
-        }
-        else if(key === 'Space') {
-            sendChar(' ');
-        }
-        else if(key === 'ArrowLeft') {
-            let pos = el.selectionStart || 0;
-            if(pos > 0) {
-                el.selectionStart = el.selectionEnd = pos - 1;
-            }
-        }
-        else if(key === 'ArrowRight') {
-            let pos = el.selectionStart || 0;
-            let max = el.value.length;
-            if(pos < max) {
-                el.selectionStart = el.selectionEnd = pos + 1;
-            }
-        }
-    }
-    
-    function sendScroll(delta) {
-        window.scrollBy(0, delta);
-        mostrarToast(`📜 ${delta > 0 ? 'Scroll ↓' : 'Scroll ↑'}`, '#faa61a');
-    }
-    
-    // ==================== MOUSE DRAG ====================
-    cursor.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = cursor.getBoundingClientRect();
-        dragStartX = touch.clientX - rect.left;
-        dragStartY = touch.clientY - rect.top;
-        isDragging = false;
-        
-        // Detectar tap rápido (clique)
-        const now = Date.now();
-        if(now - lastTapTime < 200) {
-            sendClick();
-            lastTapTime = 0;
-        } else {
-            isDragging = true;
-            lastTapTime = now;
-        }
-    });
-    
-    cursor.addEventListener('touchmove', (e) => {
-        if(!isDragging) return;
-        e.preventDefault();
-        const touch = e.touches[0];
-        let newX = touch.clientX - dragStartX;
-        let newY = touch.clientY - dragStartY;
-        
-        newX = Math.max(5, Math.min(window.innerWidth - 70, newX));
-        newY = Math.max(60, Math.min(window.innerHeight - 200, newY));
-        
-        cursorX = newX;
-        cursorY = newY;
-        cursor.style.left = cursorX + 'px';
-        cursor.style.top = cursorY + 'px';
-    });
-    
-    cursor.addEventListener('touchend', () => {
-        isDragging = false;
-    });
-    
-    // ==================== TECLADO ====================
-    function minimizeKeyboard() {
-        keyboardVisible = !keyboardVisible;
-        if(keyboardVisible) {
-            keyboardRows.style.display = 'flex';
-            minimizeBtn.textContent = '─ Minimizar';
-        } else {
-            keyboardRows.style.display = 'none';
-            minimizeBtn.textContent = '□ Maximizar';
-        }
-    }
-    
-    minimizeBtn.addEventListener('click', minimizeKeyboard);
-    
-    // Adicionar eventos às teclas
-    document.querySelectorAll('.key').forEach(btn => {
-        btn.addEventListener('click', () => {
-            let key = btn.getAttribute('data-key');
-            if(key === 'Backspace' || key === 'Enter' || key === 'Shift' || 
-               key === 'Space' || key === 'ArrowLeft' || key === 'ArrowRight') {
-                sendSpecial(key);
-            } else {
-                sendChar(key);
-            }
+      } else {
+        const cevt = new MouseEvent('contextmenu', {
+          bubbles:true, cancelable:true, clientX:x, clientY:y,
+          view: frame.contentWindow
         });
+        el.dispatchEvent(cevt);
+      }
+    } catch(e) {}
+  }
+
+  function doScroll(delta) {
+    try {
+      const {x, y} = framePoint();
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const el = doc.elementFromPoint(x, y);
+      if (el) {
+        const we = new WheelEvent('wheel', {
+          bubbles:true, cancelable:true,
+          deltaY: delta, deltaMode: 0,
+          clientX:x, clientY:y,
+          view: frame.contentWindow
+        });
+        el.dispatchEvent(we);
+      }
+      frame.contentWindow.scrollBy(0, delta);
+    } catch(e) {}
+  }
+
+  function loadUrl(rawUrl) {
+    let url = rawUrl.trim();
+    if (!url) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+    urlInput.value = url;
+    frame.src = url;
+  }
+
+  document.getElementById('goBtn').addEventListener('click', () => loadUrl(urlInput.value));
+  urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') loadUrl(urlInput.value); });
+  document.getElementById('nav-back').addEventListener('click', () => { try { frame.contentWindow.history.back(); } catch(e) {} });
+  document.getElementById('nav-fwd').addEventListener('click',  () => { try { frame.contentWindow.history.forward(); } catch(e) {} });
+  document.getElementById('nav-reload').addEventListener('click',() => { frame.src = frame.src; });
+  frame.addEventListener('load', () => {
+    try { const u = frame.contentWindow.location.href; if(u !== 'about:blank') urlInput.value = u; } catch(e) {}
+  });
+
+  document.getElementById('toggleKbd').addEventListener('click', () => {
+    kbdHidden = !kbdHidden;
+    keyboard.classList.toggle('hidden', kbdHidden);
+  });
+
+  document.getElementById('btnLeft').addEventListener('click',  () => doClick(false));
+  document.getElementById('btnRight').addEventListener('click', () => doClick(true));
+  document.getElementById('scrollUp').addEventListener('click',   () => doScroll(-120));
+  document.getElementById('scrollDown').addEventListener('click', () => doScroll(120));
+  document.getElementById('btnMiddle').addEventListener('click',  () => {
+    try { const {x,y}=framePoint(); const doc=frame.contentDocument; if(!doc)return; const el=doc.elementFromPoint(x,y); if(el&&el.tagName==='A') window.open(el.href,'_blank'); } catch(e){}
+  });
+
+  /* TRACKPAD */
+  let tpActive = false, tpLastX = 0, tpLastY = 0, tpVX = 0, tpVY = 0;
+  const SPEED = 1.8;
+
+  touchPad.addEventListener('touchstart', e => {
+    e.preventDefault();
+    tpActive = true;
+    tpLastX = e.touches[0].clientX;
+    tpLastY = e.touches[0].clientY;
+    tpVX = 0; tpVY = 0;
+  }, {passive:false});
+
+  touchPad.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (!tpActive) return;
+    const dx = (e.touches[0].clientX - tpLastX) * SPEED;
+    const dy = (e.touches[0].clientY - tpLastY) * SPEED;
+    tpLastX = e.touches[0].clientX;
+    tpLastY = e.touches[0].clientY;
+    tpVX = dx; tpVY = dy;
+    moveCursor(dx, dy);
+
+    try {
+      const {x,y} = framePoint();
+      sendMouseEvent('mousemove', x, y, 0);
+    } catch(e) {}
+  }, {passive:false});
+
+  touchPad.addEventListener('touchend', e => {
+    e.preventDefault();
+    tpActive = false;
+    if (Math.abs(tpVX) < 2 && Math.abs(tpVY) < 2) {
+      doClick(false);
+    }
+  }, {passive:false});
+
+  /* DRAG MOUSE PAD */
+  let dragPad = false, dragPadX=0, dragPadY=0;
+  padHeader.addEventListener('touchstart', e => {
+    e.preventDefault();
+    dragPad = true;
+    dragPadX = e.touches[0].clientX - mousePad.getBoundingClientRect().left;
+    dragPadY = e.touches[0].clientY - mousePad.getBoundingClientRect().top;
+  }, {passive:false});
+  window.addEventListener('touchmove', e => {
+    if (!dragPad) return;
+    e.preventDefault();
+    let nx = e.touches[0].clientX - dragPadX;
+    let ny = e.touches[0].clientY - dragPadY;
+    const vr = viewport.getBoundingClientRect();
+    nx = Math.max(vr.left, Math.min(vr.right  - mousePad.offsetWidth,  nx));
+    ny = Math.max(vr.top,  Math.min(vr.bottom - mousePad.offsetHeight, ny));
+    mousePad.style.right  = 'auto';
+    mousePad.style.bottom = 'auto';
+    mousePad.style.left = (nx - vr.left) + 'px';
+    mousePad.style.top  = (ny - vr.top)  + 'px';
+  }, {passive:false});
+  window.addEventListener('touchend', () => { dragPad = false; });
+
+  /* KEYBOARD */
+  let activeEl = null;
+
+  frame.addEventListener('load', () => {
+    try {
+      const doc = frame.contentDocument;
+      doc.addEventListener('focusin', e => { activeEl = e.target; });
+      doc.addEventListener('click',   e => { activeEl = e.target; });
+    } catch(e) {}
+  });
+
+  function getTarget() {
+    try {
+      const doc = frame.contentDocument;
+      if (doc && doc.activeElement && doc.activeElement !== doc.body) {
+        activeEl = doc.activeElement;
+        return doc.activeElement;
+      }
+    } catch(e) {}
+    return activeEl;
+  }
+
+  function fireKeyEvent(type, key, keyCode, mods) {
+    const el = getTarget();
+    if (!el) return;
+    const ev = new KeyboardEvent(type, {
+      key, keyCode, which: keyCode,
+      code: key,
+      bubbles: true, cancelable: true,
+      shiftKey:  mods.shift  || shiftOn,
+      ctrlKey:   mods.ctrl   || ctrlOn,
+      altKey:    mods.alt    || altOn,
+      view: frame.contentWindow
     });
-    
-    // Scroll buttons (opcional)
-    const scrollUpBtn = document.createElement('button');
-    const scrollDownBtn = document.createElement('button');
-    scrollUpBtn.textContent = '▲';
-    scrollDownBtn.textContent = '▼';
-    scrollUpBtn.style.cssText = 'position:fixed; bottom:200px; right:20px; background:#5865F2; color:white; border:none; border-radius:50%; width:45px; height:45px; font-size:20px; z-index:9999;';
-    scrollDownBtn.style.cssText = 'position:fixed; bottom:140px; right:20px; background:#5865F2; color:white; border:none; border-radius:50%; width:45px; height:45px; font-size:20px; z-index:9999;';
-    
-    scrollUpBtn.onclick = () => sendScroll(-200);
-    scrollDownBtn.onclick = () => sendScroll(200);
-    document.body.appendChild(scrollUpBtn);
-    document.body.appendChild(scrollDownBtn);
-    
-    mostrarToast('✅ Mouse + Teclado Virtual ATIVADOS!', '#23a55a');
-    mostrarToast('🖱️ Arraste o cursor | Toque rápido = clique', '#5865F2');
+    el.dispatchEvent(ev);
+  }
+
+  function fireInputChar(char) {
+    const el = getTarget();
+    if (!el) return;
+    if (el.isContentEditable) {
+      el.focus();
+      document.execCommand('insertText', false, char);
+      return;
+    }
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      const s = el.selectionStart || 0;
+      const e2= el.selectionEnd   || 0;
+      const v = el.value;
+      el.value = v.slice(0, s) + char + v.slice(e2);
+      el.selectionStart = el.selectionEnd = s + char.length;
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+      el.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+  }
+
+  function doBackspace() {
+    const el = getTarget();
+    if (!el) return;
+    fireKeyEvent('keydown', 'Backspace', 8, {});
+    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+      const s = el.selectionStart || 0;
+      const e2= el.selectionEnd   || 0;
+      if (s === e2 && s > 0) {
+        el.value = el.value.slice(0, s-1) + el.value.slice(e2);
+        el.selectionStart = el.selectionEnd = s - 1;
+      } else if (s !== e2) {
+        el.value = el.value.slice(0, s) + el.value.slice(e2);
+        el.selectionStart = el.selectionEnd = s;
+      }
+      el.dispatchEvent(new Event('input', {bubbles:true}));
+    } else if (el.isContentEditable) {
+      document.execCommand('delete');
+    }
+    fireKeyEvent('keyup', 'Backspace', 8, {});
+  }
+
+  function doEnter() {
+    const el = getTarget();
+    if (!el) return;
+    fireKeyEvent('keydown', 'Enter', 13, {});
+    if (el.tagName === 'TEXTAREA') {
+      fireInputChar('\n');
+    } else if (el.tagName === 'INPUT') {
+      const form = el.closest('form');
+      if (form) form.dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}));
+    }
+    fireKeyEvent('keyup', 'Enter', 13, {});
+  }
+
+  const KEY_CODES = {
+    ' ':32, 'a':65,'b':66,'c':67,'d':68,'e':69,'f':70,'g':71,'h':72,
+    'i':73,'j':74,'k':75,'l':76,'m':77,'n':78,'o':79,'p':80,'q':81,
+    'r':82,'s':83,'t':84,'u':85,'v':86,'w':87,'x':88,'y':89,'z':90,
+    '0':48,'1':49,'2':50,'3':51,'4':52,'5':53,'6':54,'7':55,'8':56,'9':57,
+    'ArrowLeft':37,'ArrowUp':38,'ArrowRight':39,'ArrowDown':40,
+    'Tab':9,'Escape':27,'Delete':46,'Insert':45,
+    'Home':36,'End':35,'PageUp':33,'PageDown':34,
+    'F1':112,'F2':113,'F3':114,'F4':115,'F5':116,'F6':117,
+    'F7':118,'F8':119,'F9':120,'F10':121,'F11':122,'F12':123,
+  };
+
+  function pressKey(key) {
+    const mods = {shift:shiftOn, ctrl:ctrlOn, alt:altOn};
+
+    if (key === 'Backspace') { doBackspace(); return; }
+    if (key === 'Enter')     { doEnter();     return; }
+    if (key === 'Shift') {
+      shiftOn = !shiftOn;
+      updateModVisual();
+      return;
+    }
+    if (key === 'Control') {
+      ctrlOn = !ctrlOn;
+      updateModVisual();
+      return;
+    }
+    if (key === 'Alt') {
+      altOn = !altOn;
+      updateModVisual();
+      return;
+    }
+    if (key === 'CapsLock') {
+      capsOn = !capsOn;
+      document.getElementById('capsKey').classList.toggle('active', capsOn);
+      return;
+    }
+
+    const kc = KEY_CODES[key.toLowerCase()] || KEY_CODES[key] || key.charCodeAt(0) || 0;
+    fireKeyEvent('keydown', key, kc, mods);
+
+    if (key === 'ArrowLeft'||key==='ArrowRight'||key==='ArrowUp'||key==='ArrowDown'||
+        key === 'Tab' || key === 'Escape' ||
+        key === 'Home'||key==='End'||key==='PageUp'||key==='PageDown'||
+        key === 'Delete'||key==='Insert'||
+        key.startsWith('F')) {
+      fireKeyEvent('keyup', key, kc, mods);
+      if (shiftOn) { shiftOn = false; updateModVisual(); }
+      return;
+    }
+
+    let ch = key;
+    if (shiftOn || capsOn) {
+      if (/^[a-z]$/.test(ch)) ch = ch.toUpperCase();
+      else {
+        const shifts = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^',
+          '7':'&','8':'*','9':'(','0':')','`':'~','-':'_','=':'+',
+          '[':'{',']':'}','\\':'|',';':':','\'':'"',',':'<','.':'>','/':'?'};
+        ch = shifts[ch] || ch;
+      }
+    }
+
+    fireInputChar(ch);
+    fireKeyEvent('keyup', key, kc, mods);
+
+    if (shiftOn) { shiftOn = false; updateModVisual(); }
+    if (ctrlOn)  { ctrlOn  = false; updateModVisual(); }
+    if (altOn)   { altOn   = false; updateModVisual(); }
+  }
+
+  function updateModVisual() {
+    document.getElementById('shiftKeyL').classList.toggle('active', shiftOn);
+    document.getElementById('shiftKeyR').classList.toggle('active', shiftOn);
+    document.getElementById('ctrlKeyL').classList.toggle('active',  ctrlOn);
+    document.getElementById('altKeyL').classList.toggle('active',   altOn);
+    document.getElementById('altKeyR').classList.toggle('active',   altOn);
+  }
+
+  function doCombo(ctrl, shift, alt, key) {
+    const el = getTarget();
+    if (!el) return;
+    const kc = KEY_CODES[key] || key.charCodeAt(0) || 0;
+    const mods = {shift, ctrl, alt};
+    try {
+      const doc = frame.contentDocument;
+      const win = frame.contentWindow;
+      const ev = new KeyboardEvent('keydown', {
+        key, keyCode: kc, which: kc, code: 'Key'+key.toUpperCase(),
+        bubbles:true, cancelable:true,
+        ctrlKey:ctrl, shiftKey:shift, altKey:alt, view:win
+      });
+      (doc.activeElement || doc.body).dispatchEvent(ev);
+
+      if (ctrl && !shift && !alt) {
+        if (key==='a') { try { win.document.execCommand('selectAll'); } catch(e){} }
+        if (key==='c') { try { win.document.execCommand('copy'); }      catch(e){} }
+        if (key==='v') { try { win.document.execCommand('paste'); }     catch(e){} }
+        if (key==='z') { try { win.document.execCommand('undo'); }      catch(e){} }
+        if (key==='x') { try { win.document.execCommand('cut'); }       catch(e){} }
+      }
+    } catch(e) {}
+  }
+
+  document.getElementById('ctrlABtn').addEventListener('click', () => doCombo(true,false,false,'a'));
+  document.getElementById('ctrlCBtn').addEventListener('click', () => doCombo(true,false,false,'c'));
+  document.getElementById('ctrlVBtn').addEventListener('click', () => doCombo(true,false,false,'v'));
+  document.getElementById('ctrlZBtn').addEventListener('click', () => doCombo(true,false,false,'z'));
+  document.getElementById('ctrlXBtn').addEventListener('click', () => doCombo(true,false,false,'x'));
+
+  document.querySelectorAll('.k').forEach(btn => {
+    btn.addEventListener('touchstart', e => { e.preventDefault(); pressKey(btn.getAttribute('data-key')); }, {passive:false});
+    btn.addEventListener('click', () => pressKey(btn.getAttribute('data-key')));
+  });
+
+  const layers = { main: document.getElementById('mainLayer'), sym: document.getElementById('symbolLayer'), fn: document.getElementById('fnLayer') };
+  function showLayer(name) {
+    layers.main.style.display = name==='main' ? '' : 'none';
+    layers.sym.style.display  = name==='sym'  ? '' : 'none';
+    layers.fn.style.display   = name==='fn'   ? '' : 'none';
+  }
+  document.getElementById('switchMain').addEventListener('click', () => showLayer('main'));
+  document.getElementById('switchSym').addEventListener('click',  () => showLayer('sym'));
+  document.getElementById('switchFn').addEventListener('click',   () => showLayer('fn'));
+
+  loadUrl('https://www.google.com');
+  moveCursor(0, 0);
+})();
 </script>
 </body>
 </html>
