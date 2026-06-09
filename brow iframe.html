@@ -1,610 +1,1152 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Chromium Navegador</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#202124;--bar:#292a2d;--card:#35363a;--hover:#3c4043;
-  --blue:#8ab4f8;--green:#81c995;--red:#f28b82;--yellow:#fdd663;
-  --txt:#e8eaed;--dim:#9aa0a6;--bdr:#3c4043;
-}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);
-  font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AutoClick AFK + Simulação Realista Cloud Phone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-#titlebar{background:var(--bar);height:38px;display:flex;align-items:center;
-  padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;
-  overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
-#titlebar::-webkit-scrollbar{height:3px}
-#tabsContainer{display:flex;align-items:flex-end;gap:2px;height:100%}
-.tab{background:var(--card);color:var(--dim);padding:6px 12px 5px;
-  border-radius:10px 10px 0 0;font-size:12px;display:inline-flex;align-items:center;
-  gap:6px;min-width:90px;max-width:160px;cursor:pointer;
-  border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0;
-  height:34px}
-.tab.active{background:var(--bg);color:var(--txt)}
-.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
-.tab-x{width:18px;height:18px;display:inline-flex;align-items:center;
-  justify-content:center;border-radius:50%;font-size:12px}
-.tab-x:active{background:rgba(255,255,255,0.2)}
-#newTab{background:var(--card);border:none;color:var(--txt);width:34px;height:30px;
-  font-size:20px;cursor:pointer;border-radius:12px;display:flex;
-  align-items:center;justify-content:center;flex-shrink:0}
-#newTab:active{background:var(--hover)}
-#winctrls{display:flex;gap:8px;align-items:center;margin-left:auto;padding-left:8px;flex-shrink:0}
-.wc{width:14px;height:14px;border-radius:50%;border:none;cursor:pointer}
-.wc.min{background:#f0c132}.wc.max{background:#34c749}.wc.cls{background:#ea4335}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0f;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-#toolbar{background:var(--bar);padding:6px 10px;display:flex;align-items:center;
-  gap:6px;flex-shrink:0;border-bottom:1px solid #000;position:relative}
-#loadbar{position:absolute;bottom:0;left:0;height:2px;
-  background:linear-gradient(90deg,var(--blue),#a78bfa);width:0;pointer-events:none}
-.nb{background:transparent;border:none;color:var(--dim);width:34px;height:34px;
-  border-radius:50%;font-size:16px;cursor:pointer;display:flex;
-  align-items:center;justify-content:center}
-.nb:active{background:var(--hover)}
-.nb[disabled]{opacity:.3}
-#omnibox{flex:1;display:flex;align-items:center;background:#111;
-  border:1.5px solid var(--bdr);border-radius:24px;padding:0 12px;
-  height:36px;gap:8px;cursor:text}
-#omnibox:focus-within{border-color:var(--blue)}
-#lockico{font-size:13px}
-#urlInput{flex:1;background:transparent;border:none;color:var(--txt);
-  font-size:13px;outline:none}
-#menubtn{background:transparent;border:none;color:var(--dim);font-size:22px;
-  cursor:pointer;width:34px;height:34px;border-radius:50%;
-  display:flex;align-items:center;justify-content:center}
-#menubtn:active{background:var(--hover)}
+        /* Barra superior */
+        .toolbar {
+            background: #1a1a2a;
+            padding: 8px 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #2a2a3a;
+        }
 
-#viewport{flex:1;position:relative;overflow:hidden;background:#1a1a1a}
-#iframeContainer{position:absolute;inset:0;width:100%;height:100%}
-.contentFrame{position:absolute;inset:0;width:100%;height:100%;border:none;display:block}
+        .url-bar {
+            flex: 1;
+            display: flex;
+            gap: 6px;
+            background: #0f0f1a;
+            border-radius: 30px;
+            padding: 4px 12px;
+            align-items: center;
+        }
 
-#mpad{position:fixed;right:12px;bottom:280px;width:170px;
-  background:#12121ae6;backdrop-filter:blur(12px);
-  border:1px solid #2a2a3a;border-radius:16px;z-index:10000;
-  box-shadow:0 10px 40px rgba(0,0,0,0.6)}
-#mhead{padding:8px 12px 4px;display:flex;justify-content:space-between;
-  align-items:center;cursor:move}
-#mhead span:first-child{color:#8ab4f8;font-size:9px;letter-spacing:1.8px}
-#mhead span:last-child{color:#5a5a7a;font-size:16px;cursor:pointer}
-#tpad{margin:0 10px;height:100px;background:#0a0a10;border-radius:12px;
-  border:1px solid #252535;position:relative;overflow:hidden}
-#tpad::before{content:'TRACKPAD';position:absolute;inset:0;display:flex;
-  align-items:center;justify-content:center;color:#1a1a2a;font-size:9px}
-#mbtns{display:flex;gap:8px;padding:8px 10px 6px}
-#lbtn,#rbtn{flex:1;height:34px;border:none;border-radius:10px;
-  font-size:11px;font-weight:bold;cursor:pointer}
-#lbtn{background:#0d2e1c;color:#81c995;border:1px solid #2a5a3a}
-#rbtn{background:#2e1a1a;color:#f28b82;border:1px solid #6a2a2a}
-#lbtn:active{background:#81c995;color:#000}
-#rbtn:active{background:#f28b82;color:#000}
-#srow{display:flex;gap:6px;padding:0 10px 10px}
-#sup,#sdn,#smid{flex:1;height:30px;background:#0d0d18;border:1px solid #252535;
-  color:#aaa;border-radius:8px;font-size:13px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center}
-#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000}
+        .url-bar input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 14px;
+            padding: 8px 0;
+            outline: none;
+        }
 
-#kbd{position:fixed;bottom:0;left:0;right:0;background:#111118ee;
-  backdrop-filter:blur(10px);border-top:1px solid #2a2a35;
-  padding:4px 4px 8px;z-index:10001}
-#kbd.koff{display:none}
-#kbar{display:flex;align-items:center;padding:4px 6px 6px;gap:4px;
-  border-bottom:1px solid #22222a;overflow-x:auto;scrollbar-width:none}
-#kbar::-webkit-scrollbar{display:none}
-.qk{background:#1e1e2a;border:1px solid #353545;color:#ccc;
-  border-radius:8px;padding:6px 12px;font-size:11px;white-space:nowrap;cursor:pointer}
-.qk:active{background:var(--blue);color:#000}
-.kr{display:flex;justify-content:center;gap:3px;margin-bottom:3px;padding:0 4px}
-.k{background:#252532;border:1px solid #353545;color:#e0e0e0;
-  border-radius:8px;height:40px;min-width:30px;display:flex;
-  align-items:center;justify-content:center;font-size:12px;cursor:pointer;
-  flex:1 0 auto}
-.k:active{background:var(--blue);color:#000}
-.k.space{flex:5}
-.k.back{min-width:50px}
-</style>
+        .url-bar button {
+            background: #23a55a;
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .nav-btn {
+            background: #5865F2;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .afk-btn {
+            background: #eb459e;
+            color: white;
+        }
+
+        .virtual-btn {
+            background: #faa61a;
+            color: #1e1e2f;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: #1a1a2a;
+            display: flex;
+            gap: 2px;
+            overflow-x: auto;
+            padding: 5px 5px 0 5px;
+        }
+
+        .tab {
+            background: #0f0f1a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            min-width: 140px;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .tab.active {
+            background: #5865F2;
+        }
+
+        .tab button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 5px;
+        }
+
+        .new-tab {
+            background: #23a55a;
+            border: none;
+            color: white;
+            padding: 6px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        /* Área de conteúdo */
+        .content-area {
+            flex: 1;
+            position: relative;
+        }
+
+        .browser-window {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            background: white;
+        }
+
+        .browser-window.active {
+            display: flex;
+        }
+
+        .browser-toolbar {
+            background: #2a2a3a;
+            padding: 4px 8px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .browser-toolbar input {
+            flex: 1;
+            background: #1e1e2f;
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .browser-toolbar button {
+            background: #5865F2;
+            border: none;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .browser-frame {
+            flex: 1;
+            width: 100%;
+            border: none;
+        }
+
+        /* Painel AFK */
+        .afk-panel {
+            position: fixed;
+            right: -450px;
+            top: 0;
+            width: 450px;
+            height: 100vh;
+            background: #1e1e2f;
+            z-index: 10001;
+            transition: right 0.3s;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+            color: white;
+        }
+
+        .afk-panel.open {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 15px;
+            background: #2a2a3a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a3a4a;
+        }
+
+        .panel-header h3 {
+            color: #eb459e;
+        }
+
+        .close-panel {
+            background: #ed4245;
+            border: none;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .afk-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .afk-btn-control {
+            flex: 1;
+            background: #5865F2;
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .afk-btn-control.active {
+            background: #eb459e;
+            box-shadow: 0 0 10px #eb459e;
+        }
+
+        .config-group {
+            margin-bottom: 15px;
+        }
+
+        .config-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .config-group input, .config-group select {
+            width: 100%;
+            padding: 8px;
+            background: #0f0f1a;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .stats {
+            background: #0f0f1a;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        /* Mouse Virtual */
+        .virtual-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #eb459e;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: all 0.05s;
+            background: rgba(235, 69, 158, 0.2);
+            display: none;
+        }
+
+        .virtual-cursor.active {
+            display: block;
+        }
+
+        /* Teclado Virtual */
+        .virtual-keyboard {
+            position: fixed;
+            bottom: -400px;
+            left: 0;
+            right: 0;
+            background: #1a1a2a;
+            padding: 10px;
+            z-index: 10002;
+            transition: bottom 0.3s;
+            border-top: 2px solid #5865F2;
+        }
+
+        .virtual-keyboard.open {
+            bottom: 0;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .key {
+            background: #2a2a3a;
+            border: none;
+            color: white;
+            padding: 12px 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            min-width: 40px;
+            transition: all 0.05s;
+        }
+
+        .key:active {
+            transform: scale(0.95);
+            background: #5865F2;
+        }
+
+        .key.special {
+            background: #eb459e;
+            min-width: 60px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: #1e1e2f;
+            color: white;
+            padding: 12px;
+            border-radius: 30px;
+            text-align: center;
+            z-index: 9999;
+            animation: fadeUp 0.3s;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-
-<div id="titlebar">
-  <div id="tabsContainer"></div>
-  <button id="newTab">+</button>
-  <div id="winctrls">
-    <div class="wc min"></div>
-    <div class="wc max"></div>
-    <div class="wc cls"></div>
-  </div>
+<div class="toolbar">
+    <div class="url-bar">
+        <input type="text" id="globalUrlInput" placeholder="Digite URL ou pesquise...">
+        <button id="globalGoBtn">IR</button>
+    </div>
+    <button id="globalBackBtn" class="nav-btn">◀</button>
+    <button id="globalForwardBtn" class="nav-btn">▶</button>
+    <button id="globalReloadBtn" class="nav-btn">🔄</button>
+    <button id="afkPanelBtn" class="nav-btn afk-btn">🤖 AFK Auto</button>
+    <button id="virtualKeyboardBtn" class="nav-btn virtual-btn">⌨️ Teclado Virtual</button>
 </div>
 
-<div id="toolbar">
-  <div id="loadbar"></div>
-  <button id="backBtn" class="nb" disabled>◀</button>
-  <button id="forwardBtn" class="nb" disabled>▶</button>
-  <button id="reloadBtn" class="nb">⟳</button>
-  <div id="omnibox">
-    <span id="lockico">🔒</span>
-    <input type="text" id="urlInput" placeholder="Digite URL ou pesquisa">
-  </div>
-  <button id="menubtn">⋮</button>
+<div class="tabs-container" id="tabsContainer"></div>
+<button id="newTabBtn" class="new-tab">+ NOVA ABA</button>
+<div class="content-area" id="contentArea"></div>
+
+<!-- Painel AFK -->
+<div id="afkPanel" class="afk-panel">
+    <div class="panel-header">
+        <h3>🤖 Modo AFK Avançado</h3>
+        <button class="close-panel" onclick="closeAfkPanel()">Fechar</button>
+    </div>
+    <div class="panel-content">
+        <div class="afk-controls">
+            <button id="startAfkBtn" class="afk-btn-control">▶️ Iniciar AFK</button>
+            <button id="stopAfkBtn" class="afk-btn-control" disabled>⏹️ Parar AFK</button>
+        </div>
+        
+        <div class="config-group">
+            <label>🎯 Aba Alvo:</label>
+            <select id="targetTabSelect"></select>
+        </div>
+        
+        <div class="config-group">
+            <label>⚡ Intervalo entre ações (ms):</label>
+            <input type="number" id="afkInterval" value="3000" min="500" max="30000">
+        </div>
+        
+        <div class="config-group">
+            <label>🎲 Modo de Comportamento:</label>
+            <select id="afkMode">
+                <option value="realistic">Realista (movimentos suaves)</option>
+                <option value="aggressive">Agressivo (cliques rápidos)</option>
+                <option value="subtle">Sutil (apenas mover mouse)</option>
+                <option value="mixed">Misto (alterna ações)</option>
+            </select>
+        </div>
+        
+        <div class="config-group">
+            <label>🖱️ Ações permitidas:</label>
+            <label><input type="checkbox" id="allowMove" checked> Mover mouse</label><br>
+            <label><input type="checkbox" id="allowClick" checked> Cliques</label><br>
+            <label><input type="checkbox" id="allowScroll" checked> Scroll</label><br>
+            <label><input type="checkbox" id="allowType" checked> Digitar</label>
+        </div>
+        
+        <div class="stats">
+            <div>📊 Status: <span id="afkStatus">Parado</span></div>
+            <div>🔄 Ações executadas: <span id="actionCount">0</span></div>
+            <div>⏱️ Tempo ativo: <span id="afkTime">00:00:00</span></div>
+        </div>
+    </div>
 </div>
 
-<div id="viewport">
-  <div id="iframeContainer"></div>
+<!-- Teclado Virtual -->
+<div id="virtualKeyboard" class="virtual-keyboard">
+    <div class="keyboard-row">
+        <button class="key" data-key="`">`</button>
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <button class="key" data-key="0">0</button>
+        <button class="key" data-key="-">-</button>
+        <button class="key" data-key="=">=</button>
+        <button class="key special" data-key="Backspace">⌫</button>
+    </div>
+    <div class="keyboard-row">
+        <button class="key special" data-key="Tab">Tab</button>
+        <button class="key" data-key="q">q</button>
+        <button class="key" data-key="w">w</button>
+        <button class="key" data-key="e">e</button>
+        <button class="key" data-key="r">r</button>
+        <button class="key" data-key="t">t</button>
+        <button class="key" data-key="y">y</button>
+        <button class="key" data-key="u">u</button>
+        <button class="key" data-key="i">i</button>
+        <button class="key" data-key="o">o</button>
+        <button class="key" data-key="p">p</button>
+        <button class="key" data-key="[">[</button>
+        <button class="key" data-key="]">]</button>
+        <button class="key special" data-key="\">\</button>
+    </div>
+    <div class="keyboard-row">
+        <button class="key special" data-key="CapsLock">Caps</button>
+        <button class="key" data-key="a">a</button>
+        <button class="key" data-key="s">s</button>
+        <button class="key" data-key="d">d</button>
+        <button class="key" data-key="f">f</button>
+        <button class="key" data-key="g">g</button>
+        <button class="key" data-key="h">h</button>
+        <button class="key" data-key="j">j</button>
+        <button class="key" data-key="k">k</button>
+        <button class="key" data-key="l">l</button>
+        <button class="key" data-key=";">;</button>
+        <button class="key" data-key="'">'</button>
+        <button class="key special" data-key="Enter">Enter</button>
+    </div>
+    <div class="keyboard-row">
+        <button class="key special" data-key="Shift">Shift</button>
+        <button class="key" data-key="z">z</button>
+        <button class="key" data-key="x">x</button>
+        <button class="key" data-key="c">c</button>
+        <button class="key" data-key="v">v</button>
+        <button class="key" data-key="b">b</button>
+        <button class="key" data-key="n">n</button>
+        <button class="key" data-key="m">m</button>
+        <button class="key" data-key=",">,</button>
+        <button class="key" data-key=".">.</button>
+        <button class="key" data-key="/">/</button>
+        <button class="key special" data-key="Shift">Shift</button>
+    </div>
+    <div class="keyboard-row">
+        <button class="key special" data-key="Ctrl">Ctrl</button>
+        <button class="key special" data-key="Alt">Alt</button>
+        <button class="key special" data-key="Space" style="min-width:200px">Espaço</button>
+        <button class="key special" data-key="ArrowLeft">←</button>
+        <button class="key special" data-key="ArrowUp">↑</button>
+        <button class="key special" data-key="ArrowDown">↓</button>
+        <button class="key special" data-key="ArrowRight">→</button>
+    </div>
 </div>
 
-<div id="mpad">
-  <div id="mhead"><span>✦ TRACKPAD</span><span id="mpadClose">✕</span></div>
-  <div id="tpad"></div>
-  <div id="mbtns"><button id="lbtn">LMB</button><button id="rbtn">RMB</button></div>
-  <div id="srow"><button id="sup">▲</button><button id="smid">●</button><button id="sdn">▼</button></div>
-</div>
-
-<div id="kbd">
-  <div id="kbar">
-    <div class="qk" data-key="Tab">Tab</div>
-    <div class="qk" data-key="Enter">Enter</div>
-    <div class="qk" data-key="Escape">Esc</div>
-    <div class="qk" data-key="ArrowUp">↑</div>
-    <div class="qk" data-key="ArrowDown">↓</div>
-    <div class="qk" data-key="ArrowLeft">←</div>
-    <div class="qk" data-key="ArrowRight">→</div>
-    <div class="qk" data-key="Control">Ctrl</div>
-    <div class="qk" data-key="Alt">Alt</div>
-    <div class="qk" data-key="Shift">Shift</div>
-    <div class="qk" data-key="Delete">Del</div>
-  </div>
-  <div class="kr" data-row="1"></div>
-  <div class="kr" data-row="2"></div>
-  <div class="kr" data-row="3"></div>
-</div>
+<!-- Cursor Virtual -->
+<div id="virtualCursor" class="virtual-cursor"></div>
 
 <script>
-const START_URL = "https://web.cloudmoonapp.com/pt/";
-let tabs = [];
-let activeTabId = null;
-let tabCounter = 0;
-let activeFrame = null;
-let cursorX = window.innerWidth / 2;
-let cursorY = window.innerHeight / 2;
-
-// Função principal: injeta controle COMPLETO dentro do iframe
-function injectFullControl(iframe) {
-  try {
-    const doc = iframe.contentDocument;
-    const win = iframe.contentWindow;
-    if(!doc || !win) return false;
-    if(win.__remoteInjected) return true;
+    // ==================== VARIÁVEIS GLOBAIS ====================
+    let browsers = [];
+    let activeBrowserId = null;
+    let browserCounter = 0;
     
-    const injectCode = `
-    (function() {
-      if(window.__remoteInjected) return;
-      window.__remoteInjected = true;
-      
-      // Cursor visual dentro do iframe
-      let cursorX = window.innerWidth / 2;
-      let cursorY = window.innerHeight / 2;
-      
-      const cursorDiv = document.createElement('div');
-      cursorDiv.id = '__virtualCursor';
-      cursorDiv.style.cssText = 'position:fixed;width:0;height:0;border-left:10px solid transparent;border-right:0 solid transparent;border-bottom:18px solid #8ab4f8;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));pointer-events:none;z-index:999999;transform-origin:top left;transition:left 0.02s linear, top 0.02s linear;';
-      const style = document.createElement('style');
-      style.textContent = '#__virtualCursor::after{content:"";position:absolute;top:12px;left:-5px;width:5px;height:12px;background:#8ab4f8;border-radius:0 0 4px 4px} #__virtualCursor.rc{border-bottom-color:#f28b82} #__virtualCursor.rc::after{background:#f28b82}';
-      document.head.appendChild(style);
-      document.body.appendChild(cursorDiv);
-      
-      function updateCursor() {
-        cursorDiv.style.left = Math.max(2, Math.min(window.innerWidth - 12, cursorX - 3)) + 'px';
-        cursorDiv.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
-      }
-      
-      window.__setCursor = function(x, y) {
-        cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
-        cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
-        updateCursor();
-      };
-      
-      window.__click = function(button) {
-        const elem = document.elementFromPoint(cursorX, cursorY);
-        if(!elem) return;
-        if(button === 'left') {
-          elem.dispatchEvent(new MouseEvent('mousedown', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:0}));
-          elem.dispatchEvent(new MouseEvent('mouseup', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:0}));
-          elem.dispatchEvent(new MouseEvent('click', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:0}));
-          cursorDiv.classList.remove('rc');
-          cursorDiv.classList.add('lc');
-          setTimeout(() => cursorDiv.classList.remove('lc'), 100);
-        } else {
-          elem.dispatchEvent(new MouseEvent('contextmenu', {view:window,bubbles:true,clientX:cursorX,clientY:cursorY,button:2}));
-          cursorDiv.classList.remove('lc');
-          cursorDiv.classList.add('rc');
-          setTimeout(() => cursorDiv.classList.remove('rc'), 150);
-        }
-      };
-      
-      window.__sendKey = function(key, code, ctrl, alt, shift) {
-        const active = document.activeElement || document.body;
-        const opts = {key, code, bubbles:true, cancelable:true, ctrlKey:ctrl, altKey:alt, shiftKey:shift};
-        active.dispatchEvent(new KeyboardEvent('keydown', opts));
-        if(key !== 'Control' && key !== 'Alt' && key !== 'Shift') {
-          active.dispatchEvent(new KeyboardEvent('keypress', {key, code, bubbles:true}));
-        }
-        active.dispatchEvent(new KeyboardEvent('keyup', {key, code, bubbles:true}));
-        
-        // Feedback visual no botão
-        if(key === 'Enter') cursorDiv.style.transform = 'scale(0.95)';
-        setTimeout(() => cursorDiv.style.transform = '', 100);
-      };
-      
-      window.__sendText = function(text) {
-        const active = document.activeElement || document.body;
-        if(active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable) {
-          const start = active.selectionStart || 0;
-          const end = active.selectionEnd || 0;
-          const val = active.value || active.innerText || '';
-          const newVal = val.substring(0, start) + text + val.substring(end);
-          if(active.value !== undefined) active.value = newVal;
-          else active.innerText = newVal;
-          if(active.selectionStart !== undefined) {
-            active.selectionStart = start + text.length;
-            active.selectionEnd = start + text.length;
-          }
-          active.dispatchEvent(new InputEvent('input', {bubbles:true, data:text}));
-        }
-      };
-      
-      window.__scrollDir = function(dir) {
-        if(dir === 'up') window.scrollBy({top: -300, behavior: 'smooth'});
-        else if(dir === 'down') window.scrollBy({top: 300, behavior: 'smooth'});
-      };
-      
-      updateCursor();
-      console.log('✅ Controle injetado no iframe');
-    })();
-    `;
+    // AFK System
+    let afkInterval = null;
+    let isAfkRunning = false;
+    let actionCounter = 0;
+    let afkStartTime = null;
+    let afkTimerInterval = null;
     
-    const script = doc.createElement('script');
-    script.textContent = injectCode;
-    doc.head.appendChild(script);
-    return true;
-  } catch(e) {
-    console.log('❌ Injeção falhou (cross-origin):', e);
-    return false;
-  }
-}
-
-// Comunicação com iframe
-function sendToIframe(cmd, data) {
-  if(!activeFrame) return;
-  try {
-    const win = activeFrame.contentWindow;
-    if(cmd === 'move' && win.__setCursor) win.__setCursor(data.x, data.y);
-    else if(cmd === 'click' && win.__click) win.__click(data);
-    else if(cmd === 'key' && win.__sendKey) win.__sendKey(data.key, data.code, data.ctrl, data.alt, data.shift);
-    else if(cmd === 'text' && win.__sendText) win.__sendText(data);
-    else if(cmd === 'scroll' && win.__scrollDir) win.__scrollDir(data);
-  } catch(e) { console.log('Com erro:', e); }
-}
-
-// Atualiza cursor local (host)
-function updateHostCursor() {
-  // Não precisamos mais de cursor host, apenas enviamos para iframe
-  sendToIframe('move', { x: cursorX, y: cursorY });
-}
-
-function setCursorPosition(x, y) {
-  cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
-  cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
-  updateHostCursor();
-}
-
-function clickAtCursor(button) {
-  sendToIframe('click', button);
-}
-
-function sendKeyToFrame(key, code, modifiers = {}) {
-  sendToIframe('key', { key, code, ctrl: !!modifiers.ctrl, alt: !!modifiers.alt, shift: !!modifiers.shift });
-}
-
-function sendTextToFrame(text) {
-  sendToIframe('text', text);
-}
-
-function createIframe(url, tabId) {
-  const iframe = document.createElement('iframe');
-  iframe.className = 'contentFrame';
-  iframe.style.display = 'none';
-  iframe.setAttribute('allow', 'fullscreen; autoplay; clipboard-write; accelerometer; camera; microphone; geolocation');
-  iframe.src = url;
-  
-  iframe.onload = () => {
-    setTimeout(() => {
-      const tab = tabs.find(t => t.id === tabId);
-      if(tab) {
+    // ==================== SISTEMA DE SIMULAÇÃO REALISTA ====================
+    
+    function getCurrentIframe() {
+        const browser = browsers.find(b => b.id === activeBrowserId);
+        if (!browser) return null;
+        return document.getElementById(browser.iframeId);
+    }
+    
+    function getIframeDocument() {
+        const iframe = getCurrentIframe();
+        if (!iframe) return null;
         try {
-          let title = iframe.contentDocument?.title || new URL(url).hostname || 'Nova aba';
-          tab.title = title.substring(0, 35);
-          updateTabsUI();
-        } catch(e) {}
-        
-        // Injeta controle
-        const injected = injectFullControl(iframe);
-        
-        if(activeTabId === tabId) {
-          try {
-            const finalUrl = iframe.contentWindow.location.href;
-            if(finalUrl && finalUrl !== 'about:blank') tab.url = finalUrl;
-            document.getElementById('urlInput').value = tab.url;
-          } catch(e) {}
-          // Sincroniza cursor
-          setTimeout(() => updateHostCursor(), 100);
+            return iframe.contentDocument || iframe.contentWindow.document;
+        } catch(e) {
+            return null;
         }
-      }
-    }, 300);
-  };
-  return iframe;
-}
-
-function navigateTo(tabId, rawUrl) {
-  const tab = tabs.find(t => t.id === tabId);
-  if(!tab) return;
-  let finalUrl = rawUrl.trim();
-  if(!finalUrl) finalUrl = START_URL;
-  if(!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
-    if(finalUrl.includes('.') && !finalUrl.includes(' ') && finalUrl.length > 3) finalUrl = 'https://' + finalUrl;
-    else finalUrl = 'https://www.google.com/search?q=' + encodeURIComponent(finalUrl);
-  }
-  tab.url = finalUrl;
-  if(tab.frame) {
-    const old = tab.frame;
-    if(old.parentNode) old.remove();
-  }
-  const newFrame = createIframe(finalUrl, tabId);
-  tab.frame = newFrame;
-  document.getElementById('iframeContainer').appendChild(newFrame);
-  if(activeTabId === tabId) {
-    showTabFrame(tabId);
-    document.getElementById('urlInput').value = finalUrl;
-  }
-  updateTabsUI();
-}
-
-function showTabFrame(tabId) {
-  tabs.forEach(t => { if(t.frame) t.frame.style.display = 'none'; });
-  const active = tabs.find(t => t.id === tabId);
-  if(active && active.frame) {
-    active.frame.style.display = 'block';
-    activeFrame = active.frame;
-    document.getElementById('urlInput').value = active.url;
-    try {
-      const curUrl = active.frame.contentWindow?.location?.href;
-      if(curUrl && curUrl !== 'about:blank') active.url = curUrl;
-    } catch(e) {}
-    updateTabsUI();
-    // Reinjeta e sincroniza cursor
-    setTimeout(() => {
-      injectFullControl(active.frame);
-      updateHostCursor();
-    }, 100);
-  }
-}
-
-function addTab(url = START_URL) {
-  const id = ++tabCounter;
-  const newTab = { id, url, title: 'Nova aba', frame: null };
-  tabs.push(newTab);
-  const frame = createIframe(url, id);
-  newTab.frame = frame;
-  document.getElementById('iframeContainer').appendChild(frame);
-  activeTabId = id;
-  showTabFrame(id);
-  updateTabsUI();
-  setTimeout(() => {
-    const container = document.getElementById('titlebar');
-    container.scrollLeft = container.scrollWidth;
-  }, 50);
-}
-
-function closeTab(id) {
-  const idx = tabs.findIndex(t => t.id === id);
-  if(idx === -1) return;
-  const tab = tabs[idx];
-  if(tab.frame?.parentNode) tab.frame.remove();
-  tabs.splice(idx, 1);
-  if(tabs.length === 0) addTab(START_URL);
-  else if(activeTabId === id) {
-    activeTabId = tabs[Math.min(idx, tabs.length-1)].id;
-    showTabFrame(activeTabId);
-  }
-  updateTabsUI();
-}
-
-function updateTabsUI() {
-  const container = document.getElementById('tabsContainer');
-  container.innerHTML = '';
-  tabs.forEach(tab => {
-    const tabDiv = document.createElement('div');
-    tabDiv.className = 'tab' + (tab.id === activeTabId ? ' active' : '');
-    tabDiv.innerHTML = `<div class="tab-ttl">${escapeHtml(tab.title)}</div><div class="tab-x">✕</div>`;
-    tabDiv.addEventListener('click', (e) => {
-      if(e.target.classList.contains('tab-x')) {
-        e.stopPropagation();
-        closeTab(tab.id);
-      } else {
-        activeTabId = tab.id;
-        showTabFrame(tab.id);
-        updateTabsUI();
-      }
+    }
+    
+    // Movimento realista de mouse (curva de Bezier)
+    async function realisticMouseMove(targetX, targetY, duration = 500) {
+        const cursor = document.getElementById('virtualCursor');
+        cursor.classList.add('active');
+        
+        const startX = parseInt(cursor.style.left) || window.innerWidth / 2;
+        const startY = parseInt(cursor.style.top) || window.innerHeight / 2;
+        
+        // Pontos de controle para curva suave
+        const cp1x = startX + (targetX - startX) * 0.3 + (Math.random() - 0.5) * 50;
+        const cp1y = startY + (targetY - startY) * 0.3 + (Math.random() - 0.5) * 50;
+        const cp2x = startX + (targetX - startX) * 0.7 + (Math.random() - 0.5) * 50;
+        const cp2y = startY + (targetY - startY) * 0.7 + (Math.random() - 0.5) * 50;
+        
+        const startTime = performance.now();
+        
+        return new Promise((resolve) => {
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const t = Math.min(1, elapsed / duration);
+                
+                // Curva de Bezier cúbica
+                const mt = 1 - t;
+                const x = mt*mt*mt*startX + 3*mt*mt*t*cp1x + 3*mt*t*t*cp2x + t*t*t*targetX;
+                const y = mt*mt*mt*startY + 3*mt*mt*t*cp1y + 3*mt*t*t*cp2y + t*t*t*targetY;
+                
+                cursor.style.left = x + 'px';
+                cursor.style.top = y + 'px';
+                
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    cursor.style.left = targetX + 'px';
+                    cursor.style.top = targetY + 'px';
+                    resolve();
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        });
+    }
+    
+    // Clique realista com delay humano
+    async function realisticClick(element, x, y) {
+        if (!element) return false;
+        
+        // Delay humano antes do clique (80-200ms)
+        await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 120));
+        
+        // Evento de mouse down
+        const mouseDownEvent = new MouseEvent('mousedown', {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        element.dispatchEvent(mouseDownEvent);
+        
+        await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 70));
+        
+        // Mouse up e click
+        const mouseUpEvent = new MouseEvent('mouseup', {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y,
+            button: 0
+        });
+        element.dispatchEvent(mouseUpEvent);
+        
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true,
+            clientX: x,
+            clientY: y
+        });
+        element.dispatchEvent(clickEvent);
+        
+        // Evento de toque para mobile
+        const touchStart = new TouchEvent('touchstart', {
+            bubbles: true,
+            touches: [new Touch({identifier: 0, target: element, clientX: x, clientY: y})]
+        });
+        element.dispatchEvent(touchStart);
+        
+        await new Promise(resolve => setTimeout(resolve, 50));
+        
+        const touchEnd = new TouchEvent('touchend', { bubbles: true });
+        element.dispatchEvent(touchEnd);
+        
+        return true;
+    }
+    
+    // Scroll suave
+    async function realisticScroll(element, deltaY) {
+        const scrollEvent = new WheelEvent('wheel', {
+            deltaY: deltaY,
+            deltaMode: 0,
+            bubbles: true,
+            cancelable: true
+        });
+        element.dispatchEvent(scrollEvent);
+        
+        // Scroll suave
+        const targetScroll = element.scrollTop + deltaY;
+        const startScroll = element.scrollTop;
+        const duration = 300;
+        const startTime = performance.now();
+        
+        return new Promise((resolve) => {
+            function animate(currentTime) {
+                const elapsed = currentTime - startTime;
+                const t = Math.min(1, elapsed / duration);
+                const ease = 1 - Math.pow(1 - t, 3); // Cubic ease out
+                element.scrollTop = startScroll + (targetScroll - startScroll) * ease;
+                
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    resolve();
+                }
+            }
+            requestAnimationFrame(animate);
+        });
+    }
+    
+    // Digitação realista
+    async function realisticType(element, text) {
+        if (!element) return;
+        
+        element.focus();
+        element.value = '';
+        
+        for (let char of text) {
+            // Delay entre teclas (50-200ms)
+            await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150));
+            
+            const keyDownEvent = new KeyboardEvent('keydown', { key: char, bubbles: true });
+            element.dispatchEvent(keyDownEvent);
+            
+            const keyPressEvent = new KeyboardEvent('keypress', { key: char, bubbles: true });
+            element.dispatchEvent(keyPressEvent);
+            
+            element.value += char;
+            
+            const inputEvent = new Event('input', { bubbles: true });
+            element.dispatchEvent(inputEvent);
+            
+            const keyUpEvent = new KeyboardEvent('keyup', { key: char, bubbles: true });
+            element.dispatchEvent(keyUpEvent);
+        }
+        
+        const changeEvent = new Event('change', { bubbles: true });
+        element.dispatchEvent(changeEvent);
+    }
+    
+    // Obter elementos clicáveis aleatórios
+    function getRandomClickableElement(doc) {
+        const selectors = [
+            'button', 'a', 'input[type="submit"]', '.btn', '[role="button"]',
+            'div[onclick]', 'span[onclick]', 'clickable', 'input', 'textarea',
+            'select', '[contenteditable="true"]'
+        ];
+        
+        const elements = doc.querySelectorAll(selectors.join(','));
+        if (elements.length === 0) return null;
+        
+        return elements[Math.floor(Math.random() * elements.length)];
+    }
+    
+    // Executar ação AFK
+    async function executeAfkAction() {
+        if (!isAfkRunning) return;
+        
+        const targetTab = document.getElementById('targetTabSelect').value;
+        const browser = browsers.find(b => b.id === targetTab);
+        if (!browser) return;
+        
+        const iframe = document.getElementById(browser.iframeId);
+        const doc = getIframeDocument();
+        if (!doc) return;
+        
+        const mode = document.getElementById('afkMode').value;
+        const allowMove = document.getElementById('allowMove').checked;
+        const allowClick = document.getElementById('allowClick').checked;
+        const allowScroll = document.getElementById('allowScroll').checked;
+        const allowType = document.getElementById('allowType').checked;
+        
+        let actionDone = false;
+        
+        // Modo misto: escolhe ação aleatória
+        let availableActions = [];
+        if (allowMove) availableActions.push('move');
+        if (allowClick) availableActions.push('click');
+        if (allowScroll) availableActions.push('scroll');
+        if (allowType) availableActions.push('type');
+        
+        if (availableActions.length === 0) return;
+        
+        let action = availableActions[Math.floor(Math.random() * availableActions.length)];
+        
+        // Ajustar baseado no modo
+        if (mode === 'realistic') {
+            // Priorizar movimentos suaves
+            if (Math.random() < 0.6) action = 'move';
+        } else if (mode === 'aggressive') {
+            if (allowClick && Math.random() < 0.7) action = 'click';
+        } else if (mode === 'subtle') {
+            action = 'move';
+        }
+        
+        try {
+            if (action === 'move') {
+                // Mover mouse para posição aleatória
+                const randomX = 100 + Math.random() * (iframe.offsetWidth - 200);
+                const randomY = 100 + Math.random() * (iframe.offsetHeight - 200);
+                await realisticMouseMove(randomX, randomY, 300 + Math.random() * 400);
+                actionDone = true;
+            }
+            else if (action === 'click') {
+                const element = getRandomClickableElement(doc);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    const x = rect.left + rect.width/2 + (Math.random() - 0.5) * 10;
+                    const y = rect.top + rect.height/2 + (Math.random() - 0.5) * 10;
+                    await realisticMouseMove(x, y, 200 + Math.random() * 300);
+                    await realisticClick(element, x, y);
+                    actionDone = true;
+                }
+            }
+            else if (action === 'scroll') {
+                const scrollable = doc.querySelector('body, .scrollable, [overflow="auto"]');
+                if (scrollable) {
+                    const delta = (Math.random() - 0.5) * 200;
+                    await realisticScroll(scrollable, delta);
+                    actionDone = true;
+                }
+            }
+            else if (action === 'type') {
+                const input = doc.querySelector('input, textarea');
+                if (input) {
+                    const texts = ['test', 'hello', '123', 'click', 'afk', 'auto'];
+                    const randomText = texts[Math.floor(Math.random() * texts.length)];
+                    await realisticType(input, randomText);
+                    actionDone = true;
+                }
+            }
+        } catch(e) {
+            console.log('AFK action error:', e);
+        }
+        
+        if (actionDone) {
+            actionCounter++;
+            document.getElementById('actionCount').innerText = actionCounter;
+        }
+    }
+    
+    // Iniciar AFK
+    function startAfk() {
+        if (afkInterval) clearInterval(afkInterval);
+        
+        const interval = parseInt(document.getElementById('afkInterval').value);
+        isAfkRunning = true;
+        afkStartTime = Date.now();
+        
+        afkInterval = setInterval(() => {
+            if (isAfkRunning) {
+                executeAfkAction();
+            }
+        }, interval);
+        
+        afkTimerInterval = setInterval(() => {
+            if (afkStartTime) {
+                const elapsed = Math.floor((Date.now() - afkStartTime) / 1000);
+                const hours = Math.floor(elapsed / 3600);
+                const minutes = Math.floor((elapsed % 3600) / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('afkTime').innerText = 
+                    `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+            }
+        }, 1000);
+        
+        document.getElementById('afkStatus').innerText = 'Executando';
+        document.getElementById('startAfkBtn').disabled = true;
+        document.getElementById('stopAfkBtn').disabled = false;
+        document.getElementById('startAfkBtn').classList.remove('active');
+        document.getElementById('stopAfkBtn').classList.add('active');
+        
+        mostrarToast('✅ Modo AFK iniciado! Ações sendo executadas em segundo plano.', '#eb459e');
+    }
+    
+    function stopAfk() {
+        if (afkInterval) {
+            clearInterval(afkInterval);
+            afkInterval = null;
+        }
+        if (afkTimerInterval) {
+            clearInterval(afkTimerInterval);
+            afkTimerInterval = null;
+        }
+        
+        isAfkRunning = false;
+        document.getElementById('afkStatus').innerText = 'Parado';
+        document.getElementById('startAfkBtn').disabled = false;
+        document.getElementById('stopAfkBtn').disabled = true;
+        document.getElementById('startAfkBtn').classList.add('active');
+        document.getElementById('stopAfkBtn').classList.remove('active');
+        
+        // Esconder cursor virtual
+        document.getElementById('virtualCursor').classList.remove('active');
+        
+        mostrarToast('⏹️ Modo AFK parado.', '#5865F2');
+    }
+    
+    // ==================== FUNÇÕES DO BROWSER ====================
+    
+    function mostrarToast(msg, cor = '#23a55a') {
+        const old = document.querySelector('.toast');
+        if (old) old.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = cor;
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    }
+    
+    function updateTargetTabSelect() {
+        const select = document.getElementById('targetTabSelect');
+        select.innerHTML = '';
+        browsers.forEach(browser => {
+            const option = document.createElement('option');
+            option.value = browser.id;
+            const iframe = document.getElementById(browser.iframeId);
+            try {
+                const url = iframe.contentWindow.location.href;
+                option.textContent = url.substring(0, 50);
+            } catch(e) {
+                option.textContent = browser.id;
+            }
+            select.appendChild(option);
+        });
+    }
+    
+    function criarNovaBrowser(url = null) {
+        const browserId = 'browser_' + (++browserCounter);
+        const iframeId = 'iframe_' + browserId;
+        
+        const browserDiv = document.createElement('div');
+        browserDiv.className = 'browser-window';
+        browserDiv.id = browserId;
+        
+        browserDiv.innerHTML = `
+            <div class="browser-toolbar">
+                <input type="text" class="browser-url" id="url_${iframeId}" placeholder="Digite URL...">
+                <button class="browser-go" data-browser="${browserId}">IR</button>
+                <button class="browser-back" data-browser="${browserId}">◀</button>
+                <button class="browser-forward" data-browser="${browserId}">▶</button>
+                <button class="browser-reload" data-browser="${browserId}">🔄</button>
+            </div>
+            <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com/webhp?igu=1'}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
+        `;
+        
+        document.getElementById('contentArea').appendChild(browserDiv);
+        
+        const iframe = document.getElementById(iframeId);
+        
+        const tabDiv = document.createElement('div');
+        tabDiv.className = 'tab';
+        tabDiv.id = 'tab_' + browserId;
+        tabDiv.innerHTML = `
+            <span>${url ? new URL(url).hostname : 'Nova aba'}</span>
+            <button class="close-tab" data-browser="${browserId}">✕</button>
+        `;
+        document.getElementById('tabsContainer').appendChild(tabDiv);
+        
+        browsers.push({
+            id: browserId,
+            iframeId: iframeId,
+            url: url || 'https://www.google.com/webhp?igu=1',
+            tabId: 'tab_' + browserId
+        });
+        
+        tabDiv.addEventListener('click', (e) => {
+            if (e.target.classList.contains('close-tab')) return;
+            ativarBrowser(browserId);
+        });
+        
+        const closeBtn = tabDiv.querySelector('.close-tab');
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fecharBrowser(browserId);
+        });
+        
+        const goBtn = browserDiv.querySelector('.browser-go');
+        const urlInput = browserDiv.querySelector('.browser-url');
+        const backBtn = browserDiv.querySelector('.browser-back');
+        const forwardBtn = browserDiv.querySelector('.browser-forward');
+        const reloadBtn = browserDiv.querySelector('.browser-reload');
+        
+        urlInput.value = url || 'https://www.google.com/webhp?igu=1';
+        
+        goBtn.addEventListener('click', () => {
+            let newUrl = urlInput.value;
+            if (!newUrl.startsWith('http')) {
+                if (newUrl.includes('.')) newUrl = 'https://' + newUrl;
+                else newUrl = 'https://www.google.com/search?q=' + encodeURIComponent(newUrl);
+            }
+            iframe.src = newUrl;
+            urlInput.value = newUrl;
+            const b = browsers.find(b => b.id === browserId);
+            if (b) b.url = newUrl;
+            try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
+            setTimeout(() => updateTargetTabSelect(), 1000);
+        });
+        
+        backBtn.addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) {} });
+        forwardBtn.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) {} });
+        reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; });
+        
+        urlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') goBtn.click(); });
+        
+        iframe.addEventListener('load', () => {
+            try {
+                const currentUrl = iframe.contentWindow.location.href;
+                urlInput.value = currentUrl;
+                const b = browsers.find(b => b.id === browserId);
+                if (b) b.url = currentUrl;
+                try { tabDiv.querySelector('span').textContent = new URL(currentUrl).hostname; } catch(e) {}
+            } catch(e) {}
+            setTimeout(() => updateTargetTabSelect(), 500);
+        });
+        
+        ativarBrowser(browserId);
+        updateTargetTabSelect();
+        return browserId;
+    }
+    
+    function ativarBrowser(browserId) {
+        activeBrowserId = browserId;
+        browsers.forEach(b => {
+            const browser = document.getElementById(b.id);
+            if (browser) browser.classList.remove('active');
+            const tab = document.getElementById(b.tabId);
+            if (tab) tab.classList.remove('active');
+        });
+        document.getElementById(browserId).classList.add('active');
+        document.getElementById('tab_' + browserId).classList.add('active');
+        
+        const browser = browsers.find(b => b.id === browserId);
+        if (browser) {
+            const iframe = document.getElementById(browser.iframeId);
+            try {
+                const currentUrl = iframe.contentWindow.location.href;
+                if (currentUrl && currentUrl !== 'about:blank') {
+                    document.getElementById('globalUrlInput').value = currentUrl;
+                }
+            } catch(e) {
+                document.getElementById('globalUrlInput').value = browser.url;
+            }
+        }
+    }
+    
+    function fecharBrowser(browserId) {
+        const index = browsers.findIndex(b => b.id === browserId);
+        if (index === -1) return;
+        const browser = browsers[index];
+        const browserDiv = document.getElementById(browser.id);
+        if (browserDiv) browserDiv.remove();
+        const tabDiv = document.getElementById(browser.tabId);
+        if (tabDiv) tabDiv.remove();
+        
+        browsers.splice(index, 1);
+        
+        if (browsers.length === 0) {
+            criarNovaBrowser('https://www.google.com/webhp?igu=1');
+        } else if (activeBrowserId === browserId) {
+            const nextIndex = index > 0 ? index - 1 : 0;
+            ativarBrowser(browsers[nextIndex].id);
+        }
+        updateTargetTabSelect();
+        
+        // Se a aba AFK foi fechada, parar automação
+        if (isAfkRunning && document.getElementById('targetTabSelect').value === browserId) {
+            stopAfk();
+        }
+    }
+    
+    function acaoGlobal(tipo) {
+        if (!activeBrowserId) return;
+        const browser = browsers.find(b => b.id === activeBrowserId);
+        if (!browser) return;
+        const iframe = document.getElementById(browser.iframeId);
+        if (tipo === 'back') { try { iframe.contentWindow.history.back(); } catch(e) {} }
+        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); } catch(e) {} }
+        else if (tipo === 'reload') { iframe.src = iframe.src; }
+    }
+    
+    // ==================== INICIALIZAÇÃO ====================
+    
+    function openAfkPanel() {
+        document.getElementById('afkPanel').classList.add('open');
+        updateTargetTabSelect();
+    }
+    
+    function closeAfkPanel() {
+        document.getElementById('afkPanel').classList.remove('open');
+    }
+    
+    // Teclado Virtual
+    function toggleVirtualKeyboard() {
+        const keyboard = document.getElementById('virtualKeyboard');
+        keyboard.classList.toggle('open');
+    }
+    
+    function sendKeyToActiveIframe(key) {
+        const browser = browsers.find(b => b.id === activeBrowserId);
+        if (!browser) return;
+        
+        const iframe = document.getElementById(browser.iframeId);
+        const doc = getIframeDocument();
+        if (!doc) return;
+        
+        // Enviar evento de tecla para o iframe
+        const activeElement = doc.activeElement;
+        if (activeElement) {
+            const keyDownEvent = new KeyboardEvent('keydown', { key: key, bubbles: true });
+            activeElement.dispatchEvent(keyDownEvent);
+            
+            if (key.length === 1) {
+                const keyPressEvent = new KeyboardEvent('keypress', { key: key, bubbles: true });
+                activeElement.dispatchEvent(keyPressEvent);
+                
+                if (activeElement.value !== undefined) {
+                    activeElement.value += key;
+                    const inputEvent = new Event('input', { bubbles: true });
+                    activeElement.dispatchEvent(inputEvent);
+                }
+            }
+            
+            const keyUpEvent = new KeyboardEvent('keyup', { key: key, bubbles: true });
+            activeElement.dispatchEvent(keyUpEvent);
+        }
+    }
+    
+    // Event Listeners
+    document.getElementById('globalGoBtn').addEventListener('click', () => {
+        if (!activeBrowserId) return;
+        let url = document.getElementById('globalUrlInput').value;
+        if (!url.startsWith('http')) {
+            if (url.includes('.')) url = 'https://' + url;
+            else url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+        }
+        const browser = browsers.find(b => b.id === activeBrowserId);
+        if (browser) {
+            const iframe = document.getElementById(browser.iframeId);
+            iframe.src = url;
+            browser.url = url;
+            const tab = document.getElementById(browser.tabId);
+            try { tab.querySelector('span').textContent = new URL(url).hostname; } catch(e) {}
+        }
     });
-    container.appendChild(tabDiv);
-  });
-}
-
-function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
-
-// Trackpad
-const trackpad = document.getElementById('tpad');
-let trackActive = false, lastX = 0, lastY = 0;
-
-trackpad.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  trackActive = true;
-  lastX = e.touches[0].clientX;
-  lastY = e.touches[0].clientY;
-});
-trackpad.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  if(trackActive) {
-    const dx = (e.touches[0].clientX - lastX) * 2.2;
-    const dy = (e.touches[0].clientY - lastY) * 2.2;
-    setCursorPosition(cursorX + dx, cursorY + dy);
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
-  }
-});
-trackpad.addEventListener('touchend', (e) => { e.preventDefault(); trackActive = false; });
-
-document.getElementById('lbtn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  clickAtCursor('left');
-});
-document.getElementById('rbtn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  clickAtCursor('right');
-});
-document.getElementById('sup').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  sendToIframe('scroll', 'up');
-});
-document.getElementById('sdn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  sendToIframe('scroll', 'down');
-});
-document.getElementById('smid').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  clickAtCursor('left');
-});
-
-// Teclado virtual
-const keyboardLayout = {
-  row1: ['q','w','e','r','t','y','u','i','o','p','[',']'],
-  row2: ['a','s','d','f','g','h','j','k','l',';',"'"],
-  row3: ['z','x','c','v','b','n','m',',','.','/']
-};
-
-function buildKeyboard() {
-  for(let r=1; r<=3; r++) {
-    const rowDiv = document.querySelector(`.kr[data-row="${r}"]`);
-    rowDiv.innerHTML = '';
-    keyboardLayout[`row${r}`].forEach(k => {
-      const keyDiv = document.createElement('div');
-      keyDiv.className = 'k';
-      keyDiv.textContent = k;
-      keyDiv.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        sendKeyToFrame(k, `Key${k.toUpperCase()}`);
-      });
-      rowDiv.appendChild(keyDiv);
+    
+    document.getElementById('globalUrlInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') document.getElementById('globalGoBtn').click();
     });
-  }
-  const lastRow = document.querySelector('.kr[data-row="3"]');
-  const spaceDiv = document.createElement('div');
-  spaceDiv.className = 'k space';
-  spaceDiv.textContent = 'Espaço';
-  spaceDiv.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    sendKeyToFrame(' ', 'Space');
-  });
-  lastRow.appendChild(spaceDiv);
-  const backDiv = document.createElement('div');
-  backDiv.className = 'k back';
-  backDiv.textContent = '⌫';
-  backDiv.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    sendKeyToFrame('Backspace', 'Backspace');
-  });
-  lastRow.appendChild(backDiv);
-}
-
-document.querySelectorAll('.qk').forEach(btn => {
-  btn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const key = btn.dataset.key;
-    const special = { 'Enter':'Enter','Tab':'Tab','Escape':'Escape','ArrowUp':'ArrowUp','ArrowDown':'ArrowDown','ArrowLeft':'ArrowLeft','ArrowRight':'ArrowRight','Delete':'Delete' };
-    if(special[key]) sendKeyToFrame(key, special[key]);
-    else if(key === 'Control') sendKeyToFrame('Control', 'ControlLeft', {ctrl:true});
-    else if(key === 'Alt') sendKeyToFrame('Alt', 'AltLeft', {alt:true});
-    else if(key === 'Shift') sendKeyToFrame('Shift', 'ShiftLeft', {shift:true});
-  });
-});
-
-// Navegação
-const urlInput = document.getElementById('urlInput');
-urlInput.addEventListener('keypress', (e) => {
-  if(e.key === 'Enter') navigateTo(activeTabId, urlInput.value);
-});
-document.getElementById('backBtn').addEventListener('click', () => {
-  if(activeFrame) try { activeFrame.contentWindow.history.back(); } catch(e) {}
-});
-document.getElementById('forwardBtn').addEventListener('click', () => {
-  if(activeFrame) try { activeFrame.contentWindow.history.forward(); } catch(e) {}
-});
-document.getElementById('reloadBtn').addEventListener('click', () => {
-  if(activeFrame) try { activeFrame.contentWindow.location.reload(); } catch(e) {}
-});
-document.getElementById('newTab').addEventListener('click', () => addTab(START_URL));
-document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar (demo)'));
-document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar (demo)'));
-document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar (demo)'));
-
-// Mover mousepad
-const mpad = document.getElementById('mpad');
-let mpadDrag = false, mpadStartX=0, mpadStartY=0, mpadLeft=0, mpadTop=0;
-document.getElementById('mhead').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  mpadDrag = true;
-  mpadStartX = e.touches[0].clientX;
-  mpadStartY = e.touches[0].clientY;
-  mpadLeft = mpad.offsetLeft;
-  mpadTop = mpad.offsetTop;
-});
-document.addEventListener('touchmove', (e) => {
-  if(mpadDrag) {
-    e.preventDefault();
-    let newL = mpadLeft + (e.touches[0].clientX - mpadStartX);
-    let newT = mpadTop + (e.touches[0].clientY - mpadStartY);
-    newL = Math.min(window.innerWidth - mpad.offsetWidth, Math.max(0, newL));
-    newT = Math.min(window.innerHeight - 280, Math.max(0, newT));
-    mpad.style.left = newL + 'px';
-    mpad.style.right = 'auto';
-    mpad.style.top = newT + 'px';
-  }
-});
-document.addEventListener('touchend', () => { mpadDrag = false; });
-document.getElementById('mpadClose').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  mpad.style.display = 'none';
-});
-
-let kbdVisible = true;
-document.getElementById('menubtn').addEventListener('click', () => {
-  kbdVisible = !kbdVisible;
-  document.getElementById('kbd').classList.toggle('koff', !kbdVisible);
-});
-
-// Toque na tela = move cursor + clique
-document.getElementById('viewport').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  const touch = e.touches[0];
-  setCursorPosition(touch.clientX, touch.clientY);
-  clickAtCursor('left');
-});
-
-buildKeyboard();
-addTab(START_URL);
-setCursorPosition(window.innerWidth/2, window.innerHeight/2);
+    
+    document.getElementById('globalBackBtn').addEventListener('click', () => acaoGlobal('back'));
+    document.getElementById('globalForwardBtn').addEventListener('click', () => acaoGlobal('forward'));
+    document.getElementById('globalReloadBtn').addEventListener('click', () => acaoGlobal('reload'));
+    document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser('https://www.google.com/webhp?igu=1'));
+    document.getElementById('afkPanelBtn').addEventListener('click', openAfkPanel);
+    document.getElementById('virtualKeyboardBtn').addEventListener('click', toggleVirtualKeyboard);
+    document.getElementById('startAfkBtn').addEventListener('click', startAfk);
+    document.getElementById('stopAfkBtn').addEventListener('click', stopAfk);
+    
+    // Teclas do teclado virtual
+    document.querySelectorAll('.key').forEach(keyBtn => {
+        keyBtn.addEventListener('click', () => {
+            const key = keyBtn.getAttribute('data-key');
+            if (key === 'Space') {
+                sendKeyToActiveIframe(' ');
+            } else if (key === 'Enter') {
+                sendKeyToActiveIframe('Enter');
+            } else if (key === 'Backspace') {
+                // Lógica especial para backspace
+                const browser = browsers.find(b => b.id === activeBrowserId);
+                if (browser) {
+                    const doc = getIframeDocument();
+                    const activeElement = doc.activeElement;
+                    if (activeElement && activeElement.value) {
+                        activeElement.value = activeElement.value.slice(0, -1);
+                        const inputEvent = new Event('input', { bubbles: true });
+                        activeElement.dispatchEvent(inputEvent);
+                    }
+                }
+            } else {
+                sendKeyToActiveIframe(key);
+            }
+        });
+    });
+    
+    // Iniciar
+    criarNovaBrowser('https://www.google.com/webhp?igu=1');
+    mostrarToast('✅ Sistema AFK Avançado + Simulação Realista ativado!', '#eb459e');
 </script>
 </body>
 </html>
