@@ -2,790 +2,1203 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Cloud Phone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Chromium</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
-
-:root {
-  --bg: #0d0d14;
-  --panel: #13131f;
-  --border: #1e1e30;
-  --accent: #5865f2;
-  --green: #23a55a;
-  --red: #ed4245;
-  --amber: #f0a500;
-  --text: #e0e0f0;
-  --sub: #8888aa;
-  --key-bg: #1a1a2e;
-  --key-hover: #22223a;
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+:root{
+  --c1:#202124;--c2:#292a2d;--c3:#35363a;--c4:#3c4043;--c5:#1a1a1f;
+  --blue:#8ab4f8;--green:#81c995;--red:#f28b82;--yellow:#fdd663;--purple:#c58af9;
+  --text:#e8eaed;--sub:#9aa0a6;--border:#3c4043;
+}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:var(--c1);
+  font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+  display:flex;flex-direction:column;
+  touch-action:none;
+  -webkit-user-select:none;user-select:none;
 }
 
-html, body {
-  width:100%; height:100%; overflow:hidden;
-  background:var(--bg); font-family:'Segoe UI',Arial,sans-serif;
-  display:flex; flex-direction:column;
+/* ── TITLEBAR ── */
+#titlebar{
+  background:var(--c2);height:38px;display:flex;align-items:flex-end;
+  padding:0 6px;gap:2px;flex-shrink:0;
+  border-bottom:1px solid #111;
+}
+.tab{
+  background:var(--c3);color:var(--sub);
+  padding:5px 10px 4px;border-radius:8px 8px 0 0;
+  font-size:11px;display:flex;align-items:center;gap:5px;
+  min-width:90px;max-width:180px;cursor:pointer;
+  border:1px solid #111;border-bottom:none;
+  white-space:nowrap;overflow:hidden;flex-shrink:0;
+  transition:background .15s;
+}
+.tab.active{background:var(--c1);color:var(--text);}
+.tab-ico{font-size:12px;flex-shrink:0;}
+.tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis;font-size:11px;}
+.tab-x{width:16px;height:16px;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:12px;color:var(--sub);flex-shrink:0;}
+.tab-x:active{background:rgba(255,255,255,.15);color:#fff;}
+#btnNewTab{
+  background:transparent;border:none;color:var(--sub);
+  width:28px;height:28px;font-size:18px;cursor:pointer;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  align-self:center;margin-bottom:3px;flex-shrink:0;
+}
+#btnNewTab:active{background:var(--c4);}
+#winctrls{display:flex;gap:6px;align-items:center;margin-left:auto;margin-bottom:7px;}
+.wc{width:12px;height:12px;border-radius:50%;border:none;cursor:pointer;flex-shrink:0;}
+.wc.min{background:#f0c132;}.wc.max{background:#34c749;}.wc.cls{background:#ea4335;}
+
+/* ── TOOLBAR ── */
+#toolbar{
+  background:var(--c2);padding:5px 8px;
+  display:flex;align-items:center;gap:4px;
+  flex-shrink:0;border-bottom:1px solid #111;position:relative;
+}
+#loadbar{
+  position:absolute;bottom:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--purple));
+  width:0;transition:width .3s ease;pointer-events:none;z-index:10;
+}
+.nb{
+  background:transparent;border:none;color:var(--sub);
+  width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .1s;
+}
+.nb:active{background:var(--c4);}
+.nb:disabled{opacity:.3;pointer-events:none;}
+#omni{
+  flex:1;display:flex;align-items:center;
+  background:#111;border:1.5px solid var(--border);
+  border-radius:20px;padding:0 12px;height:32px;gap:6px;
+  cursor:text;transition:border-color .15s;
+}
+#omni.editing{border-color:var(--blue);background:#0a0a10;}
+#lock{font-size:12px;flex-shrink:0;}
+#urltext{
+  flex:1;color:var(--text);font-size:12.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  pointer-events:none;
+}
+#urltext.editing-mode{
+  color:var(--blue);white-space:pre;overflow:visible;
+}
+#urlcursor{
+  display:inline-block;width:1px;height:13px;
+  background:var(--blue);margin-left:1px;
+  animation:blink .9s step-end infinite;
+  vertical-align:middle;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+#urlcursor.hide{display:none;}
+#menubtn{
+  background:transparent;border:none;color:var(--sub);
+  font-size:20px;cursor:pointer;width:32px;height:32px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+#menubtn:active{background:var(--c4);}
+
+/* ── VIEWPORT ── */
+#viewport{flex:1;position:relative;overflow:hidden;}
+#siteFrame{
+  position:absolute;inset:0;width:100%;height:100%;
+  border:none;display:block;background:#fff;
 }
 
-/* TOOLBAR */
-#toolbar {
-  background:var(--panel);
-  border-bottom:1px solid var(--border);
-  padding:6px 8px;
-  display:flex; align-items:center; gap:6px;
-  flex-shrink:0; z-index:100;
+/* ── NOLOAD SCREEN ── */
+#noload{
+  position:absolute;inset:0;display:none;
+  background:var(--c1);flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;
+  padding:28px;z-index:50;
 }
+#noload.show{display:flex;}
+#noload .ico{font-size:56px;}
+#noload h2{color:var(--text);font-size:18px;font-weight:400;text-align:center;}
+#noload p{color:var(--sub);font-size:12px;max-width:300px;line-height:1.65;text-align:center;}
+#noload .dlink{color:var(--blue);font-size:12px;text-decoration:none;}
+.proxybtns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px;}
+.proxybtn{
+  background:var(--c3);border:1px solid var(--border);
+  color:var(--text);padding:8px 16px;border-radius:20px;
+  font-size:12px;cursor:pointer;transition:background .15s;
+}
+.proxybtn:active{background:var(--blue);color:#000;border-color:var(--blue);}
 
-#nav-back, #nav-fwd, #nav-reload {
-  background:var(--key-bg); border:1px solid var(--border);
-  color:var(--text); width:32px; height:32px;
-  border-radius:8px; font-size:15px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  flex-shrink:0;
+/* ── LOADING SPINNER ── */
+#spinner{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  display:none;z-index:40;pointer-events:none;
 }
-#nav-back:active, #nav-fwd:active, #nav-reload:active { background:var(--accent); }
+#spinner.show{display:block;}
+.spin{
+  width:36px;height:36px;border:3px solid var(--c3);
+  border-top-color:var(--blue);border-radius:50%;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-#url-wrap {
-  flex:1; display:flex; align-items:center;
-  background:var(--bg); border:1px solid var(--border);
-  border-radius:20px; padding:0 12px; height:32px; gap:6px;
+/* ── CURSOR ── */
+#cursor{
+  position:fixed;pointer-events:none;z-index:2147483647;
+  width:0;height:0;
+  border-left:9px solid transparent;
+  border-right:0px solid transparent;
+  border-bottom:15px solid rgba(255,255,255,.93);
+  filter:drop-shadow(0 1px 4px rgba(0,0,0,.8));
+  transform-origin:top left;
+  transition:none;
 }
-#urlInput {
-  flex:1; background:transparent; border:none; outline:none;
-  color:var(--text); font-size:12px;
+#cursor::after{
+  content:'';position:absolute;top:9px;left:-4px;
+  width:4px;height:9px;
+  background:rgba(255,255,255,.93);
+  border-radius:0 0 3px 3px;
 }
-#goBtn {
-  background:var(--accent); border:none; color:#fff;
-  padding:4px 12px; border-radius:14px; font-size:11px; cursor:pointer;
-}
+#cursor.lclick{border-bottom-color:rgba(138,180,248,.95);}
+#cursor.rclick{border-bottom-color:rgba(242,139,130,.95);}
+#cursor.drag{border-bottom-color:rgba(253,214,99,.95);}
 
-#toggleKbd {
-  background:var(--key-bg); border:1px solid var(--border);
-  color:var(--text); padding:4px 10px; border-radius:8px; font-size:11px; cursor:pointer;
+/* ── MOUSE PAD ── */
+#mousepad{
+  position:fixed;right:8px;bottom:260px;
+  width:160px;background:#13131a;
+  border:1px solid #252535;border-radius:14px;
+  z-index:2147483640;
+  box-shadow:0 8px 32px rgba(0,0,0,.85);
+  touch-action:none;
 }
-
-/* VIEWPORT */
-#viewport {
-  flex:1; position:relative; overflow:hidden;
+#mhead{
+  padding:7px 10px 4px;display:flex;
+  justify-content:space-between;align-items:center;
+  cursor:move;touch-action:none;
+  border-radius:14px 14px 0 0;
 }
-
-#siteFrame {
-  width:100%; height:100%; border:none; display:block;
-  background:#fff;
+#mhead-label{color:#444;font-size:9px;letter-spacing:1.5px;font-weight:700;}
+#mhead-drag{color:#2a2a3a;font-size:14px;}
+#trackpad{
+  margin:0 8px 0;height:90px;
+  background:#0a0a10;border-radius:8px;
+  border:1px solid #1a1a28;
+  position:relative;overflow:hidden;
+  touch-action:none;cursor:crosshair;
 }
-
-/* CURSOR DOT */
-#cursorDot {
-  position:absolute; width:22px; height:22px;
-  border-radius:50%; background:rgba(88,101,242,0.85);
-  border:2px solid #fff;
-  pointer-events:none; z-index:9000;
+#trackpad-hint{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#1a1a2a;font-size:8px;letter-spacing:2px;pointer-events:none;
+  flex-direction:column;gap:2px;
+}
+#tpdot{
+  position:absolute;width:6px;height:6px;
+  background:var(--blue);border-radius:50%;
   transform:translate(-50%,-50%);
-  transition:background 0.08s;
-  box-shadow:0 0 8px rgba(88,101,242,0.7);
-  left:50%; top:50%;
+  pointer-events:none;opacity:.6;
+  transition:left .05s,top .05s;
 }
-#cursorDot.clicking { background:rgba(35,165,90,0.9); transform:translate(-50%,-50%) scale(0.7); }
-#cursorDot.rclicking { background:rgba(237,66,69,0.9); transform:translate(-50%,-50%) scale(0.7); }
+#mbtns{display:flex;gap:5px;padding:7px 8px 5px;}
+#lbtn,#rbtn{
+  flex:1;height:30px;border:none;border-radius:8px;
+  font-size:10px;font-weight:700;cursor:pointer;
+  letter-spacing:.3px;transition:background .1s;
+}
+#lbtn{background:#1a5e35;color:#81c995;}
+#rbtn{background:#5e1a1a;color:#f28b82;}
+#lbtn:active{background:#81c995;color:#000;}
+#rbtn:active{background:#f28b82;color:#000;}
+#scrollrow{display:flex;gap:5px;padding:0 8px 8px;}
+#sup,#sdn,#smid{
+  flex:1;height:26px;background:#0d0d18;
+  border:1px solid #252535;color:#555;
+  border-radius:7px;font-size:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .1s;
+}
+#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000;border-color:var(--blue);}
 
-/* MOUSE PAD */
-#mousePad {
-  position:absolute; bottom:4px; right:4px;
-  width:170px; background:var(--panel);
-  border:1px solid var(--border); border-radius:16px;
-  z-index:9100; touch-action:none;
-  box-shadow:0 4px 20px rgba(0,0,0,0.6);
+/* ── KEYBOARD ── */
+#kbd{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#111118;border-top:1px solid #252530;
+  padding:3px 2px 8px;
+  z-index:2147483635;
+  touch-action:none;
+  -webkit-user-select:none;user-select:none;
 }
+#kbd.off{display:none;}
 
-#padHeader {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:6px 10px 4px;
-  cursor:move; touch-action:none;
+/* Quick bar */
+#kbar{
+  display:flex;align-items:center;
+  padding:2px 5px 5px;gap:4px;
+  border-bottom:1px solid #1e1e28;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
-#padLabel { color:var(--sub); font-size:10px; font-weight:600; letter-spacing:.5px; }
-#padDrag { color:var(--sub); font-size:14px; }
+#kbar::-webkit-scrollbar{display:none;}
+.qk{
+  background:#1e1e2a;border:1px solid #2e2e3e;color:#aaa;
+  border-radius:6px;padding:4px 9px;font-size:10px;
+  white-space:nowrap;cursor:pointer;flex-shrink:0;
+  transition:background .1s;
+}
+.qk:active,.qk.on{background:var(--blue);color:#000;border-color:var(--blue);}
 
-#touchPad {
-  margin:0 8px;
-  height:100px; background:var(--key-bg);
-  border-radius:10px; border:1px solid var(--border);
-  position:relative; overflow:hidden; touch-action:none;
+/* Key rows */
+.kr{display:flex;justify-content:center;gap:2px;margin-bottom:2px;padding:0 2px;}
+.k{
+  background:#252532;border:1px solid #2e2e3e;color:#ddd;
+  border-radius:6px;height:36px;min-width:26px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;cursor:pointer;padding:0 3px;
+  flex-shrink:0;position:relative;
+  touch-action:manipulation;
+  transition:background .07s,transform .07s;
+  -webkit-user-select:none;user-select:none;
 }
-#touchPad::after {
-  content:'TRACKPAD';
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  color:var(--border); font-size:9px; letter-spacing:2px; pointer-events:none;
-}
+.k:active{background:var(--blue);color:#000;transform:scale(.92);}
+.k sub{position:absolute;top:2px;right:2px;font-size:7px;color:#444;}
+.k.mod{background:#1a1a28;color:#7a8090;font-size:10px;}
+.k.mod:active{background:var(--blue);color:#000;}
+.k.mod.on{background:rgba(138,180,248,.25);color:var(--blue);border-color:var(--blue);}
+.k.w2{min-width:44px;}.k.w3{min-width:56px;}.k.w4{min-width:70px;}.k.w5{min-width:84px;}
+.k.sp{flex:1;max-width:200px;font-size:10px;letter-spacing:.5px;}
 
-#padButtons {
-  display:flex; gap:6px; padding:8px;
-}
-#btnLeft, #btnRight {
-  flex:1; height:34px; border:none; border-radius:10px;
-  font-size:11px; font-weight:700; cursor:pointer; letter-spacing:.5px;
-}
-#btnLeft  { background:var(--green); color:#fff; }
-#btnRight { background:var(--red); color:#fff; }
-#btnLeft:active  { filter:brightness(1.2); transform:scale(0.95); }
-#btnRight:active { filter:brightness(1.2); transform:scale(0.95); }
+/* Layer visibility */
+#lsym{display:none;}#lfn{display:none;}
 
-#scrollBtns {
-  display:flex; gap:6px; padding:0 8px 8px;
+/* ── URL MODAL ── */
+#urlmodal{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  z-index:2147483648;display:none;
+  align-items:flex-start;justify-content:center;
+  padding-top:60px;
 }
-#scrollUp, #scrollDown, #btnMiddle {
-  flex:1; height:28px; background:var(--key-bg);
-  border:1px solid var(--border); color:var(--text);
-  border-radius:8px; font-size:13px; cursor:pointer;
+#urlmodal.show{display:flex;}
+#urlbox{
+  background:var(--c2);border:1px solid var(--blue);
+  border-radius:12px;width:90%;max-width:420px;
+  padding:12px;box-shadow:0 8px 40px rgba(0,0,0,.8);
 }
-#scrollUp:active, #scrollDown:active, #btnMiddle:active { background:var(--accent); }
-
-/* KEYBOARD */
-#keyboard {
-  position:fixed; bottom:0; left:0; right:0;
-  background:var(--panel); border-top:1px solid var(--border);
-  padding:6px 4px 10px; z-index:9200;
-  transition:transform 0.25s ease;
+#urlbox-input{
+  width:100%;background:#111;border:1px solid var(--border);
+  border-radius:8px;color:var(--text);font-size:13px;
+  padding:10px 12px;outline:none;
+  -webkit-appearance:none;
 }
-#keyboard.hidden { transform:translateY(100%); }
-
-.krow {
-  display:flex; justify-content:center;
-  gap:3px; margin-bottom:3px;
+#urlbox-input:focus{border-color:var(--blue);}
+#urlbox-hint{color:var(--sub);font-size:10px;margin-top:6px;padding:0 2px;}
+#urlbox-btns{display:flex;gap:8px;margin-top:10px;}
+.ubbtn{
+  flex:1;padding:9px;border:none;border-radius:8px;
+  font-size:12px;cursor:pointer;font-weight:600;
 }
-
-.k {
-  background:var(--key-bg); border:1px solid var(--border);
-  color:var(--text); border-radius:7px;
-  font-size:12px; font-weight:500;
-  min-width:30px; height:36px;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; padding:0 4px; flex-shrink:0;
-  position:relative; transition:background 0.06s;
-}
-.k:active, .k.active { background:var(--accent); border-color:var(--accent); color:#fff; }
-.k.fn  { background:#1a1a35; color:var(--sub); font-size:10px; }
-.k.mod { background:#16162a; color:#aaa; }
-.k.wide2 { min-width:54px; }
-.k.wide3 { min-width:70px; }
-.k.wide4 { min-width:90px; }
-.k.space { flex:1; max-width:180px; }
-.k .sub { position:absolute; top:2px; right:3px; font-size:7px; color:var(--sub); }
-
-#kbdTopRow {
-  display:flex; justify-content:space-between; padding:0 2px; margin-bottom:2px;
-}
-.kbdTopBtn {
-  background:transparent; border:none; color:var(--sub);
-  font-size:10px; cursor:pointer; padding:2px 6px;
-}
-.kbdTopBtn:active { color:var(--accent); }
-
-#symbolLayer  { display:none; }
-#fnLayer      { display:none; }
+.ubbtn.go{background:var(--blue);color:#000;}
+.ubbtn.go:active{background:#6a9fd8;}
+.ubbtn.cancel{background:var(--c3);color:var(--text);}
+.ubbtn.cancel:active{background:var(--c4);}
 </style>
 </head>
 <body>
 
+<!-- TITLEBAR -->
+<div id="titlebar">
+  <div class="tab active">
+    <span class="tab-ico" id="tabico">🌐</span>
+    <span class="tab-ttl" id="tabttl">Nova aba</span>
+    <span class="tab-x">×</span>
+  </div>
+  <button id="btnNewTab">+</button>
+  <div id="winctrls">
+    <div class="wc min"></div>
+    <div class="wc max"></div>
+    <div class="wc cls"></div>
+  </div>
+</div>
+
 <!-- TOOLBAR -->
 <div id="toolbar">
-  <button id="nav-back">&#8592;</button>
-  <button id="nav-fwd">&#8594;</button>
-  <button id="nav-reload">&#8635;</button>
-  <div id="url-wrap">
-    <input id="urlInput" type="text" placeholder="Digite um URL..." autocomplete="off" autocorrect="off" spellcheck="false">
-    <button id="goBtn">IR</button>
+  <div id="loadbar"></div>
+  <button class="nb" id="btnBack" title="Voltar">&#8592;</button>
+  <button class="nb" id="btnFwd" title="Avançar">&#8594;</button>
+  <button class="nb" id="btnReload" title="Recarregar">&#8635;</button>
+  <button class="nb" id="btnHome" title="Início">&#8962;</button>
+  <div id="omni" onclick="openUrlModal()">
+    <span id="lock">🔒</span>
+    <span id="urltext">google.com</span>
   </div>
-  <button id="toggleKbd">⌨️</button>
+  <button id="menubtn">⋮</button>
 </div>
 
 <!-- VIEWPORT -->
 <div id="viewport">
-  <iframe id="siteFrame" src="about:blank" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"></iframe>
-  <div id="cursorDot"></div>
+  <iframe id="siteFrame" src="about:blank"
+    allow="*"
+    sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-pointer-lock allow-modals allow-top-navigation-by-user-activation">
+  </iframe>
+  <div id="spinner"><div class="spin"></div></div>
+  <div id="noload">
+    <div class="ico">🚫</div>
+    <h2>Site bloqueou o carregamento</h2>
+    <p>Este site usa <strong style="color:var(--red)">X-Frame-Options</strong>, impedindo iframe. Tente via proxy:</p>
+    <div class="proxybtns">
+      <button class="proxybtn" onclick="CB.tryProxy(0)">🔄 Proxy 1</button>
+      <button class="proxybtn" onclick="CB.tryProxy(1)">🔄 Proxy 2</button>
+      <button class="proxybtn" onclick="CB.tryProxy(2)">🔄 Proxy 3</button>
+    </div>
+    <a id="directlink" href="#" target="_blank" class="dlink">🔗 Abrir no navegador</a>
+  </div>
+</div>
 
-  <!-- MOUSE PAD -->
-  <div id="mousePad">
-    <div id="padHeader">
-      <span id="padLabel">MOUSE</span>
-      <span id="padDrag">&#8759;</span>
-    </div>
-    <div id="touchPad"></div>
-    <div id="padButtons">
-      <button id="btnLeft">L</button>
-      <button id="btnRight">R</button>
-    </div>
-    <div id="scrollBtns">
-      <button id="scrollUp">▲</button>
-      <button id="btnMiddle">●</button>
-      <button id="scrollDown">▼</button>
+<!-- CURSOR -->
+<div id="cursor"></div>
+
+<!-- URL MODAL -->
+<div id="urlmodal" onclick="closeUrlModalOutside(event)">
+  <div id="urlbox">
+    <input id="urlbox-input" type="url" placeholder="https://exemplo.com ou pesquisa..."
+      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+      inputmode="url">
+    <div id="urlbox-hint">Digite um URL ou termo de busca e pressione Ir</div>
+    <div id="urlbox-btns">
+      <button class="ubbtn cancel" onclick="closeUrlModal()">Cancelar</button>
+      <button class="ubbtn go" onclick="submitUrlModal()">Ir ↵</button>
     </div>
   </div>
 </div>
 
+<!-- MOUSE PAD -->
+<div id="mousepad">
+  <div id="mhead">
+    <span id="mhead-label">MOUSE</span>
+    <span id="mhead-drag">&#8759;</span>
+  </div>
+  <div id="trackpad">
+    <div id="trackpad-hint">
+      <span>TRACKPAD</span>
+      <span style="font-size:7px;color:#151520">arraste para mover</span>
+    </div>
+    <div id="tpdot"></div>
+  </div>
+  <div id="mbtns">
+    <button id="lbtn">&#9166; ESQ</button>
+    <button id="rbtn">DIR &#9166;</button>
+  </div>
+  <div id="scrollrow">
+    <button id="sup">▲</button>
+    <button id="smid">●</button>
+    <button id="sdn">▼</button>
+  </div>
+</div>
+
 <!-- KEYBOARD -->
-<div id="keyboard">
-  <div id="kbdTopRow">
-    <button class="kbdTopBtn" id="switchMain">ABC</button>
-    <button class="kbdTopBtn" id="switchSym">!@#</button>
-    <button class="kbdTopBtn" id="switchFn">F1-F12</button>
-    <button class="kbdTopBtn" id="ctrlABtn">Ctrl+A</button>
-    <button class="kbdTopBtn" id="ctrlCBtn">Ctrl+C</button>
-    <button class="kbdTopBtn" id="ctrlVBtn">Ctrl+V</button>
-    <button class="kbdTopBtn" id="ctrlZBtn">Ctrl+Z</button>
-    <button class="kbdTopBtn" id="ctrlXBtn">Ctrl+X</button>
+<div id="kbd">
+  <!-- Quick bar -->
+  <div id="kbar">
+    <div class="qk on" id="qabc"  data-layer="main">ABC</div>
+    <div class="qk"    id="qsym"  data-layer="sym">!@#</div>
+    <div class="qk"    id="qfn"   data-layer="fn">F1-12</div>
+    <div class="qk"    id="qtog"  onclick="CB.toggleKbd()">⌨ Fechar</div>
+    <div class="qk"    onclick="CB.combo('a')">Ctrl+A</div>
+    <div class="qk"    onclick="CB.combo('c')">Ctrl+C</div>
+    <div class="qk"    onclick="CB.combo('v')">Ctrl+V</div>
+    <div class="qk"    onclick="CB.combo('z')">Ctrl+Z</div>
+    <div class="qk"    onclick="CB.combo('x')">Ctrl+X</div>
+    <div class="qk"    onclick="CB.combo('f')">Ctrl+F</div>
+    <div class="qk"    onclick="CB.combo('t')">Ctrl+T</div>
+    <div class="qk"    onclick="CB.combo('r')">Ctrl+R</div>
   </div>
 
-  <!-- MAIN LAYER -->
-  <div id="mainLayer">
-    <div class="krow">
-      <div class="k fn" data-key="Escape">Esc</div>
-      <div class="k" data-key="`">`<span class="sub">~</span></div>
-      <div class="k" data-key="1">1<span class="sub">!</span></div>
-      <div class="k" data-key="2">2<span class="sub">@</span></div>
-      <div class="k" data-key="3">3<span class="sub">#</span></div>
-      <div class="k" data-key="4">4<span class="sub">$</span></div>
-      <div class="k" data-key="5">5<span class="sub">%</span></div>
-      <div class="k" data-key="6">6<span class="sub">^</span></div>
-      <div class="k" data-key="7">7<span class="sub">&amp;</span></div>
-      <div class="k" data-key="8">8<span class="sub">*</span></div>
-      <div class="k" data-key="9">9<span class="sub">(</span></div>
-      <div class="k" data-key="0">0<span class="sub">)</span></div>
-      <div class="k" data-key="-">-<span class="sub">_</span></div>
-      <div class="k" data-key="=">=<span class="sub">+</span></div>
-      <div class="k wide2 mod" data-key="Backspace">⌫</div>
+  <!-- Main QWERTY -->
+  <div id="lmain">
+    <div class="kr">
+      <div class="k mod w2" data-k="Escape">Esc</div>
+      <div class="k" data-k="`">`<sub>~</sub></div>
+      <div class="k" data-k="1">1<sub>!</sub></div>
+      <div class="k" data-k="2">2<sub>@</sub></div>
+      <div class="k" data-k="3">3<sub>#</sub></div>
+      <div class="k" data-k="4">4<sub>$</sub></div>
+      <div class="k" data-k="5">5<sub>%</sub></div>
+      <div class="k" data-k="6">6<sub>^</sub></div>
+      <div class="k" data-k="7">7<sub>&amp;</sub></div>
+      <div class="k" data-k="8">8<sub>*</sub></div>
+      <div class="k" data-k="9">9<sub>(</sub></div>
+      <div class="k" data-k="0">0<sub>)</sub></div>
+      <div class="k" data-k="-">-<sub>_</sub></div>
+      <div class="k" data-k="=">=<sub>+</sub></div>
+      <div class="k mod w3" data-k="Backspace">⌫ Del</div>
     </div>
-    <div class="krow">
-      <div class="k wide2 fn" data-key="Tab">Tab</div>
-      <div class="k" data-key="q">q</div>
-      <div class="k" data-key="w">w</div>
-      <div class="k" data-key="e">e</div>
-      <div class="k" data-key="r">r</div>
-      <div class="k" data-key="t">t</div>
-      <div class="k" data-key="y">y</div>
-      <div class="k" data-key="u">u</div>
-      <div class="k" data-key="i">i</div>
-      <div class="k" data-key="o">o</div>
-      <div class="k" data-key="p">p</div>
-      <div class="k" data-key="[">[<span class="sub">{</span></div>
-      <div class="k" data-key="]">]<span class="sub">}</span></div>
-      <div class="k" data-key="\">\<span class="sub">|</span></div>
+    <div class="kr">
+      <div class="k mod w3" data-k="Tab">Tab</div>
+      <div class="k" data-k="q">q</div><div class="k" data-k="w">w</div>
+      <div class="k" data-k="e">e</div><div class="k" data-k="r">r</div>
+      <div class="k" data-k="t">t</div><div class="k" data-k="y">y</div>
+      <div class="k" data-k="u">u</div><div class="k" data-k="i">i</div>
+      <div class="k" data-k="o">o</div><div class="k" data-k="p">p</div>
+      <div class="k" data-k="[">[<sub>{</sub></div>
+      <div class="k" data-k="]">]<sub>}</sub></div>
+      <div class="k" data-k="\">\<sub>|</sub></div>
     </div>
-    <div class="krow">
-      <div class="k wide3 mod" id="capsKey" data-key="CapsLock">Caps</div>
-      <div class="k" data-key="a">a</div>
-      <div class="k" data-key="s">s</div>
-      <div class="k" data-key="d">d</div>
-      <div class="k" data-key="f">f</div>
-      <div class="k" data-key="g">g</div>
-      <div class="k" data-key="h">h</div>
-      <div class="k" data-key="j">j</div>
-      <div class="k" data-key="k">k</div>
-      <div class="k" data-key="l">l</div>
-      <div class="k" data-key=";">;<span class="sub">:</span></div>
-      <div class="k" data-key="'">'<span class="sub">"</span></div>
-      <div class="k wide3 mod" data-key="Enter">↵ Enter</div>
+    <div class="kr">
+      <div class="k mod w3" id="kcaps" data-k="CapsLock">Caps</div>
+      <div class="k" data-k="a">a</div><div class="k" data-k="s">s</div>
+      <div class="k" data-k="d">d</div><div class="k" data-k="f">f</div>
+      <div class="k" data-k="g">g</div><div class="k" data-k="h">h</div>
+      <div class="k" data-k="j">j</div><div class="k" data-k="k">k</div>
+      <div class="k" data-k="l">l</div>
+      <div class="k" data-k=";">;<sub>:</sub></div>
+      <div class="k" data-k="'">'<sub>"</sub></div>
+      <div class="k mod w4" data-k="Enter">↵ Enter</div>
     </div>
-    <div class="krow">
-      <div class="k wide4 mod" id="shiftKeyL" data-key="Shift">⇧ Shift</div>
-      <div class="k" data-key="z">z</div>
-      <div class="k" data-key="x">x</div>
-      <div class="k" data-key="c">c</div>
-      <div class="k" data-key="v">v</div>
-      <div class="k" data-key="b">b</div>
-      <div class="k" data-key="n">n</div>
-      <div class="k" data-key="m">m</div>
-      <div class="k" data-key=",">,<span class="sub">&lt;</span></div>
-      <div class="k" data-key=".">.<span class="sub">&gt;</span></div>
-      <div class="k" data-key="/">/</div>
-      <div class="k wide4 mod" id="shiftKeyR" data-key="Shift">⇧ Shift</div>
+    <div class="kr">
+      <div class="k mod w4" id="kshl" data-k="Shift">⇧ Shift</div>
+      <div class="k" data-k="z">z</div><div class="k" data-k="x">x</div>
+      <div class="k" data-k="c">c</div><div class="k" data-k="v">v</div>
+      <div class="k" data-k="b">b</div><div class="k" data-k="n">n</div>
+      <div class="k" data-k="m">m</div>
+      <div class="k" data-k=",">,<sub>&lt;</sub></div>
+      <div class="k" data-k=".">.<sub>&gt;</sub></div>
+      <div class="k" data-k="/">/</div>
+      <div class="k mod w4" id="kshr" data-k="Shift">⇧ Shift</div>
     </div>
-    <div class="krow">
-      <div class="k wide2 mod" id="ctrlKeyL" data-key="Control">Ctrl</div>
-      <div class="k wide2 mod" id="altKeyL" data-key="Alt">Alt</div>
-      <div class="k space mod" data-key=" ">ESPAÇO</div>
-      <div class="k wide2 mod" id="altKeyR" data-key="Alt">Alt</div>
-      <div class="k mod" data-key="ArrowLeft">←</div>
-      <div class="k mod" data-key="ArrowUp">↑</div>
-      <div class="k mod" data-key="ArrowDown">↓</div>
-      <div class="k mod" data-key="ArrowRight">→</div>
+    <div class="kr">
+      <div class="k mod w3" id="kctrl" data-k="Control">Ctrl</div>
+      <div class="k mod w2" id="kalt"  data-k="Alt">Alt</div>
+      <div class="k sp mod" data-k=" ">ESPAÇO</div>
+      <div class="k mod w2" data-k="Alt">Alt</div>
+      <div class="k mod" data-k="ArrowLeft">◀</div>
+      <div class="k mod" data-k="ArrowUp">▲</div>
+      <div class="k mod" data-k="ArrowDown">▼</div>
+      <div class="k mod" data-k="ArrowRight">▶</div>
     </div>
   </div>
 
-  <!-- SYMBOL LAYER -->
-  <div id="symbolLayer">
-    <div class="krow">
-      <div class="k" data-key="!">!</div><div class="k" data-key="@">@</div>
-      <div class="k" data-key="#">#</div><div class="k" data-key="$">$</div>
-      <div class="k" data-key="%">%</div><div class="k" data-key="^">^</div>
-      <div class="k" data-key="&">&amp;</div><div class="k" data-key="*">*</div>
-      <div class="k" data-key="(">(</div><div class="k" data-key=")">)</div>
-      <div class="k wide2 mod" data-key="Backspace">⌫</div>
+  <!-- Symbol Layer -->
+  <div id="lsym">
+    <div class="kr">
+      <div class="k" data-k="!">!</div><div class="k" data-k="@">@</div>
+      <div class="k" data-k="#">#</div><div class="k" data-k="$">$</div>
+      <div class="k" data-k="%">%</div><div class="k" data-k="^">^</div>
+      <div class="k" data-k="&amp;">&amp;</div><div class="k" data-k="*">*</div>
+      <div class="k" data-k="(">(</div><div class="k" data-k=")">)</div>
+      <div class="k mod w3" data-k="Backspace">⌫</div>
     </div>
-    <div class="krow">
-      <div class="k" data-key="-">-</div><div class="k" data-key="_">_</div>
-      <div class="k" data-key="=">=</div><div class="k" data-key="+">+</div>
-      <div class="k" data-key="[">[</div><div class="k" data-key="]">]</div>
-      <div class="k" data-key="{">{</div><div class="k" data-key="}">}</div>
-      <div class="k" data-key="|">|</div><div class="k" data-key="\\">\\</div>
+    <div class="kr">
+      <div class="k" data-k="-">-</div><div class="k" data-k="_">_</div>
+      <div class="k" data-k="=">=</div><div class="k" data-k="+">+</div>
+      <div class="k" data-k="[">[</div><div class="k" data-k="]">]</div>
+      <div class="k" data-k="{">{</div><div class="k" data-k="}">}</div>
+      <div class="k" data-k="|">|</div><div class="k" data-k="~">~</div>
+      <div class="k mod w3" data-k="Enter">↵</div>
     </div>
-    <div class="krow">
-      <div class="k" data-key=";">"</div><div class="k" data-key=":"">:</div>
-      <div class="k" data-key="'">'</div><div class="k" data-key='"'>"</div>
-      <div class="k" data-key=",">,</div><div class="k" data-key=".">.</div>
-      <div class="k" data-key="<">&lt;</div><div class="k" data-key=">">&gt;</div>
-      <div class="k" data-key="/">/</div><div class="k" data-key="?">?</div>
-      <div class="k wide2 mod" data-key="Enter">↵</div>
+    <div class="kr">
+      <div class="k" data-k=":">:</div><div class="k" data-k='"'>"</div>
+      <div class="k" data-k="'">'</div><div class="k" data-k=",">,</div>
+      <div class="k" data-k=".">.</div><div class="k" data-k="/">/</div>
+      <div class="k" data-k="?">?</div><div class="k" data-k="\\\">\</div>
+      <div class="k" data-k="@">@</div><div class="k" data-k="#">#</div>
     </div>
-    <div class="krow">
-      <div class="k" data-key="~">~</div><div class="k" data-key="`">`</div>
-      <div class="k" data-key="@">@</div><div class="k" data-key="#">#</div>
-      <div class="k" data-key="€">€</div><div class="k" data-key="£">£</div>
-      <div class="k" data-key="¥">¥</div><div class="k" data-key="©">©</div>
-      <div class="k" data-key="®">®</div><div class="k" data-key="°">°</div>
-    </div>
-    <div class="krow">
-      <div class="k space mod" data-key=" ">ESPAÇO</div>
+    <div class="kr">
+      <div class="k" data-k="€">€</div><div class="k" data-k="£">£</div>
+      <div class="k" data-k="¥">¥</div><div class="k" data-k="°">°</div>
+      <div class="k" data-k="©">©</div><div class="k" data-k="®">®</div>
+      <div class="k sp mod" data-k=" ">ESPAÇO</div>
     </div>
   </div>
 
-  <!-- FN LAYER -->
-  <div id="fnLayer">
-    <div class="krow">
-      <div class="k wide2 fn" data-key="F1">F1</div>
-      <div class="k wide2 fn" data-key="F2">F2</div>
-      <div class="k wide2 fn" data-key="F3">F3</div>
-      <div class="k wide2 fn" data-key="F4">F4</div>
-      <div class="k wide2 fn" data-key="F5">F5</div>
-      <div class="k wide2 fn" data-key="F6">F6</div>
+  <!-- Fn Layer -->
+  <div id="lfn">
+    <div class="kr">
+      <div class="k w3 mod" data-k="F1">F1</div>
+      <div class="k w3 mod" data-k="F2">F2</div>
+      <div class="k w3 mod" data-k="F3">F3</div>
+      <div class="k w3 mod" data-k="F4">F4</div>
+      <div class="k w3 mod" data-k="F5">F5</div>
+      <div class="k w3 mod" data-k="F6">F6</div>
     </div>
-    <div class="krow">
-      <div class="k wide2 fn" data-key="F7">F7</div>
-      <div class="k wide2 fn" data-key="F8">F8</div>
-      <div class="k wide2 fn" data-key="F9">F9</div>
-      <div class="k wide2 fn" data-key="F10">F10</div>
-      <div class="k wide2 fn" data-key="F11">F11</div>
-      <div class="k wide2 fn" data-key="F12">F12</div>
+    <div class="kr">
+      <div class="k w3 mod" data-k="F7">F7</div>
+      <div class="k w3 mod" data-k="F8">F8</div>
+      <div class="k w3 mod" data-k="F9">F9</div>
+      <div class="k w3 mod" data-k="F10">F10</div>
+      <div class="k w3 mod" data-k="F11">F11</div>
+      <div class="k w3 mod" data-k="F12">F12</div>
     </div>
-    <div class="krow">
-      <div class="k wide2 fn" data-key="Home">Home</div>
-      <div class="k wide2 fn" data-key="End">End</div>
-      <div class="k wide2 fn" data-key="PageUp">PgUp</div>
-      <div class="k wide2 fn" data-key="PageDown">PgDn</div>
-      <div class="k wide2 fn" data-key="Insert">Ins</div>
-      <div class="k wide2 fn" data-key="Delete">Del</div>
-    </div>
-    <div class="krow">
-      <div class="k wide2 fn" data-key="PrintScreen">PrtSc</div>
-      <div class="k wide2 fn" data-key="ScrollLock">ScrLk</div>
-      <div class="k wide2 fn" data-key="Pause">Pause</div>
+    <div class="kr">
+      <div class="k w3 mod" data-k="Home">Home</div>
+      <div class="k w3 mod" data-k="End">End</div>
+      <div class="k w3 mod" data-k="PageUp">PgUp</div>
+      <div class="k w3 mod" data-k="PageDown">PgDn</div>
+      <div class="k w3 mod" data-k="Insert">Ins</div>
+      <div class="k w3 mod" data-k="Delete">Del</div>
     </div>
   </div>
 </div>
 
 <script>
-(function(){
-  const frame    = document.getElementById('siteFrame');
-  const dot      = document.getElementById('cursorDot');
-  const viewport = document.getElementById('viewport');
-  const urlInput = document.getElementById('urlInput');
-  const keyboard = document.getElementById('keyboard');
-  const touchPad = document.getElementById('touchPad');
-  const mousePad = document.getElementById('mousePad');
-  const padHeader= document.getElementById('padHeader');
+// ═══════════════════════════════════════════════════════════
+//  CHROMIUM CONTROLLER
+// ═══════════════════════════════════════════════════════════
+window.CB = (function(){
+'use strict';
 
-  let curX = window.innerWidth / 2;
-  let curY = window.innerHeight / 2;
-  let shiftOn = false, ctrlOn = false, altOn = false, capsOn = false;
-  let kbdHidden = false;
+/* ── DOM refs ── */
+const frame     = document.getElementById('siteFrame');
+const cur       = document.getElementById('cursor');
+const noload    = document.getElementById('noload');
+const loadbar   = document.getElementById('loadbar');
+const spinner   = document.getElementById('spinner');
+const mousepad  = document.getElementById('mousepad');
+const trackpad  = document.getElementById('trackpad');
+const kbd       = document.getElementById('kbd');
+const tpdot     = document.getElementById('tpdot');
+const urltext   = document.getElementById('urltext');
+const lock      = document.getElementById('lock');
 
-  function moveCursor(dx, dy) {
-    const rect = viewport.getBoundingClientRect();
-    curX = Math.max(rect.left, Math.min(rect.right,  curX + dx));
-    curY = Math.max(rect.top,  Math.min(rect.bottom, curY + dy));
-    dot.style.left = (curX - rect.left) + 'px';
-    dot.style.top  = (curY - rect.top)  + 'px';
+/* ── Cursor state ── */
+let cx = window.innerWidth / 2;
+let cy = window.innerHeight / 2;
+
+/* ── Keyboard state ── */
+let shift = false, ctrl = false, altK = false, caps = false;
+let kbdVisible = true;
+let lastFocused = null;
+
+/* ── Nav state ── */
+let currentUrl = '';
+let loadTimer = null;
+
+/* ── Proxies ── */
+const PROXIES = [
+  u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+  u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u => `https://thingproxy.freeboard.io/fetch/${encodeURIComponent(u)}`
+];
+
+/* ═══════════════════════════════════════════
+   CURSOR
+═══════════════════════════════════════════ */
+function moveCur(x, y) {
+  cx = Math.max(0, Math.min(window.innerWidth - 2, x));
+  cy = Math.max(0, Math.min(window.innerHeight - 2, y));
+  cur.style.left = cx + 'px';
+  cur.style.top  = cy + 'px';
+  // Update trackpad dot relative position
+  updateTpDot();
+}
+moveCur(cx, cy);
+
+function updateTpDot() {
+  const r = trackpad.getBoundingClientRect();
+  if (!r.width) return;
+  const fr = frame.getBoundingClientRect();
+  const px = ((cx - fr.left) / fr.width) * r.width;
+  const py = ((cy - fr.top)  / fr.height) * r.height;
+  const clx = Math.max(3, Math.min(r.width - 3, px));
+  const cly = Math.max(3, Math.min(r.height - 3, py));
+  tpdot.style.left = clx + 'px';
+  tpdot.style.top  = cly + 'px';
+}
+
+/* ═══════════════════════════════════════════
+   URL / NAVIGATION
+═══════════════════════════════════════════ */
+function normalizeUrl(raw) {
+  let u = raw.trim();
+  if (!u) return '';
+  if (u.startsWith('http://') || u.startsWith('https://')) return u;
+  // Looks like a domain?
+  if (/^[\w-]+\.[a-z]{2,}(\/|$)/i.test(u)) return 'https://' + u;
+  // Search
+  return 'https://www.google.com/search?q=' + encodeURIComponent(u);
+}
+
+function loadUrl(raw) {
+  const u = normalizeUrl(raw);
+  if (!u) return;
+  currentUrl = u;
+  showUrl(u);
+  document.getElementById('directlink').href = u;
+  noload.classList.remove('show');
+  spinner.classList.add('show');
+  startLoad();
+  frame.src = u;
+}
+
+function showUrl(u) {
+  try {
+    const parsed = new URL(u);
+    urltext.textContent = parsed.hostname + parsed.pathname.replace(/\/$/, '') || parsed.hostname;
+    lock.textContent = u.startsWith('https') ? '🔒' : '🔓';
+  } catch {
+    urltext.textContent = u.slice(0, 50);
+    lock.textContent = '🔓';
   }
+}
 
-  function framePoint() {
-    const rect = frame.getBoundingClientRect();
-    return { x: curX - rect.left, y: curY - rect.top };
-  }
-
-  function sendMouseEvent(type, x, y, button) {
-    try {
-      const doc = frame.contentDocument;
-      if (!doc) return;
-      const el = doc.elementFromPoint(x, y);
-      if (!el) return;
-      const evt = new MouseEvent(type, {
-        bubbles:true, cancelable:true,
-        clientX: x, clientY: y,
-        screenX: x, screenY: y,
-        button: button || 0, buttons: button === 2 ? 2 : 1,
-        view: frame.contentWindow
-      });
-      el.dispatchEvent(evt);
-      return el;
-    } catch(e) {}
-  }
-
-  function doClick(right) {
-    const {x, y} = framePoint();
-    dot.classList.add(right ? 'rclicking' : 'clicking');
-    setTimeout(() => dot.classList.remove('clicking', 'rclicking'), 180);
-    try {
-      const doc = frame.contentDocument;
-      if (!doc) return;
-      const el = doc.elementFromPoint(x, y);
-      if (!el) return;
-      sendMouseEvent('mousedown', x, y, right ? 2 : 0);
-      sendMouseEvent('mouseup',   x, y, right ? 2 : 0);
-      if (!right) {
-        sendMouseEvent('click', x, y, 0);
-        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) {
-          el.focus();
-        }
-        if (el.tagName === 'A' && el.href) {
-          const href = el.href;
-          loadUrl(href);
-        }
-        if (el.tagName === 'BUTTON' || el.type === 'submit') {
-          el.click();
-        }
-      } else {
-        const cevt = new MouseEvent('contextmenu', {
-          bubbles:true, cancelable:true, clientX:x, clientY:y,
-          view: frame.contentWindow
-        });
-        el.dispatchEvent(cevt);
-      }
-    } catch(e) {}
-  }
-
-  function doScroll(delta) {
-    try {
-      const {x, y} = framePoint();
-      const doc = frame.contentDocument;
-      if (!doc) return;
-      const el = doc.elementFromPoint(x, y);
-      if (el) {
-        const we = new WheelEvent('wheel', {
-          bubbles:true, cancelable:true,
-          deltaY: delta, deltaMode: 0,
-          clientX:x, clientY:y,
-          view: frame.contentWindow
-        });
-        el.dispatchEvent(we);
-      }
-      frame.contentWindow.scrollBy(0, delta);
-    } catch(e) {}
-  }
-
-  function loadUrl(rawUrl) {
-    let url = rawUrl.trim();
-    if (!url) return;
-    if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
-    urlInput.value = url;
-    frame.src = url;
-  }
-
-  document.getElementById('goBtn').addEventListener('click', () => loadUrl(urlInput.value));
-  urlInput.addEventListener('keydown', e => { if(e.key === 'Enter') loadUrl(urlInput.value); });
-  document.getElementById('nav-back').addEventListener('click', () => { try { frame.contentWindow.history.back(); } catch(e) {} });
-  document.getElementById('nav-fwd').addEventListener('click',  () => { try { frame.contentWindow.history.forward(); } catch(e) {} });
-  document.getElementById('nav-reload').addEventListener('click',() => { frame.src = frame.src; });
-  frame.addEventListener('load', () => {
-    try { const u = frame.contentWindow.location.href; if(u !== 'about:blank') urlInput.value = u; } catch(e) {}
+function startLoad() {
+  clearTimeout(loadTimer);
+  loadbar.style.transition = 'none';
+  loadbar.style.width = '0%';
+  requestAnimationFrame(() => {
+    loadbar.style.transition = 'width 2s ease-out';
+    loadbar.style.width = '75%';
   });
+  // Fallback timeout
+  loadTimer = setTimeout(() => {
+    endLoad();
+    spinner.classList.remove('show');
+  }, 8000);
+}
 
-  document.getElementById('toggleKbd').addEventListener('click', () => {
-    kbdHidden = !kbdHidden;
-    keyboard.classList.toggle('hidden', kbdHidden);
-  });
+function endLoad() {
+  clearTimeout(loadTimer);
+  loadbar.style.transition = 'width .2s ease';
+  loadbar.style.width = '100%';
+  spinner.classList.remove('show');
+  setTimeout(() => {
+    loadbar.style.transition = 'none';
+    loadbar.style.width = '0%';
+  }, 300);
+}
 
-  document.getElementById('btnLeft').addEventListener('click',  () => doClick(false));
-  document.getElementById('btnRight').addEventListener('click', () => doClick(true));
-  document.getElementById('scrollUp').addEventListener('click',   () => doScroll(-120));
-  document.getElementById('scrollDown').addEventListener('click', () => doScroll(120));
-  document.getElementById('btnMiddle').addEventListener('click',  () => {
-    try { const {x,y}=framePoint(); const doc=frame.contentDocument; if(!doc)return; const el=doc.elementFromPoint(x,y); if(el&&el.tagName==='A') window.open(el.href,'_blank'); } catch(e){}
-  });
+function showNoLoad() {
+  noload.classList.add('show');
+  spinner.classList.remove('show');
+  endLoad();
+}
 
-  /* TRACKPAD */
-  let tpActive = false, tpLastX = 0, tpLastY = 0, tpVX = 0, tpVY = 0;
-  const SPEED = 1.8;
-
-  touchPad.addEventListener('touchstart', e => {
-    e.preventDefault();
-    tpActive = true;
-    tpLastX = e.touches[0].clientX;
-    tpLastY = e.touches[0].clientY;
-    tpVX = 0; tpVY = 0;
-  }, {passive:false});
-
-  touchPad.addEventListener('touchmove', e => {
-    e.preventDefault();
-    if (!tpActive) return;
-    const dx = (e.touches[0].clientX - tpLastX) * SPEED;
-    const dy = (e.touches[0].clientY - tpLastY) * SPEED;
-    tpLastX = e.touches[0].clientX;
-    tpLastY = e.touches[0].clientY;
-    tpVX = dx; tpVY = dy;
-    moveCursor(dx, dy);
-
-    try {
-      const {x,y} = framePoint();
-      sendMouseEvent('mousemove', x, y, 0);
-    } catch(e) {}
-  }, {passive:false});
-
-  touchPad.addEventListener('touchend', e => {
-    e.preventDefault();
-    tpActive = false;
-    if (Math.abs(tpVX) < 2 && Math.abs(tpVY) < 2) {
-      doClick(false);
+/* iframe events */
+frame.addEventListener('load', () => {
+  endLoad();
+  try {
+    const doc = frame.contentDocument;
+    if (!doc || !doc.body || doc.body.innerHTML.trim() === '') {
+      showNoLoad(); return;
     }
-  }, {passive:false});
-
-  /* DRAG MOUSE PAD */
-  let dragPad = false, dragPadX=0, dragPadY=0;
-  padHeader.addEventListener('touchstart', e => {
-    e.preventDefault();
-    dragPad = true;
-    dragPadX = e.touches[0].clientX - mousePad.getBoundingClientRect().left;
-    dragPadY = e.touches[0].clientY - mousePad.getBoundingClientRect().top;
-  }, {passive:false});
-  window.addEventListener('touchmove', e => {
-    if (!dragPad) return;
-    e.preventDefault();
-    let nx = e.touches[0].clientX - dragPadX;
-    let ny = e.touches[0].clientY - dragPadY;
-    const vr = viewport.getBoundingClientRect();
-    nx = Math.max(vr.left, Math.min(vr.right  - mousePad.offsetWidth,  nx));
-    ny = Math.max(vr.top,  Math.min(vr.bottom - mousePad.offsetHeight, ny));
-    mousePad.style.right  = 'auto';
-    mousePad.style.bottom = 'auto';
-    mousePad.style.left = (nx - vr.left) + 'px';
-    mousePad.style.top  = (ny - vr.top)  + 'px';
-  }, {passive:false});
-  window.addEventListener('touchend', () => { dragPad = false; });
-
-  /* KEYBOARD */
-  let activeEl = null;
-
-  frame.addEventListener('load', () => {
-    try {
-      const doc = frame.contentDocument;
-      doc.addEventListener('focusin', e => { activeEl = e.target; });
-      doc.addEventListener('click',   e => { activeEl = e.target; });
-    } catch(e) {}
-  });
-
-  function getTarget() {
-    try {
-      const doc = frame.contentDocument;
-      if (doc && doc.activeElement && doc.activeElement !== doc.body) {
-        activeEl = doc.activeElement;
-        return doc.activeElement;
-      }
-    } catch(e) {}
-    return activeEl;
+    const loc = frame.contentWindow.location.href;
+    if (loc && loc !== 'about:blank') {
+      currentUrl = loc;
+      showUrl(loc);
+      const title = doc.title;
+      document.getElementById('tabttl').textContent = title || loc;
+      document.getElementById('tabico').textContent = '🌐';
+      // Hook clicks/focus inside frame
+      doc.addEventListener('focusin', e => { lastFocused = e.target; }, true);
+      doc.addEventListener('click', e => {
+        const el = e.target;
+        if (el && el.tagName === 'A' && el.href && !el.href.startsWith('javascript')) {
+          e.preventDefault();
+          loadUrl(el.href);
+        }
+      }, true);
+    }
+  } catch(e) {
+    // cross-origin — frame loaded but we can't read it. That's fine.
+    endLoad();
   }
+});
+frame.addEventListener('error', showNoLoad);
 
-  function fireKeyEvent(type, key, keyCode, mods) {
-    const el = getTarget();
-    if (!el) return;
-    const ev = new KeyboardEvent(type, {
-      key, keyCode, which: keyCode,
-      code: key,
+/* Toolbar buttons */
+document.getElementById('btnBack').onclick   = () => { try { frame.contentWindow.history.back(); } catch(e) {} };
+document.getElementById('btnFwd').onclick    = () => { try { frame.contentWindow.history.forward(); } catch(e) {} };
+document.getElementById('btnReload').onclick = () => { noload.classList.remove('show'); startLoad(); frame.src = currentUrl || 'https://www.google.com'; };
+document.getElementById('btnHome').onclick   = () => loadUrl('https://www.google.com');
+document.getElementById('btnNewTab').onclick = () => loadUrl('https://www.google.com');
+
+/* ═══════════════════════════════════════════
+   URL MODAL (native input for URL)
+═══════════════════════════════════════════ */
+window.openUrlModal = function() {
+  const modal = document.getElementById('urlmodal');
+  const inp   = document.getElementById('urlbox-input');
+  modal.classList.add('show');
+  inp.value = currentUrl || '';
+  setTimeout(() => inp.focus(), 100);
+};
+
+window.closeUrlModal = function() {
+  document.getElementById('urlmodal').classList.remove('show');
+};
+
+window.closeUrlModalOutside = function(e) {
+  if (e.target === document.getElementById('urlmodal')) closeUrlModal();
+};
+
+window.submitUrlModal = function() {
+  const val = document.getElementById('urlbox-input').value;
+  closeUrlModal();
+  if (val) loadUrl(val);
+};
+
+document.getElementById('urlbox-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') { e.preventDefault(); submitUrlModal(); }
+});
+
+/* ═══════════════════════════════════════════
+   PROXY
+═══════════════════════════════════════════ */
+function tryProxy(idx) {
+  if (idx >= PROXIES.length) return;
+  const p = PROXIES[idx](currentUrl);
+  noload.classList.remove('show');
+  startLoad();
+  frame.src = p;
+}
+
+/* ═══════════════════════════════════════════
+   MOUSE PAD — drag to move
+═══════════════════════════════════════════ */
+let padDrag = false, pdx = 0, pdy = 0;
+
+document.getElementById('mhead').addEventListener('touchstart', e => {
+  e.preventDefault();
+  padDrag = true;
+  const r = mousepad.getBoundingClientRect();
+  pdx = e.touches[0].clientX - r.left;
+  pdy = e.touches[0].clientY - r.top;
+}, { passive: false });
+
+window.addEventListener('touchmove', e => {
+  if (!padDrag) return;
+  e.preventDefault();
+  let nx = e.touches[0].clientX - pdx;
+  let ny = e.touches[0].clientY - pdy;
+  nx = Math.max(0, Math.min(window.innerWidth  - mousepad.offsetWidth,  nx));
+  ny = Math.max(0, Math.min(window.innerHeight - mousepad.offsetHeight, ny));
+  mousepad.style.right = 'auto';
+  mousepad.style.bottom = 'auto';
+  mousepad.style.left = nx + 'px';
+  mousepad.style.top  = ny + 'px';
+}, { passive: false });
+
+window.addEventListener('touchend', () => { padDrag = false; });
+
+/* ═══════════════════════════════════════════
+   TRACKPAD
+═══════════════════════════════════════════ */
+let tpActive = false, tpX = 0, tpY = 0, tpMoved = false;
+let tpStartX = 0, tpStartY = 0;
+const TP_SPEED = 2.6;
+const TP_CLICK_THRESHOLD = 6;
+
+trackpad.addEventListener('touchstart', e => {
+  e.preventDefault();
+  tpActive = true; tpMoved = false;
+  tpX = tpStartX = e.touches[0].clientX;
+  tpY = tpStartY = e.touches[0].clientY;
+}, { passive: false });
+
+trackpad.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (!tpActive) return;
+  const dx = (e.touches[0].clientX - tpX) * TP_SPEED;
+  const dy = (e.touches[0].clientY - tpY) * TP_SPEED;
+  tpX = e.touches[0].clientX;
+  tpY = e.touches[0].clientY;
+  const totalDx = Math.abs(tpX - tpStartX);
+  const totalDy = Math.abs(tpY - tpStartY);
+  if (totalDx > TP_CLICK_THRESHOLD || totalDy > TP_CLICK_THRESHOLD) tpMoved = true;
+  moveCur(cx + dx, cy + dy);
+  dispatchFrameMouseEvent('mousemove', 0);
+}, { passive: false });
+
+trackpad.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (!tpMoved) doClick(false);
+  tpActive = false;
+}, { passive: false });
+
+/* ═══════════════════════════════════════════
+   MOUSE EVENTS INTO FRAME
+═══════════════════════════════════════════ */
+function getFramePoint() {
+  const r = frame.getBoundingClientRect();
+  return { fx: cx - r.left, fy: cy - r.top, inFrame: cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom };
+}
+
+function dispatchFrameMouseEvent(type, button) {
+  try {
+    const { fx, fy, inFrame } = getFramePoint();
+    if (!inFrame) return null;
+    const doc = frame.contentDocument;
+    if (!doc) return null;
+    const el = doc.elementFromPoint(fx, fy);
+    if (!el) return null;
+    el.dispatchEvent(new MouseEvent(type, {
       bubbles: true, cancelable: true,
-      shiftKey:  mods.shift  || shiftOn,
-      ctrlKey:   mods.ctrl   || ctrlOn,
-      altKey:    mods.alt    || altOn,
+      button, buttons: button === 0 ? 1 : 2,
+      clientX: fx, clientY: fy,
       view: frame.contentWindow
-    });
-    el.dispatchEvent(ev);
+    }));
+    return el;
+  } catch(e) { return null; }
+}
+
+function doClick(right) {
+  cur.classList.add(right ? 'rclick' : 'lclick');
+  setTimeout(() => cur.classList.remove('lclick', 'rclick'), 160);
+
+  // Check if cursor is over host UI element
+  const hostEl = document.elementFromPoint(cx, cy);
+  if (hostEl && hostEl !== frame && hostEl !== document.body) {
+    hostEl.click();
+    return;
   }
 
-  function fireInputChar(char) {
-    const el = getTarget();
+  // Fire into iframe
+  try {
+    const { fx, fy, inFrame } = getFramePoint();
+    if (!inFrame) return;
+    const doc = frame.contentDocument;
+    if (!doc) return;
+    const el = doc.elementFromPoint(fx, fy);
     if (!el) return;
-    if (el.isContentEditable) {
-      el.focus();
-      document.execCommand('insertText', false, char);
-      return;
-    }
-    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-      const s = el.selectionStart || 0;
-      const e2= el.selectionEnd   || 0;
-      const v = el.value;
-      el.value = v.slice(0, s) + char + v.slice(e2);
-      el.selectionStart = el.selectionEnd = s + char.length;
-      el.dispatchEvent(new Event('input', {bubbles:true}));
-      el.dispatchEvent(new Event('change',{bubbles:true}));
-    }
-  }
 
-  function doBackspace() {
-    const el = getTarget();
-    if (!el) return;
-    fireKeyEvent('keydown', 'Backspace', 8, {});
-    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-      const s = el.selectionStart || 0;
-      const e2= el.selectionEnd   || 0;
-      if (s === e2 && s > 0) {
-        el.value = el.value.slice(0, s-1) + el.value.slice(e2);
-        el.selectionStart = el.selectionEnd = s - 1;
-      } else if (s !== e2) {
-        el.value = el.value.slice(0, s) + el.value.slice(e2);
-        el.selectionStart = el.selectionEnd = s;
+    el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, button: right?2:0, buttons: right?2:1, clientX: fx, clientY: fy, view: frame.contentWindow }));
+    el.dispatchEvent(new MouseEvent('mouseup',   { bubbles: true, cancelable: true, button: right?2:0, buttons: 0, clientX: fx, clientY: fy, view: frame.contentWindow }));
+
+    if (!right) {
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: fx, clientY: fy, view: frame.contentWindow }));
+
+      // Focus inputs
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable) {
+        el.focus();
+        lastFocused = el;
       }
-      el.dispatchEvent(new Event('input', {bubbles:true}));
-    } else if (el.isContentEditable) {
-      document.execCommand('delete');
-    }
-    fireKeyEvent('keyup', 'Backspace', 8, {});
-  }
-
-  function doEnter() {
-    const el = getTarget();
-    if (!el) return;
-    fireKeyEvent('keydown', 'Enter', 13, {});
-    if (el.tagName === 'TEXTAREA') {
-      fireInputChar('\n');
-    } else if (el.tagName === 'INPUT') {
-      const form = el.closest('form');
-      if (form) form.dispatchEvent(new Event('submit', {bubbles:true, cancelable:true}));
-    }
-    fireKeyEvent('keyup', 'Enter', 13, {});
-  }
-
-  const KEY_CODES = {
-    ' ':32, 'a':65,'b':66,'c':67,'d':68,'e':69,'f':70,'g':71,'h':72,
-    'i':73,'j':74,'k':75,'l':76,'m':77,'n':78,'o':79,'p':80,'q':81,
-    'r':82,'s':83,'t':84,'u':85,'v':86,'w':87,'x':88,'y':89,'z':90,
-    '0':48,'1':49,'2':50,'3':51,'4':52,'5':53,'6':54,'7':55,'8':56,'9':57,
-    'ArrowLeft':37,'ArrowUp':38,'ArrowRight':39,'ArrowDown':40,
-    'Tab':9,'Escape':27,'Delete':46,'Insert':45,
-    'Home':36,'End':35,'PageUp':33,'PageDown':34,
-    'F1':112,'F2':113,'F3':114,'F4':115,'F5':116,'F6':117,
-    'F7':118,'F8':119,'F9':120,'F10':121,'F11':122,'F12':123,
-  };
-
-  function pressKey(key) {
-    const mods = {shift:shiftOn, ctrl:ctrlOn, alt:altOn};
-
-    if (key === 'Backspace') { doBackspace(); return; }
-    if (key === 'Enter')     { doEnter();     return; }
-    if (key === 'Shift') {
-      shiftOn = !shiftOn;
-      updateModVisual();
-      return;
-    }
-    if (key === 'Control') {
-      ctrlOn = !ctrlOn;
-      updateModVisual();
-      return;
-    }
-    if (key === 'Alt') {
-      altOn = !altOn;
-      updateModVisual();
-      return;
-    }
-    if (key === 'CapsLock') {
-      capsOn = !capsOn;
-      document.getElementById('capsKey').classList.toggle('active', capsOn);
-      return;
-    }
-
-    const kc = KEY_CODES[key.toLowerCase()] || KEY_CODES[key] || key.charCodeAt(0) || 0;
-    fireKeyEvent('keydown', key, kc, mods);
-
-    if (key === 'ArrowLeft'||key==='ArrowRight'||key==='ArrowUp'||key==='ArrowDown'||
-        key === 'Tab' || key === 'Escape' ||
-        key === 'Home'||key==='End'||key==='PageUp'||key==='PageDown'||
-        key === 'Delete'||key==='Insert'||
-        key.startsWith('F')) {
-      fireKeyEvent('keyup', key, kc, mods);
-      if (shiftOn) { shiftOn = false; updateModVisual(); }
-      return;
-    }
-
-    let ch = key;
-    if (shiftOn || capsOn) {
-      if (/^[a-z]$/.test(ch)) ch = ch.toUpperCase();
-      else {
-        const shifts = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^',
-          '7':'&','8':'*','9':'(','0':')','`':'~','-':'_','=':'+',
-          '[':'{',']':'}','\\':'|',';':':','\'':'"',',':'<','.':'>','/':'?'};
-        ch = shifts[ch] || ch;
+      // Handle anchor navigation
+      const anchor = el.closest('a');
+      if (anchor && anchor.href && !anchor.href.startsWith('javascript')) {
+        loadUrl(anchor.href);
       }
-    }
-
-    fireInputChar(ch);
-    fireKeyEvent('keyup', key, kc, mods);
-
-    if (shiftOn) { shiftOn = false; updateModVisual(); }
-    if (ctrlOn)  { ctrlOn  = false; updateModVisual(); }
-    if (altOn)   { altOn   = false; updateModVisual(); }
-  }
-
-  function updateModVisual() {
-    document.getElementById('shiftKeyL').classList.toggle('active', shiftOn);
-    document.getElementById('shiftKeyR').classList.toggle('active', shiftOn);
-    document.getElementById('ctrlKeyL').classList.toggle('active',  ctrlOn);
-    document.getElementById('altKeyL').classList.toggle('active',   altOn);
-    document.getElementById('altKeyR').classList.toggle('active',   altOn);
-  }
-
-  function doCombo(ctrl, shift, alt, key) {
-    const el = getTarget();
-    if (!el) return;
-    const kc = KEY_CODES[key] || key.charCodeAt(0) || 0;
-    const mods = {shift, ctrl, alt};
-    try {
-      const doc = frame.contentDocument;
-      const win = frame.contentWindow;
-      const ev = new KeyboardEvent('keydown', {
-        key, keyCode: kc, which: kc, code: 'Key'+key.toUpperCase(),
-        bubbles:true, cancelable:true,
-        ctrlKey:ctrl, shiftKey:shift, altKey:alt, view:win
-      });
-      (doc.activeElement || doc.body).dispatchEvent(ev);
-
-      if (ctrl && !shift && !alt) {
-        if (key==='a') { try { win.document.execCommand('selectAll'); } catch(e){} }
-        if (key==='c') { try { win.document.execCommand('copy'); }      catch(e){} }
-        if (key==='v') { try { win.document.execCommand('paste'); }     catch(e){} }
-        if (key==='z') { try { win.document.execCommand('undo'); }      catch(e){} }
-        if (key==='x') { try { win.document.execCommand('cut'); }       catch(e){} }
+      // Submit buttons
+      if (el.type === 'submit') {
+        const form = el.closest('form');
+        if (form) form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        else el.click();
       }
-    } catch(e) {}
-  }
+    } else {
+      el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: fx, clientY: fy, view: frame.contentWindow }));
+    }
+  } catch(e) {}
+}
 
-  document.getElementById('ctrlABtn').addEventListener('click', () => doCombo(true,false,false,'a'));
-  document.getElementById('ctrlCBtn').addEventListener('click', () => doCombo(true,false,false,'c'));
-  document.getElementById('ctrlVBtn').addEventListener('click', () => doCombo(true,false,false,'v'));
-  document.getElementById('ctrlZBtn').addEventListener('click', () => doCombo(true,false,false,'z'));
-  document.getElementById('ctrlXBtn').addEventListener('click', () => doCombo(true,false,false,'x'));
+function doScroll(delta) {
+  try {
+    const { fx, fy, inFrame } = getFramePoint();
+    const doc = frame.contentDocument;
+    if (doc && inFrame) {
+      const el = doc.elementFromPoint(fx, fy);
+      if (el) el.dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, deltaY: delta, deltaMode: 0, clientX: fx, clientY: fy, view: frame.contentWindow }));
+      frame.contentWindow.scrollBy(0, delta);
+    } else {
+      window.scrollBy(0, delta);
+    }
+  } catch(e) { window.scrollBy(0, delta); }
+}
 
-  document.querySelectorAll('.k').forEach(btn => {
-    btn.addEventListener('touchstart', e => { e.preventDefault(); pressKey(btn.getAttribute('data-key')); }, {passive:false});
-    btn.addEventListener('click', () => pressKey(btn.getAttribute('data-key')));
+/* Button bindings */
+const btn = id => document.getElementById(id);
+
+btn('lbtn').addEventListener('touchstart', e => { e.preventDefault(); doClick(false); }, { passive: false });
+btn('rbtn').addEventListener('touchstart', e => { e.preventDefault(); doClick(true);  }, { passive: false });
+btn('sup').addEventListener('touchstart',  e => { e.preventDefault(); doScroll(-130); }, { passive: false });
+btn('sdn').addEventListener('touchstart',  e => { e.preventDefault(); doScroll(130);  }, { passive: false });
+btn('smid').addEventListener('touchstart', e => { e.preventDefault(); doScroll(0);    }, { passive: false });
+
+btn('lbtn').onclick = () => doClick(false);
+btn('rbtn').onclick = () => doClick(true);
+btn('sup').onclick  = () => doScroll(-130);
+btn('sdn').onclick  = () => doScroll(130);
+
+/* ═══════════════════════════════════════════
+   VIRTUAL KEYBOARD ENGINE
+═══════════════════════════════════════════ */
+const SHIFTMAP = {
+  '1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')',
+  '`':'~','-':'_','=':'+','[':'{',']':'}','\\':'|',';':':','\'':'"',',':'<','.':'>','/':'?'
+};
+
+const NAV_KEYS = new Set([
+  'ArrowLeft','ArrowRight','ArrowUp','ArrowDown',
+  'Home','End','PageUp','PageDown','Insert','Delete',
+  'Tab','Escape','F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12'
+]);
+
+const KEY_CODES = {
+  ' ':32, Enter:13, Backspace:8, Tab:9, Escape:27, Delete:46, Insert:45,
+  ArrowLeft:37,ArrowUp:38,ArrowRight:39,ArrowDown:40,
+  Home:36,End:35,PageUp:33,PageDown:34, CapsLock:20,
+  Control:17,Shift:16,Alt:18,
+  F1:112,F2:113,F3:114,F4:115,F5:116,F6:117,
+  F7:118,F8:119,F9:120,F10:121,F11:122,F12:123
+};
+for (let i = 65; i <= 90; i++) {
+  const ch = String.fromCharCode(i);
+  KEY_CODES[ch.toLowerCase()] = i;
+  KEY_CODES[ch] = i;
+}
+for (let i = 48; i <= 57; i++) KEY_CODES[String.fromCharCode(i)] = i;
+
+function makeKeyEvent(type, key) {
+  const kc = KEY_CODES[key] || KEY_CODES[key.toLowerCase()] || (key.length === 1 ? key.charCodeAt(0) : 0);
+  return new KeyboardEvent(type, {
+    key, keyCode: kc, which: kc,
+    code: 'Key' + (key.length === 1 ? key.toUpperCase() : key),
+    bubbles: true, cancelable: true,
+    shiftKey: shift, ctrlKey: ctrl, altKey: altK,
+    view: window
   });
+}
 
-  const layers = { main: document.getElementById('mainLayer'), sym: document.getElementById('symbolLayer'), fn: document.getElementById('fnLayer') };
-  function showLayer(name) {
-    layers.main.style.display = name==='main' ? '' : 'none';
-    layers.sym.style.display  = name==='sym'  ? '' : 'none';
-    layers.fn.style.display   = name==='fn'   ? '' : 'none';
+function makeKeyEventFor(type, key, win) {
+  const kc = KEY_CODES[key] || KEY_CODES[key.toLowerCase()] || (key.length === 1 ? key.charCodeAt(0) : 0);
+  return new KeyboardEvent(type, {
+    key, keyCode: kc, which: kc,
+    code: 'Key' + (key.length === 1 ? key.toUpperCase() : key),
+    bubbles: true, cancelable: true,
+    shiftKey: shift, ctrlKey: ctrl, altKey: altK,
+    view: win
+  });
+}
+
+function getActiveTarget() {
+  // Priority: lastFocused in frame > active element in frame > frame body
+  try {
+    const doc = frame.contentDocument;
+    if (!doc) return null;
+    const ae = doc.activeElement;
+    if (ae && ae !== doc.body) return { el: ae, win: frame.contentWindow, doc };
+    if (lastFocused && lastFocused.ownerDocument === doc) return { el: lastFocused, win: frame.contentWindow, doc };
+    return { el: doc.body, win: frame.contentWindow, doc };
+  } catch(e) { return null; }
+}
+
+function insertText(el, doc, ch) {
+  if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+    const s = el.selectionStart != null ? el.selectionStart : el.value.length;
+    const e2 = el.selectionEnd != null ? el.selectionEnd : s;
+    el.value = el.value.slice(0, s) + ch + el.value.slice(e2);
+    el.selectionStart = el.selectionEnd = s + ch.length;
+    el.dispatchEvent(new Event('input',  { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  } else if (el.isContentEditable) {
+    try { doc.execCommand('insertText', false, ch); } catch(e) {}
   }
-  document.getElementById('switchMain').addEventListener('click', () => showLayer('main'));
-  document.getElementById('switchSym').addEventListener('click',  () => showLayer('sym'));
-  document.getElementById('switchFn').addEventListener('click',   () => showLayer('fn'));
+}
 
-  loadUrl('https://www.google.com');
-  moveCursor(0, 0);
+function deleteChar(el, doc) {
+  if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+    const s  = el.selectionStart != null ? el.selectionStart : el.value.length;
+    const e2 = el.selectionEnd  != null ? el.selectionEnd  : s;
+    if (s === e2 && s > 0) {
+      el.value = el.value.slice(0, s - 1) + el.value.slice(s);
+      el.selectionStart = el.selectionEnd = s - 1;
+    } else if (s !== e2) {
+      el.value = el.value.slice(0, s) + el.value.slice(e2);
+      el.selectionStart = el.selectionEnd = s;
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+  } else if (el.isContentEditable) {
+    try { doc.execCommand('delete'); } catch(e) {}
+  }
+}
+
+function pressKey(key) {
+  /* ── Modifiers ── */
+  if (key === 'Shift')   { shift = !shift;  updMods(); return; }
+  if (key === 'Control') { ctrl  = !ctrl;   updMods(); return; }
+  if (key === 'Alt')     { altK  = !altK;   updMods(); return; }
+  if (key === 'CapsLock') {
+    caps = !caps;
+    document.getElementById('kcaps').classList.toggle('on', caps);
+    return;
+  }
+
+  const tgtInfo = getActiveTarget();
+  if (!tgtInfo) { if (shift) resetMods(); return; }
+  const { el, win, doc } = tgtInfo;
+
+  /* ── Ctrl combos ── */
+  if (ctrl && key.length === 1) {
+    el.dispatchEvent(makeKeyEventFor('keydown', key, win));
+    try {
+      const k = key.toLowerCase();
+      if (k === 'a') doc.execCommand('selectAll');
+      else if (k === 'c') doc.execCommand('copy');
+      else if (k === 'v') doc.execCommand('paste');
+      else if (k === 'z') doc.execCommand('undo');
+      else if (k === 'x') doc.execCommand('cut');
+    } catch(e) {}
+    el.dispatchEvent(makeKeyEventFor('keyup', key, win));
+    resetMods(); return;
+  }
+
+  /* ── Nav / function keys ── */
+  if (NAV_KEYS.has(key)) {
+    el.dispatchEvent(makeKeyEventFor('keydown', key, win));
+    el.dispatchEvent(makeKeyEventFor('keyup',   key, win));
+    if (shift) resetMods();
+    return;
+  }
+
+  /* ── Backspace ── */
+  if (key === 'Backspace') {
+    el.dispatchEvent(makeKeyEventFor('keydown', 'Backspace', win));
+    deleteChar(el, doc);
+    el.dispatchEvent(makeKeyEventFor('keyup', 'Backspace', win));
+    return;
+  }
+
+  /* ── Enter ── */
+  if (key === 'Enter') {
+    el.dispatchEvent(makeKeyEventFor('keydown', 'Enter', win));
+    if (el.tagName === 'TEXTAREA') {
+      insertText(el, doc, '\n');
+    } else if (el.tagName === 'INPUT') {
+      // Try submit form
+      const form = el.closest('form');
+      if (form) {
+        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+        form.dispatchEvent(submitEvent);
+        // Also check if there's a submit button
+        const sb = form.querySelector('[type=submit]');
+        if (sb) sb.click();
+      } else {
+        el.dispatchEvent(makeKeyEventFor('keypress', 'Enter', win));
+      }
+    } else if (el.isContentEditable) {
+      try { doc.execCommand('insertParagraph'); } catch(e) {}
+    }
+    el.dispatchEvent(makeKeyEventFor('keyup', 'Enter', win));
+    if (shift) resetMods();
+    return;
+  }
+
+  /* ── Printable character ── */
+  let ch = key;
+  if (key.length === 1) {
+    if (shift && !caps) {
+      ch = /^[a-z]$/.test(key) ? key.toUpperCase() : (SHIFTMAP[key] || key);
+    } else if (caps && !shift) {
+      ch = /^[a-z]$/.test(key) ? key.toUpperCase() : key;
+    } else if (caps && shift) {
+      ch = /^[a-z]$/.test(key) ? key.toLowerCase() : (SHIFTMAP[key] || key);
+    }
+  }
+
+  el.dispatchEvent(makeKeyEventFor('keydown', key, win));
+  try {
+    el.dispatchEvent(new KeyboardEvent('keypress', {
+      key: ch, keyCode: ch.charCodeAt(0), which: ch.charCodeAt(0),
+      bubbles: true, cancelable: true,
+      shiftKey: shift, ctrlKey: ctrl, altKey: altK,
+      view: win
+    }));
+  } catch(e) {}
+  insertText(el, doc, ch);
+  el.dispatchEvent(makeKeyEventFor('keyup', key, win));
+
+  if (shift) resetMods();
+}
+
+/* Combos (Ctrl+key) from quick bar */
+function combo(key) {
+  const tgtInfo = getActiveTarget();
+  if (!tgtInfo) return;
+  const { el, win, doc } = tgtInfo;
+  const kc = KEY_CODES[key] || key.charCodeAt(0);
+  try {
+    el.dispatchEvent(new KeyboardEvent('keydown', { key, keyCode: kc, which: kc, ctrlKey: true, bubbles: true, cancelable: true, view: win }));
+    const k = key.toLowerCase();
+    if (k === 'a') doc.execCommand('selectAll');
+    else if (k === 'c') doc.execCommand('copy');
+    else if (k === 'v') doc.execCommand('paste');
+    else if (k === 'z') doc.execCommand('undo');
+    else if (k === 'x') doc.execCommand('cut');
+    else if (k === 'f') {
+      // focus search in frame
+      const inp = doc.querySelector('input[type=search],input[name=q],input[type=text]');
+      if (inp) { inp.focus(); lastFocused = inp; }
+    } else if (k === 't') { loadUrl('https://www.google.com'); }
+    else if (k === 'r') { frame.src = currentUrl || 'about:blank'; startLoad(); }
+    el.dispatchEvent(new KeyboardEvent('keyup', { key, keyCode: kc, ctrlKey: true, bubbles: true, view: win }));
+  } catch(e) {}
+}
+
+function resetMods() { shift = false; ctrl = false; altK = false; updMods(); }
+
+function updMods() {
+  document.getElementById('kshl').classList.toggle('on', shift);
+  document.getElementById('kshr').classList.toggle('on', shift);
+  document.getElementById('kctrl').classList.toggle('on', ctrl);
+  document.getElementById('kalt').classList.toggle('on', altK);
+}
+
+/* ── Layer switching ── */
+function layer(name) {
+  document.getElementById('lmain').style.display = name === 'main' ? '' : 'none';
+  document.getElementById('lsym').style.display  = name === 'sym'  ? '' : 'none';
+  document.getElementById('lfn').style.display   = name === 'fn'   ? '' : 'none';
+  document.querySelectorAll('#kbar .qk[data-layer]').forEach(el => {
+    el.classList.toggle('on', el.dataset.layer === name);
+  });
+}
+
+/* ── Toggle keyboard ── */
+function toggleKbd() {
+  kbdVisible = !kbdVisible;
+  kbd.classList.toggle('off', !kbdVisible);
+  document.getElementById('qtog').textContent = kbdVisible ? '⌨ Fechar' : '⌨ Abrir';
+}
+
+/* ── Bind keys ── */
+document.querySelectorAll('.k').forEach(btn => {
+  const key = btn.getAttribute('data-k');
+  if (!key) return;
+
+  btn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    pressKey(key);
+  }, { passive: false });
+
+  btn.addEventListener('mousedown', e => {
+    e.preventDefault();
+    pressKey(key);
+  });
+});
+
+/* ── Quick bar layer buttons ── */
+document.querySelectorAll('#kbar .qk[data-layer]').forEach(el => {
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    layer(el.dataset.layer);
+  }, { passive: false });
+  el.addEventListener('click', () => layer(el.dataset.layer));
+});
+
+/* ── Prevent native keyboard on all non-modal inputs ── */
+document.addEventListener('focusin', e => {
+  const t = e.target;
+  if (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') {
+    // Only allow native keyboard for the URL modal input
+    if (t.id === 'urlbox-input') return;
+    t.setAttribute('readonly', 'true');
+    setTimeout(() => t.removeAttribute('readonly'), 50);
+    t.blur();
+  }
+}, true);
+
+/* ── Init ── */
+loadUrl('https://www.google.com');
+
+/* ── Public API ── */
+return { tryProxy, layer, toggleKbd, combo, loadUrl };
 })();
 </script>
 </body>
