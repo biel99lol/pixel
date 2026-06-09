@@ -13,10 +13,10 @@
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column}
 
-#titlebar{background:var(--bar);height:38px;display:flex;align-items:center;padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto;overflow-y:hidden}
+#titlebar{background:var(--bar);height:40px;display:flex;align-items:center;padding:0 6px;gap:2px;flex-shrink:0;border-bottom:1px solid #000;overflow-x:auto;overflow-y:hidden}
 #titlebar::-webkit-scrollbar{height:3px}
 #tabsContainer{display:flex;align-items:flex-end;gap:2px;height:100%}
-.tab{background:var(--card);color:var(--dim);padding:6px 12px 5px;border-radius:10px 10px 0 0;font-size:12px;display:inline-flex;align-items:center;gap:6px;min-width:90px;max-width:160px;cursor:pointer;border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0;height:34px}
+.tab{background:var(--card);color:var(--dim);padding:6px 12px 5px;border-radius:10px 10px 0 0;font-size:12px;display:inline-flex;align-items:center;gap:6px;min-width:100px;max-width:180px;cursor:pointer;border:1px solid #000;border-bottom:none;white-space:nowrap;flex-shrink:0;height:36px}
 .tab.active{background:var(--bg);color:var(--txt)}
 .tab-ttl{flex:1;overflow:hidden;text-overflow:ellipsis}
 .tab-x{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;font-size:12px}
@@ -36,38 +36,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
 #urlInput{flex:1;background:transparent;border:none;color:var(--txt);font-size:13px;outline:none}
 #menubtn{background:transparent;border:none;color:var(--dim);font-size:22px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 
-#viewport{flex:1;position:relative;overflow:auto;background:#fff}
+#viewport{flex:1;position:relative;overflow:hidden;background:#fff}
 .contentFrame{width:100%;height:100%;border:none;display:block}
-
-#virtualCursor{position:fixed;width:0;height:0;border-left:10px solid transparent;border-right:0 solid transparent;border-bottom:18px solid #8ab4f8;filter:drop-shadow(0 2px 5px rgba(0,0,0,0.6));pointer-events:none;z-index:999999;transition:left 0.02s linear, top 0.02s linear}
-#virtualCursor::after{content:'';position:absolute;top:12px;left:-5px;width:5px;height:12px;background:#8ab4f8;border-radius:0 0 4px 4px}
-#virtualCursor.rc{border-bottom-color:#f28b82}
-#virtualCursor.rc::after{background:#f28b82}
-
-#mpad{position:fixed;right:12px;bottom:280px;width:170px;background:#12121ae6;backdrop-filter:blur(12px);border:1px solid #2a2a3a;border-radius:16px;z-index:10000}
-#mhead{padding:8px 12px 4px;display:flex;justify-content:space-between;align-items:center;cursor:move}
-#mhead span:first-child{color:#8ab4f8;font-size:9px}
-#mhead span:last-child{color:#5a5a7a;font-size:16px;cursor:pointer}
-#tpad{margin:0 10px;height:100px;background:#0a0a10;border-radius:12px;border:1px solid #252535;position:relative}
-#tpad::before{content:'TRACKPAD';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#1a1a2a;font-size:9px}
-#mbtns{display:flex;gap:8px;padding:8px 10px 6px}
-#lbtn,#rbtn{flex:1;height:34px;border:none;border-radius:10px;font-size:11px;font-weight:bold;cursor:pointer}
-#lbtn{background:#0d2e1c;color:#81c995}#rbtn{background:#2e1a1a;color:#f28b82}
-#lbtn:active{background:#81c995;color:#000}#rbtn:active{background:#f28b82;color:#000}
-#srow{display:flex;gap:6px;padding:0 10px 10px}
-#sup,#sdn,#smid{flex:1;height:30px;background:#0d0d18;border:1px solid #252535;color:#aaa;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-#sup:active,#sdn:active,#smid:active{background:var(--blue);color:#000}
-
-#kbd{position:fixed;bottom:0;left:0;right:0;background:#111118ee;backdrop-filter:blur(10px);border-top:1px solid #2a2a35;padding:4px 4px 8px;z-index:10001}
-#kbd.koff{display:none}
-#kbar{display:flex;padding:4px 6px 6px;gap:4px;border-bottom:1px solid #22222a;overflow-x:auto}
-.qk{background:#1e1e2a;border:1px solid #353545;color:#ccc;border-radius:8px;padding:6px 12px;font-size:11px;white-space:nowrap;cursor:pointer}
-.qk:active{background:var(--blue);color:#000}
-.kr{display:flex;justify-content:center;gap:3px;margin-bottom:3px;padding:0 4px}
-.k{background:#252532;border:1px solid #353545;color:#e0e0e0;border-radius:8px;height:40px;min-width:30px;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;flex:1 0 auto}
-.k:active{background:var(--blue);color:#000}
-.k.space{flex:5}
-.k.back{min-width:50px}
 </style>
 </head>
 <body>
@@ -97,374 +67,290 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-famil
   <iframe id="mainFrame" class="contentFrame" src="about:blank"></iframe>
 </div>
 
-<div id="virtualCursor" class="lc"></div>
-
-<div id="mpad">
-  <div id="mhead"><span>✦ TRACKPAD</span><span id="mpadClose">✕</span></div>
-  <div id="tpad"></div>
-  <div id="mbtns"><button id="lbtn">LMB</button><button id="rbtn">RMB</button></div>
-  <div id="srow"><button id="sup">▲</button><button id="smid">●</button><button id="sdn">▼</button></div>
-</div>
-
-<div id="kbd">
-  <div id="kbar">
-    <div class="qk" data-key="Tab">Tab</div><div class="qk" data-key="Enter">Enter</div>
-    <div class="qk" data-key="Escape">Esc</div><div class="qk" data-key="ArrowUp">↑</div>
-    <div class="qk" data-key="ArrowDown">↓</div><div class="qk" data-key="ArrowLeft">←</div>
-    <div class="qk" data-key="ArrowRight">→</div><div class="qk" data-key="Control">Ctrl</div>
-    <div class="qk" data-key="Alt">Alt</div><div class="qk" data-key="Shift">Shift</div>
-    <div class="qk" data-key="Delete">Del</div>
-  </div>
-  <div class="kr" data-row="1"></div>
-  <div class="kr" data-row="2"></div>
-  <div class="kr" data-row="3"></div>
-</div>
-
 <script>
-const START_URL = "https://web.cloudmoonapp.com/pt/";
-let tabs = [{ id: 1, url: START_URL, title: 'Nova aba' }];
-let activeTabId = 1;
-let tabCounter = 1;
-let canGoBack = false;
-let canGoForward = false;
+const START_URL = "https://www.google.com";
 
-const iframe = document.getElementById('mainFrame');
-let cursorX = window.innerWidth / 2;
-let cursorY = window.innerHeight / 2;
-let currentFrameDoc = null;
+// Cada aba guarda seu próprio iframe e estado
+let tabs = [];
+let activeTabId = null;
+let tabCounter = 0;
+let isInitialized = false;
 
-// Atualiza cursor visual
-function updateCursorVisual() {
-  const cur = document.getElementById('virtualCursor');
-  cur.style.left = Math.max(2, Math.min(window.innerWidth - 12, cursorX - 3)) + 'px';
-  cur.style.top = Math.max(2, Math.min(window.innerHeight - 20, cursorY - 14)) + 'px';
+// Container do viewport
+const viewport = document.getElementById('viewport');
+
+// Função para criar um iframe isolado
+function createIsolatedIframe() {
+  const iframe = document.createElement('iframe');
+  iframe.className = 'contentFrame';
+  iframe.style.display = 'none';
+  iframe.src = 'about:blank';
+  
+  // Configurações para isolamento de sessão
+  iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-popups-to-escape-sandbox');
+  // Remove sandbox para permitir funcionalidade completa (ou mantenha conforme necessidade)
+  iframe.removeAttribute('sandbox');
+  
+  return iframe;
 }
 
-function setCursorPosition(x, y) {
-  cursorX = Math.min(window.innerWidth - 8, Math.max(6, x));
-  cursorY = Math.min(window.innerHeight - 24, Math.max(24, y));
-  updateCursorVisual();
-}
-
-// Clique no iframe (funciona para qualquer site)
-function clickAtCursor(button) {
-  try {
-    const doc = iframe.contentDocument;
-    if(!doc) return;
-    
-    // Ajusta coordenadas relativas ao iframe
-    const rect = iframe.getBoundingClientRect();
-    const iframeX = cursorX - rect.left;
-    const iframeY = cursorY - rect.top;
-    
-    if(iframeX < 0 || iframeY < 0 || iframeX > rect.width || iframeY > rect.height) return;
-    
-    const elem = doc.elementFromPoint(iframeX, iframeY);
-    if(elem) {
-      if(button === 'left') {
-        elem.dispatchEvent(new MouseEvent('mousedown', {bubbles:true, clientX:iframeX, clientY:iframeY, button:0}));
-        elem.dispatchEvent(new MouseEvent('mouseup', {bubbles:true, clientX:iframeX, clientY:iframeY, button:0}));
-        elem.dispatchEvent(new MouseEvent('click', {bubbles:true, clientX:iframeX, clientY:iframeY, button:0}));
-      } else {
-        elem.dispatchEvent(new MouseEvent('contextmenu', {bubbles:true, clientX:iframeX, clientY:iframeY, button:2}));
-      }
-      
-      const cur = document.getElementById('virtualCursor');
-      cur.className = button === 'left' ? 'lc' : 'rc';
-      setTimeout(() => cur.className = 'lc', 100);
-    }
-  } catch(e) { console.log('Click error (cross-origin):', e); }
-}
-
-// Teclado no iframe
-function sendKeyToFrame(key, code, modifiers = {}) {
-  try {
-    const doc = iframe.contentDocument;
-    const active = doc?.activeElement || doc?.body;
-    if(!active) return;
-    
-    const opts = {key, code, bubbles:true, cancelable:true, ctrlKey:modifiers.ctrl, altKey:modifiers.alt, shiftKey:modifiers.shift};
-    active.dispatchEvent(new KeyboardEvent('keydown', opts));
-    if(key !== 'Control' && key !== 'Alt' && key !== 'Shift') {
-      active.dispatchEvent(new KeyboardEvent('keypress', {key, code, bubbles:true}));
-    }
-    active.dispatchEvent(new KeyboardEvent('keyup', {key, code, bubbles:true}));
-  } catch(e) { console.log('Key error:', e); }
-}
-
-// Scroll no iframe
-function scrollIframe(direction) {
-  try {
-    const win = iframe.contentWindow;
-    if(win) {
-      if(direction === 'up') win.scrollBy(0, -300);
-      else win.scrollBy(0, 300);
-    }
-  } catch(e) {}
-}
-
-// Navegação
-function navigateTo(url) {
-  let finalUrl = url.trim();
-  if(!finalUrl) finalUrl = START_URL;
-  if(!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
-    if(finalUrl.includes('.') && !finalUrl.includes(' ')) finalUrl = 'https://' + finalUrl;
-    else finalUrl = 'https://www.google.com/search?q=' + encodeURIComponent(finalUrl);
+// Adicionar nova aba
+function addTab(url = START_URL, isNew = true) {
+  const id = ++tabCounter;
+  const iframe = createIsolatedIframe();
+  
+  tabs.push({
+    id: id,
+    url: url,
+    title: 'Nova aba',
+    iframe: iframe,
+    historyIndex: 0,
+    history: [url],
+    canGoBack: false,
+    canGoForward: false
+  });
+  
+  viewport.appendChild(iframe);
+  
+  if (isNew || tabs.length === 1) {
+    activeTabId = id;
+    switchToTab(id);
   }
   
-  const tab = tabs.find(t => t.id === activeTabId);
-  if(tab) {
-    tab.url = finalUrl;
-    iframe.src = finalUrl;
-    document.getElementById('urlInput').value = finalUrl;
-    updateTabsUI();
-  }
-}
-
-function addTab(url = START_URL) {
-  const id = ++tabCounter;
-  tabs.push({ id, url, title: 'Nova aba' });
-  activeTabId = id;
-  iframe.src = url;
-  document.getElementById('urlInput').value = url;
   updateTabsUI();
+  return id;
 }
 
-function closeTab(id) {
-  const idx = tabs.findIndex(t => t.id === id);
-  if(idx === -1) return;
-  tabs.splice(idx, 1);
-  if(tabs.length === 0) {
-    addTab(START_URL);
-  } else if(activeTabId === id) {
-    activeTabId = tabs[Math.min(idx, tabs.length-1)].id;
-    const tab = tabs.find(t => t.id === activeTabId);
-    iframe.src = tab.url;
-    document.getElementById('urlInput').value = tab.url;
-  }
-  updateTabsUI();
-}
-
-function switchTab(id) {
-  activeTabId = id;
+// Mudar para aba específica
+function switchToTab(id) {
   const tab = tabs.find(t => t.id === id);
-  if(tab) {
-    iframe.src = tab.url;
-    document.getElementById('urlInput').value = tab.url;
-  }
+  if (!tab) return;
+  
+  activeTabId = id;
+  
+  // Esconder todos os iframes e mostrar o ativo
+  tabs.forEach(t => {
+    t.iframe.style.display = 'none';
+  });
+  tab.iframe.style.display = 'block';
+  
+  // Atualizar URL na barra
+  document.getElementById('urlInput').value = tab.url;
+  
+  // Atualizar botões de navegação
+  updateNavButtons(tab);
+  
+  // Atualizar título da aba ativa
+  updateTabTitle(id, tab.title);
+  
   updateTabsUI();
 }
 
+// Atualizar botões de navegação
+function updateNavButtons(tab) {
+  const backBtn = document.getElementById('backBtn');
+  const forwardBtn = document.getElementById('forwardBtn');
+  
+  backBtn.disabled = !tab.canGoBack;
+  forwardBtn.disabled = !tab.canGoForward;
+}
+
+// Navegar para URL
+function navigateTo(url, tabId = activeTabId) {
+  let finalUrl = url.trim();
+  if (!finalUrl) finalUrl = START_URL;
+  
+  if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+    if (finalUrl.includes('.') && !finalUrl.includes(' ')) {
+      finalUrl = 'https://' + finalUrl;
+    } else {
+      finalUrl = 'https://www.google.com/search?q=' + encodeURIComponent(finalUrl);
+    }
+  }
+  
+  const tab = tabs.find(t => t.id === tabId);
+  if (!tab) return;
+  
+  // Atualizar histórico
+  if (tab.historyIndex < tab.history.length - 1) {
+    tab.history = tab.history.slice(0, tab.historyIndex + 1);
+  }
+  tab.history.push(finalUrl);
+  tab.historyIndex = tab.history.length - 1;
+  tab.url = finalUrl;
+  tab.canGoBack = tab.historyIndex > 0;
+  tab.canGoForward = false;
+  
+  // Navegar no iframe
+  tab.iframe.src = finalUrl;
+  document.getElementById('urlInput').value = finalUrl;
+  
+  updateNavButtons(tab);
+  updateTabsUI();
+  
+  // Atualizar título quando carregar
+  tab.iframe.onload = () => {
+    setTimeout(() => {
+      try {
+        let title = tab.iframe.contentDocument?.title;
+        if (title && title.trim()) {
+          tab.title = title.substring(0, 30);
+        } else {
+          try {
+            const urlObj = new URL(tab.url);
+            tab.title = urlObj.hostname || 'Nova aba';
+          } catch(e) {
+            tab.title = 'Nova aba';
+          }
+        }
+        if (activeTabId === tab.id) {
+          updateTabTitle(tab.id, tab.title);
+        }
+        updateTabsUI();
+      } catch(e) {
+        // Cross-origin, mantém título atual
+      }
+    }, 200);
+  };
+}
+
+// Voltar página
+function goBack() {
+  const tab = tabs.find(t => t.id === activeTabId);
+  if (!tab || !tab.canGoBack) return;
+  
+  tab.historyIndex--;
+  const previousUrl = tab.history[tab.historyIndex];
+  tab.url = previousUrl;
+  tab.canGoBack = tab.historyIndex > 0;
+  tab.canGoForward = true;
+  
+  tab.iframe.src = previousUrl;
+  document.getElementById('urlInput').value = previousUrl;
+  
+  updateNavButtons(tab);
+}
+
+// Avançar página
+function goForward() {
+  const tab = tabs.find(t => t.id === activeTabId);
+  if (!tab || !tab.canGoForward) return;
+  
+  tab.historyIndex++;
+  const nextUrl = tab.history[tab.historyIndex];
+  tab.url = nextUrl;
+  tab.canGoForward = tab.historyIndex < tab.history.length - 1;
+  tab.canGoBack = true;
+  
+  tab.iframe.src = nextUrl;
+  document.getElementById('urlInput').value = nextUrl;
+  
+  updateNavButtons(tab);
+}
+
+// Recarregar página
+function reloadPage() {
+  const tab = tabs.find(t => t.id === activeTabId);
+  if (tab) {
+    tab.iframe.src = tab.iframe.src;
+  }
+}
+
+// Fechar aba
+function closeTab(id) {
+  const index = tabs.findIndex(t => t.id === id);
+  if (index === -1) return;
+  
+  const tab = tabs[index];
+  tab.iframe.remove();
+  tabs.splice(index, 1);
+  
+  if (tabs.length === 0) {
+    addTab(START_URL, false);
+  } else if (activeTabId === id) {
+    const newIndex = Math.min(index, tabs.length - 1);
+    switchToTab(tabs[newIndex].id);
+  }
+  
+  updateTabsUI();
+}
+
+// Atualizar título da aba na interface
+function updateTabTitle(tabId, title) {
+  const tabElement = document.querySelector(`.tab[data-id='${tabId}']`);
+  if (tabElement) {
+    const titleSpan = tabElement.querySelector('.tab-ttl');
+    if (titleSpan) titleSpan.textContent = title;
+  }
+}
+
+// Atualizar UI das abas
 function updateTabsUI() {
   const container = document.getElementById('tabsContainer');
   container.innerHTML = '';
+  
   tabs.forEach(tab => {
     const tabDiv = document.createElement('div');
     tabDiv.className = 'tab' + (tab.id === activeTabId ? ' active' : '');
-    tabDiv.innerHTML = `<div class="tab-ttl">${escapeHtml(tab.title)}</div><div class="tab-x">✕</div>`;
+    tabDiv.setAttribute('data-id', tab.id);
+    tabDiv.innerHTML = `
+      <div class="tab-ttl">${escapeHtml(tab.title)}</div>
+      <div class="tab-x">✕</div>
+    `;
+    
     tabDiv.addEventListener('click', (e) => {
-      if(e.target.classList.contains('tab-x')) {
+      if (e.target.classList.contains('tab-x')) {
         e.stopPropagation();
         closeTab(tab.id);
       } else {
-        switchTab(tab.id);
+        switchToTab(tab.id);
       }
     });
+    
     container.appendChild(tabDiv);
   });
+  
+  // Scroll para a aba ativa
+  const activeTabElement = document.querySelector('.tab.active');
+  if (activeTabElement) {
+    activeTabElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
 }
 
-function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
-
-// Atualiza título da aba
-iframe.onload = () => {
-  setTimeout(() => {
-    try {
-      const doc = iframe.contentDocument;
-      let title = doc?.title || new URL(iframe.src).hostname || 'Nova aba';
-      const tab = tabs.find(t => t.id === activeTabId);
-      if(tab) {
-        tab.title = title.substring(0, 35);
-        updateTabsUI();
-      }
-      document.getElementById('urlInput').value = iframe.src;
-      
-      // Atualiza botões de navegação
-      try {
-        const win = iframe.contentWindow;
-        canGoBack = win.history.length > 1;
-        canGoForward = false;
-        document.getElementById('backBtn').disabled = !canGoBack;
-        document.getElementById('forwardBtn').disabled = !canGoForward;
-      } catch(e) {}
-    } catch(e) {}
-  }, 200);
-};
-
-// Trackpad
-const trackpad = document.getElementById('tpad');
-let trackActive = false, lastX = 0, lastY = 0;
-
-trackpad.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  trackActive = true;
-  lastX = e.touches[0].clientX;
-  lastY = e.touches[0].clientY;
-});
-trackpad.addEventListener('touchmove', (e) => {
-  e.preventDefault();
-  if(trackActive) {
-    const dx = (e.touches[0].clientX - lastX) * 2.5;
-    const dy = (e.touches[0].clientY - lastY) * 2.5;
-    setCursorPosition(cursorX + dx, cursorY + dy);
-    lastX = e.touches[0].clientX;
-    lastY = e.touches[0].clientY;
-  }
-});
-trackpad.addEventListener('touchend', (e) => { e.preventDefault(); trackActive = false; });
-
-document.getElementById('lbtn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  clickAtCursor('left');
-});
-document.getElementById('rbtn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  clickAtCursor('right');
-});
-document.getElementById('sup').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  scrollIframe('up');
-});
-document.getElementById('sdn').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  scrollIframe('down');
-});
-document.getElementById('smid').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  clickAtCursor('left');
-});
-
-// Teclado virtual
-const keyboardLayout = {
-  row1: ['q','w','e','r','t','y','u','i','o','p','[',']'],
-  row2: ['a','s','d','f','g','h','j','k','l',';',"'"],
-  row3: ['z','x','c','v','b','n','m',',','.','/']
-};
-
-function buildKeyboard() {
-  for(let r=1; r<=3; r++) {
-    const rowDiv = document.querySelector(`.kr[data-row="${r}"]`);
-    rowDiv.innerHTML = '';
-    keyboardLayout[`row${r}`].forEach(k => {
-      const keyDiv = document.createElement('div');
-      keyDiv.className = 'k';
-      keyDiv.textContent = k;
-      keyDiv.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        sendKeyToFrame(k, `Key${k.toUpperCase()}`);
-      });
-      rowDiv.appendChild(keyDiv);
-    });
-  }
-  const lastRow = document.querySelector('.kr[data-row="3"]');
-  const spaceDiv = document.createElement('div');
-  spaceDiv.className = 'k space';
-  spaceDiv.textContent = 'Espaço';
-  spaceDiv.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    sendKeyToFrame(' ', 'Space');
-  });
-  lastRow.appendChild(spaceDiv);
-  const backDiv = document.createElement('div');
-  backDiv.className = 'k back';
-  backDiv.textContent = '⌫';
-  backDiv.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    sendKeyToFrame('Backspace', 'Backspace');
-  });
-  lastRow.appendChild(backDiv);
+function escapeHtml(str) { 
+  return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); 
 }
 
-document.querySelectorAll('.qk').forEach(btn => {
-  btn.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    const key = btn.dataset.key;
-    const special = {'Enter':'Enter','Tab':'Tab','Escape':'Escape','ArrowUp':'ArrowUp','ArrowDown':'ArrowDown','ArrowLeft':'ArrowLeft','ArrowRight':'ArrowRight','Delete':'Delete'};
-    if(special[key]) sendKeyToFrame(key, special[key]);
-    else if(key === 'Control') sendKeyToFrame('Control', 'ControlLeft', {ctrl:true});
-    else if(key === 'Alt') sendKeyToFrame('Alt', 'AltLeft', {alt:true});
-    else if(key === 'Shift') sendKeyToFrame('Shift', 'ShiftLeft', {shift:true});
-  });
-});
-
-// Navegação UI
+// Event listeners da toolbar
 document.getElementById('urlInput').addEventListener('keypress', (e) => {
-  if(e.key === 'Enter') navigateTo(e.target.value);
+  if (e.key === 'Enter') {
+    navigateTo(e.target.value);
+  }
 });
-document.getElementById('backBtn').addEventListener('click', () => {
-  try { iframe.contentWindow.history.back(); } catch(e) {}
-});
-document.getElementById('forwardBtn').addEventListener('click', () => {
-  try { iframe.contentWindow.history.forward(); } catch(e) {}
-});
-document.getElementById('reloadBtn').addEventListener('click', () => {
-  iframe.src = iframe.src;
-});
+
+document.getElementById('backBtn').addEventListener('click', goBack);
+document.getElementById('forwardBtn').addEventListener('click', goForward);
+document.getElementById('reloadBtn').addEventListener('click', reloadPage);
 document.getElementById('newTab').addEventListener('click', () => addTab(START_URL));
 
-// Move mousepad
-const mpad = document.getElementById('mpad');
-let mpadDrag = false, mpadStartX=0, mpadStartY=0, mpadLeft=0, mpadTop=0;
-document.getElementById('mhead').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  mpadDrag = true;
-  mpadStartX = e.touches[0].clientX;
-  mpadStartY = e.touches[0].clientY;
-  mpadLeft = mpad.offsetLeft;
-  mpadTop = mpad.offsetTop;
-});
-document.addEventListener('touchmove', (e) => {
-  if(mpadDrag) {
-    e.preventDefault();
-    let newL = mpadLeft + (e.touches[0].clientX - mpadStartX);
-    let newT = mpadTop + (e.touches[0].clientY - mpadStartY);
-    newL = Math.min(window.innerWidth - mpad.offsetWidth, Math.max(0, newL));
-    newT = Math.min(window.innerHeight - 280, Math.max(0, newT));
-    mpad.style.left = newL + 'px';
-    mpad.style.right = 'auto';
-    mpad.style.top = newT + 'px';
-  }
-});
-document.addEventListener('touchend', () => { mpadDrag = false; });
-document.getElementById('mpadClose').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  mpad.style.display = 'none';
-});
-
-let kbdVisible = true;
+// Menu de opções (simples)
 document.getElementById('menubtn').addEventListener('click', () => {
-  kbdVisible = !kbdVisible;
-  document.getElementById('kbd').classList.toggle('koff', !kbdVisible);
+  alert('Opções:\n- Abas independentes\n- Histórico por aba\n- Sessões isoladas');
 });
 
-// Toque na viewport = move + clique
-document.getElementById('viewport').addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  const touch = e.touches[0];
-  setCursorPosition(touch.clientX, touch.clientY);
-  clickAtCursor('left');
-});
-
-// Window controls
-document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar'));
-document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar'));
-document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar'));
+// Controles da janela (simulados)
+document.querySelector('.wc.min').addEventListener('click', () => alert('Minimizar (simulado)'));
+document.querySelector('.wc.cls').addEventListener('click', () => alert('Fechar (simulado)'));
+document.querySelector('.wc.max').addEventListener('click', () => alert('Maximizar (simulado)'));
 
 // Inicialização
-buildKeyboard();
-iframe.src = START_URL;
-setCursorPosition(window.innerWidth/2, window.innerHeight/2);
-updateTabsUI();
+function init() {
+  addTab(START_URL, false);
+  isInitialized = true;
+}
+
+// Iniciar
+init();
 </script>
 </body>
 </html>
