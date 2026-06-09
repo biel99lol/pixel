@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AutoClick AFK + Simulação Realista Cloud Phone</title>
+    <title>Auto Click + Automação Multi-Telas</title>
     <style>
         * {
             margin: 0;
@@ -72,17 +72,37 @@
             font-weight: bold;
         }
 
-        .afk-btn {
-            background: #eb459e;
-            color: white;
-        }
-
-        .virtual-btn {
+        .settings-btn {
             background: #faa61a;
             color: #1e1e2f;
         }
 
-        /* Tabs */
+        .automation-btn {
+            background: #eb459e;
+            color: white;
+        }
+
+        /* Botões de atalho */
+        .shortcuts {
+            display: flex;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #1a1a2a;
+            overflow-x: auto;
+        }
+
+        .shortcuts button {
+            background: #0f0f1a;
+            border: none;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* Container de abas */
         .tabs-container {
             background: #1a1a2a;
             display: flex;
@@ -183,12 +203,12 @@
             border: none;
         }
 
-        /* Painel AFK */
-        .afk-panel {
+        /* Painel de Automação */
+        .automation-panel {
             position: fixed;
-            right: -450px;
+            right: -400px;
             top: 0;
-            width: 450px;
+            width: 400px;
             height: 100vh;
             background: #1e1e2f;
             z-index: 10001;
@@ -199,7 +219,7 @@
             color: white;
         }
 
-        .afk-panel.open {
+        .automation-panel.open {
             right: 0;
         }
 
@@ -231,26 +251,62 @@
             padding: 15px;
         }
 
-        .afk-controls {
+        .action-buttons {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
-        .afk-btn-control {
-            flex: 1;
+        .action-btn {
             background: #5865F2;
             border: none;
             color: white;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            font-weight: bold;
+            font-size: 12px;
         }
 
-        .afk-btn-control.active {
+        .action-btn.record {
             background: #eb459e;
-            box-shadow: 0 0 10px #eb459e;
+        }
+
+        .action-btn.stop {
+            background: #ed4245;
+        }
+
+        .action-btn.play {
+            background: #23a55a;
+        }
+
+        .sequence-list {
+            background: #0f0f1a;
+            border-radius: 10px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .sequence-item {
+            background: #2a2a3a;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sequence-item button {
+            background: #ed4245;
+            border: none;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         .config-group {
@@ -273,76 +329,73 @@
             border-radius: 5px;
         }
 
-        .stats {
-            background: #0f0f1a;
-            padding: 10px;
-            border-radius: 10px;
-            margin-top: 15px;
-            font-size: 12px;
-        }
-
-        /* Mouse Virtual */
-        .virtual-cursor {
+        /* Explorer DOM */
+        .dom-explorer {
             position: fixed;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #eb459e;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            transition: all 0.05s;
-            background: rgba(235, 69, 158, 0.2);
-            display: none;
-        }
-
-        .virtual-cursor.active {
-            display: block;
-        }
-
-        /* Teclado Virtual */
-        .virtual-keyboard {
-            position: fixed;
-            bottom: -400px;
-            left: 0;
-            right: 0;
-            background: #1a1a2a;
-            padding: 10px;
-            z-index: 10002;
-            transition: bottom 0.3s;
-            border-top: 2px solid #5865F2;
-        }
-
-        .virtual-keyboard.open {
-            bottom: 0;
-        }
-
-        .keyboard-row {
+            left: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: #1e1e2f;
+            z-index: 10001;
+            transition: left 0.3s;
             display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-
-        .key {
-            background: #2a2a3a;
-            border: none;
+            flex-direction: column;
+            box-shadow: 5px 0 20px rgba(0,0,0,0.5);
             color: white;
-            padding: 12px 8px;
-            border-radius: 8px;
-            cursor: pointer;
+        }
+
+        .dom-explorer.open {
+            left: 0;
+        }
+
+        .dom-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
             font-size: 12px;
-            min-width: 40px;
-            transition: all 0.05s;
+            font-family: monospace;
         }
 
-        .key:active {
-            transform: scale(0.95);
-            background: #5865F2;
+        .dom-node {
+            padding-left: 15px;
+            margin: 2px 0;
+            cursor: pointer;
         }
 
-        .key.special {
-            background: #eb459e;
-            min-width: 60px;
+        .dom-node:hover {
+            background: #2a2a3a;
+        }
+
+        .dom-tag {
+            color: #eb459e;
+        }
+
+        .dom-attr {
+            color: #faa61a;
+        }
+
+        /* Modal Configurações DPI */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #1e1e2f;
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            color: white;
         }
 
         .toast {
@@ -374,138 +427,110 @@
     <button id="globalBackBtn" class="nav-btn">◀</button>
     <button id="globalForwardBtn" class="nav-btn">▶</button>
     <button id="globalReloadBtn" class="nav-btn">🔄</button>
-    <button id="afkPanelBtn" class="nav-btn afk-btn">🤖 AFK Auto</button>
-    <button id="virtualKeyboardBtn" class="nav-btn virtual-btn">⌨️ Teclado Virtual</button>
+    <button id="automationPanelBtn" class="nav-btn automation-btn">🤖 Automação</button>
+    <button id="domExplorerBtn" class="nav-btn" style="background:#23a55a;">🔍 Explorer</button>
+    <button id="settingsBtn" class="nav-btn settings-btn">⚙️ DPI</button>
+</div>
+
+<div class="shortcuts">
+    <button data-url="https://cloud.vsphone.com/activation-code/shop/agent-apply">☁️ VSPhone</button>
+    <button data-url="https://temp-mail.org/pt/">📧 Temp Mail</button>
+    <button data-url="https://www.google.com">🔍 Google</button>
+    <button data-url="https://www.youtube.com">📺 YouTube</button>
+    <button data-url="https://www.roblox.com">🎮 Roblox</button>
+    <button data-url="https://discord.com/register">🎙️ Discord</button>
+    <button data-url="https://biel99lol.github.io/pixel/web.html">📧 Gerador</button>
 </div>
 
 <div class="tabs-container" id="tabsContainer"></div>
-<button id="newTabBtn" class="new-tab">+ NOVA ABA</button>
+<button id="newTabBtn" class="new-tab">+ NOVA ABA (Browser)</button>
 <div class="content-area" id="contentArea"></div>
 
-<!-- Painel AFK -->
-<div id="afkPanel" class="afk-panel">
+<!-- Painel de Automação -->
+<div id="automationPanel" class="automation-panel">
     <div class="panel-header">
-        <h3>🤖 Modo AFK Avançado</h3>
-        <button class="close-panel" onclick="closeAfkPanel()">Fechar</button>
+        <h3>🤖 Central de Automação</h3>
+        <button class="close-panel" onclick="closeAutomationPanel()">Fechar</button>
     </div>
     <div class="panel-content">
-        <div class="afk-controls">
-            <button id="startAfkBtn" class="afk-btn-control">▶️ Iniciar AFK</button>
-            <button id="stopAfkBtn" class="afk-btn-control" disabled>⏹️ Parar AFK</button>
+        <div class="action-buttons">
+            <button id="recordBtn" class="action-btn record">🔴 Gravar Cliques</button>
+            <button id="stopRecordBtn" class="action-btn stop" disabled>⏹️ Parar</button>
+            <button id="playSequenceBtn" class="action-btn play">▶️ Executar Sequência</button>
+            <button id="clearSequenceBtn" class="action-btn">🗑️ Limpar</button>
         </div>
         
-        <div class="config-group">
-            <label>🎯 Aba Alvo:</label>
-            <select id="targetTabSelect"></select>
-        </div>
+        <h4>📋 Sequência Gravada:</h4>
+        <div id="sequenceList" class="sequence-list"></div>
         
+        <h4>⚙️ Configurações de Execução:</h4>
         <div class="config-group">
-            <label>⚡ Intervalo entre ações (ms):</label>
-            <input type="number" id="afkInterval" value="3000" min="500" max="30000">
+            <label>Velocidade (ms entre ações):</label>
+            <input type="number" id="delaySpeed" value="500" min="50" max="5000">
         </div>
-        
         <div class="config-group">
-            <label>🎲 Modo de Comportamento:</label>
-            <select id="afkMode">
-                <option value="realistic">Realista (movimentos suaves)</option>
-                <option value="aggressive">Agressivo (cliques rápidos)</option>
-                <option value="subtle">Sutil (apenas mover mouse)</option>
-                <option value="mixed">Misto (alterna ações)</option>
+            <label>Repetições:</label>
+            <select id="repeatCount">
+                <option value="1">1 vez</option>
+                <option value="2">2 vezes</option>
+                <option value="3">3 vezes</option>
+                <option value="5">5 vezes</option>
+                <option value="10">10 vezes</option>
+                <option value="0">Infinito</option>
             </select>
         </div>
         
+        <h4>➕ Adicionar Ação Manual:</h4>
+        <div class="action-buttons">
+            <button id="addClickBtn" class="action-btn">🖱️ Clique</button>
+            <button id="addHoldBtn" class="action-btn">⏸️ Segurar (1s)</button>
+            <button id="addTypeBtn" class="action-btn">⌨️ Digitar</button>
+            <button id="addWaitBtn" class="action-btn">⏰ Esperar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Explorer DOM -->
+<div id="domExplorer" class="dom-explorer">
+    <div class="panel-header">
+        <h3>🔍 Explorer DOM / Seletores</h3>
+        <button class="close-panel" onclick="closeDomExplorer()">Fechar</button>
+    </div>
+    <div class="panel-content">
         <div class="config-group">
-            <label>🖱️ Ações permitidas:</label>
-            <label><input type="checkbox" id="allowMove" checked> Mover mouse</label><br>
-            <label><input type="checkbox" id="allowClick" checked> Cliques</label><br>
-            <label><input type="checkbox" id="allowScroll" checked> Scroll</label><br>
-            <label><input type="checkbox" id="allowType" checked> Digitar</label>
+            <label>🎯 Selecionar elemento (Clique no elemento da página)</label>
+            <button id="pickElementBtn" class="action-btn" style="width:100%;">👆 Modo Seleção</button>
         </div>
+        <div id="selectedElement" style="background:#0f0f1a; padding:10px; border-radius:5px; margin-bottom:10px; font-size:11px; word-break:break-all;">
+            Nenhum elemento selecionado
+        </div>
+        <h4>📂 Estrutura DOM:</h4>
+        <div id="domTree" class="dom-content"></div>
+    </div>
+</div>
+
+<!-- Modal Configurações -->
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <h3>⚙️ Configurações de DPI / Zoom</h3>
+        <label>DPI (50% a 200%):</label>
+        <input type="range" id="dpiSlider" min="50" max="200" value="100" step="5">
+        <span id="dpiValue">100%</span>
         
-        <div class="stats">
-            <div>📊 Status: <span id="afkStatus">Parado</span></div>
-            <div>🔄 Ações executadas: <span id="actionCount">0</span></div>
-            <div>⏱️ Tempo ativo: <span id="afkTime">00:00:00</span></div>
-        </div>
+        <label>Zoom da Página (%):</label>
+        <input type="range" id="zoomSlider" min="30" max="200" value="100" step="5">
+        <span id="zoomValue">100%</span>
+        
+        <label>Modo Noturno:</label>
+        <select id="nightMode">
+            <option value="off">Desligado</option>
+            <option value="on">Ligado</option>
+        </select>
+        
+        <button id="saveSettingsBtn">Salvar e Aplicar</button>
+        <button id="closeModalBtn" style="background:#ed4245; margin-top:10px;">Fechar</button>
     </div>
 </div>
-
-<!-- Teclado Virtual -->
-<div id="virtualKeyboard" class="virtual-keyboard">
-    <div class="keyboard-row">
-        <button class="key" data-key="`">`</button>
-        <button class="key" data-key="1">1</button>
-        <button class="key" data-key="2">2</button>
-        <button class="key" data-key="3">3</button>
-        <button class="key" data-key="4">4</button>
-        <button class="key" data-key="5">5</button>
-        <button class="key" data-key="6">6</button>
-        <button class="key" data-key="7">7</button>
-        <button class="key" data-key="8">8</button>
-        <button class="key" data-key="9">9</button>
-        <button class="key" data-key="0">0</button>
-        <button class="key" data-key="-">-</button>
-        <button class="key" data-key="=">=</button>
-        <button class="key special" data-key="Backspace">⌫</button>
-    </div>
-    <div class="keyboard-row">
-        <button class="key special" data-key="Tab">Tab</button>
-        <button class="key" data-key="q">q</button>
-        <button class="key" data-key="w">w</button>
-        <button class="key" data-key="e">e</button>
-        <button class="key" data-key="r">r</button>
-        <button class="key" data-key="t">t</button>
-        <button class="key" data-key="y">y</button>
-        <button class="key" data-key="u">u</button>
-        <button class="key" data-key="i">i</button>
-        <button class="key" data-key="o">o</button>
-        <button class="key" data-key="p">p</button>
-        <button class="key" data-key="[">[</button>
-        <button class="key" data-key="]">]</button>
-        <button class="key special" data-key="\">\</button>
-    </div>
-    <div class="keyboard-row">
-        <button class="key special" data-key="CapsLock">Caps</button>
-        <button class="key" data-key="a">a</button>
-        <button class="key" data-key="s">s</button>
-        <button class="key" data-key="d">d</button>
-        <button class="key" data-key="f">f</button>
-        <button class="key" data-key="g">g</button>
-        <button class="key" data-key="h">h</button>
-        <button class="key" data-key="j">j</button>
-        <button class="key" data-key="k">k</button>
-        <button class="key" data-key="l">l</button>
-        <button class="key" data-key=";">;</button>
-        <button class="key" data-key="'">'</button>
-        <button class="key special" data-key="Enter">Enter</button>
-    </div>
-    <div class="keyboard-row">
-        <button class="key special" data-key="Shift">Shift</button>
-        <button class="key" data-key="z">z</button>
-        <button class="key" data-key="x">x</button>
-        <button class="key" data-key="c">c</button>
-        <button class="key" data-key="v">v</button>
-        <button class="key" data-key="b">b</button>
-        <button class="key" data-key="n">n</button>
-        <button class="key" data-key="m">m</button>
-        <button class="key" data-key=",">,</button>
-        <button class="key" data-key=".">.</button>
-        <button class="key" data-key="/">/</button>
-        <button class="key special" data-key="Shift">Shift</button>
-    </div>
-    <div class="keyboard-row">
-        <button class="key special" data-key="Ctrl">Ctrl</button>
-        <button class="key special" data-key="Alt">Alt</button>
-        <button class="key special" data-key="Space" style="min-width:200px">Espaço</button>
-        <button class="key special" data-key="ArrowLeft">←</button>
-        <button class="key special" data-key="ArrowUp">↑</button>
-        <button class="key special" data-key="ArrowDown">↓</button>
-        <button class="key special" data-key="ArrowRight">→</button>
-    </div>
-</div>
-
-<!-- Cursor Virtual -->
-<div id="virtualCursor" class="virtual-cursor"></div>
 
 <script>
     // ==================== VARIÁVEIS GLOBAIS ====================
@@ -513,14 +538,21 @@
     let activeBrowserId = null;
     let browserCounter = 0;
     
-    // AFK System
-    let afkInterval = null;
-    let isAfkRunning = false;
-    let actionCounter = 0;
-    let afkStartTime = null;
-    let afkTimerInterval = null;
+    // Automação
+    let sequence = [];
+    let isRecording = false;
+    let isPlaying = false;
+    let pickMode = false;
+    let selectedSelector = null;
     
-    // ==================== SISTEMA DE SIMULAÇÃO REALISTA ====================
+    // Configurações
+    let settings = {
+        dpi: 100,
+        zoom: 100,
+        nightMode: 'off'
+    };
+    
+    // ==================== FUNÇÕES DE AUTOMAÇÃO ====================
     
     function getCurrentIframe() {
         const browser = browsers.find(b => b.id === activeBrowserId);
@@ -538,322 +570,303 @@
         }
     }
     
-    // Movimento realista de mouse (curva de Bezier)
-    async function realisticMouseMove(targetX, targetY, duration = 500) {
-        const cursor = document.getElementById('virtualCursor');
-        cursor.classList.add('active');
-        
-        const startX = parseInt(cursor.style.left) || window.innerWidth / 2;
-        const startY = parseInt(cursor.style.top) || window.innerHeight / 2;
-        
-        // Pontos de controle para curva suave
-        const cp1x = startX + (targetX - startX) * 0.3 + (Math.random() - 0.5) * 50;
-        const cp1y = startY + (targetY - startY) * 0.3 + (Math.random() - 0.5) * 50;
-        const cp2x = startX + (targetX - startX) * 0.7 + (Math.random() - 0.5) * 50;
-        const cp2y = startY + (targetY - startY) * 0.7 + (Math.random() - 0.5) * 50;
-        
-        const startTime = performance.now();
-        
-        return new Promise((resolve) => {
-            function animate(currentTime) {
-                const elapsed = currentTime - startTime;
-                const t = Math.min(1, elapsed / duration);
-                
-                // Curva de Bezier cúbica
-                const mt = 1 - t;
-                const x = mt*mt*mt*startX + 3*mt*mt*t*cp1x + 3*mt*t*t*cp2x + t*t*t*targetX;
-                const y = mt*mt*mt*startY + 3*mt*mt*t*cp1y + 3*mt*t*t*cp2y + t*t*t*targetY;
-                
-                cursor.style.left = x + 'px';
-                cursor.style.top = y + 'px';
-                
-                if (t < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    cursor.style.left = targetX + 'px';
-                    cursor.style.top = targetY + 'px';
-                    resolve();
-                }
-            }
-            
-            requestAnimationFrame(animate);
-        });
+    function getElementBySelector(selector) {
+        const doc = getIframeDocument();
+        if (!doc) return null;
+        return doc.querySelector(selector);
     }
     
-    // Clique realista com delay humano
-    async function realisticClick(element, x, y) {
+    function simulateClick(element) {
         if (!element) return false;
-        
-        // Delay humano antes do clique (80-200ms)
-        await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 120));
-        
-        // Evento de mouse down
-        const mouseDownEvent = new MouseEvent('mousedown', {
-            view: window,
-            bubbles: true,
-            cancelable: true,
-            clientX: x,
-            clientY: y,
-            button: 0
-        });
-        element.dispatchEvent(mouseDownEvent);
-        
-        await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 70));
-        
-        // Mouse up e click
-        const mouseUpEvent = new MouseEvent('mouseup', {
-            view: window,
-            bubbles: true,
-            cancelable: true,
-            clientX: x,
-            clientY: y,
-            button: 0
-        });
-        element.dispatchEvent(mouseUpEvent);
-        
+        const rect = element.getBoundingClientRect();
+        const iframe = getCurrentIframe();
         const clickEvent = new MouseEvent('click', {
-            view: window,
+            view: iframe?.contentWindow,
             bubbles: true,
             cancelable: true,
-            clientX: x,
-            clientY: y
+            clientX: rect.left + rect.width/2,
+            clientY: rect.top + rect.height/2
         });
         element.dispatchEvent(clickEvent);
         
         // Evento de toque para mobile
-        const touchStart = new TouchEvent('touchstart', {
+        const touchEvent = new TouchEvent('touchstart', {
             bubbles: true,
-            touches: [new Touch({identifier: 0, target: element, clientX: x, clientY: y})]
+            touches: [new Touch({identifier: 0, target: element, clientX: rect.left + rect.width/2, clientY: rect.top + rect.height/2})]
         });
-        element.dispatchEvent(touchStart);
-        
-        await new Promise(resolve => setTimeout(resolve, 50));
-        
-        const touchEnd = new TouchEvent('touchend', { bubbles: true });
-        element.dispatchEvent(touchEnd);
+        element.dispatchEvent(touchEvent);
         
         return true;
     }
     
-    // Scroll suave
-    async function realisticScroll(element, deltaY) {
-        const scrollEvent = new WheelEvent('wheel', {
-            deltaY: deltaY,
-            deltaMode: 0,
+    function simulateHold(element, duration = 1000) {
+        if (!element) return Promise.resolve(false);
+        const rect = element.getBoundingClientRect();
+        const iframe = getCurrentIframe();
+        
+        const touchStart = new TouchEvent('touchstart', {
             bubbles: true,
-            cancelable: true
+            touches: [new Touch({identifier: 0, target: element, clientX: rect.left + rect.width/2, clientY: rect.top + rect.height/2})]
         });
-        element.dispatchEvent(scrollEvent);
+        element.dispatchEvent(touchStart);
         
-        // Scroll suave
-        const targetScroll = element.scrollTop + deltaY;
-        const startScroll = element.scrollTop;
-        const duration = 300;
-        const startTime = performance.now();
-        
-        return new Promise((resolve) => {
-            function animate(currentTime) {
-                const elapsed = currentTime - startTime;
-                const t = Math.min(1, elapsed / duration);
-                const ease = 1 - Math.pow(1 - t, 3); // Cubic ease out
-                element.scrollTop = startScroll + (targetScroll - startScroll) * ease;
-                
-                if (t < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    resolve();
-                }
-            }
-            requestAnimationFrame(animate);
+        return new Promise(resolve => {
+            setTimeout(() => {
+                const touchEnd = new TouchEvent('touchend', { bubbles: true });
+                element.dispatchEvent(touchEnd);
+                resolve(true);
+            }, duration);
         });
     }
     
-    // Digitação realista
-    async function realisticType(element, text) {
-        if (!element) return;
-        
+    function simulateType(element, text) {
+        if (!element) return false;
         element.focus();
-        element.value = '';
-        
-        for (let char of text) {
-            // Delay entre teclas (50-200ms)
-            await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150));
-            
-            const keyDownEvent = new KeyboardEvent('keydown', { key: char, bubbles: true });
-            element.dispatchEvent(keyDownEvent);
-            
-            const keyPressEvent = new KeyboardEvent('keypress', { key: char, bubbles: true });
-            element.dispatchEvent(keyPressEvent);
-            
-            element.value += char;
-            
-            const inputEvent = new Event('input', { bubbles: true });
-            element.dispatchEvent(inputEvent);
-            
-            const keyUpEvent = new KeyboardEvent('keyup', { key: char, bubbles: true });
-            element.dispatchEvent(keyUpEvent);
-        }
-        
+        element.value = text;
+        const inputEvent = new Event('input', { bubbles: true });
+        element.dispatchEvent(inputEvent);
         const changeEvent = new Event('change', { bubbles: true });
         element.dispatchEvent(changeEvent);
+        return true;
     }
     
-    // Obter elementos clicáveis aleatórios
-    function getRandomClickableElement(doc) {
-        const selectors = [
-            'button', 'a', 'input[type="submit"]', '.btn', '[role="button"]',
-            'div[onclick]', 'span[onclick]', 'clickable', 'input', 'textarea',
-            'select', '[contenteditable="true"]'
-        ];
+    async function executeSequence() {
+        if (isPlaying) {
+            mostrarToast('⚠️ Automação já está em execução!', '#faa61a');
+            return;
+        }
         
-        const elements = doc.querySelectorAll(selectors.join(','));
-        if (elements.length === 0) return null;
+        if (sequence.length === 0) {
+            mostrarToast('⚠️ Nenhuma ação na sequência! Grave ou adicione ações.', '#faa61a');
+            return;
+        }
         
-        return elements[Math.floor(Math.random() * elements.length)];
+        isPlaying = true;
+        const repeat = parseInt(document.getElementById('repeatCount').value);
+        const delay = parseInt(document.getElementById('delaySpeed').value);
+        const maxRepeat = repeat === 0 ? Infinity : repeat;
+        let currentRepeat = 0;
+        
+        mostrarToast(`🎬 Iniciando automação com ${sequence.length} ações...`, '#23a55a');
+        
+        while (currentRepeat < maxRepeat && isPlaying) {
+            for (let action of sequence) {
+                if (!isPlaying) break;
+                
+                const element = action.selector ? getElementBySelector(action.selector) : null;
+                
+                switch(action.type) {
+                    case 'click':
+                        if (element) simulateClick(element);
+                        else mostrarToast(`⚠️ Elemento não encontrado: ${action.selector}`, '#ed4245');
+                        break;
+                    case 'hold':
+                        if (element) await simulateHold(element, action.duration || 1000);
+                        break;
+                    case 'type':
+                        if (element) simulateType(element, action.text);
+                        break;
+                    case 'wait':
+                        await new Promise(resolve => setTimeout(resolve, action.duration || 1000));
+                        break;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            currentRepeat++;
+            if (repeat !== 0) mostrarToast(`🔄 Execução ${currentRepeat}/${repeat} concluída`, '#5865F2');
+        }
+        
+        isPlaying = false;
+        mostrarToast('✅ Automação finalizada!', '#23a55a');
     }
     
-    // Executar ação AFK
-    async function executeAfkAction() {
-        if (!isAfkRunning) return;
+    function addAction(type, data = {}) {
+        const selector = selectedSelector || prompt('Digite o seletor CSS do elemento (ex: #id, .classe, button)', 'body');
+        if (!selector && type !== 'wait') {
+            mostrarToast('⚠️ Seletor necessário para esta ação!', '#ed4245');
+            return false;
+        }
         
-        const targetTab = document.getElementById('targetTabSelect').value;
-        const browser = browsers.find(b => b.id === targetTab);
-        if (!browser) return;
+        const action = {
+            type: type,
+            selector: selector,
+            timestamp: Date.now()
+        };
         
-        const iframe = document.getElementById(browser.iframeId);
+        if (type === 'hold') action.duration = data.duration || 1000;
+        if (type === 'type') action.text = data.text || prompt('Digite o texto a ser inserido:', '');
+        if (type === 'wait') action.duration = data.duration || parseInt(prompt('Tempo de espera (ms):', '1000'));
+        
+        if (type === 'type' && !action.text) return false;
+        
+        sequence.push(action);
+        updateSequenceDisplay();
+        mostrarToast(`✅ Ação "${type}" adicionada à sequência`, '#23a55a');
+        return true;
+    }
+    
+    function updateSequenceDisplay() {
+        const container = document.getElementById('sequenceList');
+        container.innerHTML = '';
+        sequence.forEach((action, index) => {
+            const div = document.createElement('div');
+            div.className = 'sequence-item';
+            let text = '';
+            switch(action.type) {
+                case 'click': text = `🖱️ Clique em: ${action.selector}`; break;
+                case 'hold': text = `⏸️ Segurar em: ${action.selector} (${action.duration}ms)`; break;
+                case 'type': text = `⌨️ Digitar "${action.text}" em: ${action.selector}`; break;
+                case 'wait': text = `⏰ Aguardar: ${action.duration}ms`; break;
+            }
+            div.innerHTML = `<span>${index+1}. ${text}</span><button onclick="removeAction(${index})">✕</button>`;
+            container.appendChild(div);
+        });
+    }
+    
+    function removeAction(index) {
+        sequence.splice(index, 1);
+        updateSequenceDisplay();
+        mostrarToast('Ação removida', '#5865F2');
+    }
+    
+    function clearSequence() {
+        sequence = [];
+        updateSequenceDisplay();
+        mostrarToast('Sequência limpa!', '#faa61a');
+    }
+    
+    // Gravação de ações
+    function startRecording() {
+        isRecording = true;
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.addEventListener('click', recordClick);
+            doc.addEventListener('touchstart', recordTouch);
+        }
+        document.getElementById('recordBtn').disabled = true;
+        document.getElementById('stopRecordBtn').disabled = false;
+        mostrarToast('🔴 Gravação iniciada! Clique nos elementos para gravar ações.', '#eb459e');
+    }
+    
+    function stopRecording() {
+        isRecording = false;
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.removeEventListener('click', recordClick);
+            doc.removeEventListener('touchstart', recordTouch);
+        }
+        document.getElementById('recordBtn').disabled = false;
+        document.getElementById('stopRecordBtn').disabled = true;
+        mostrarToast('⏹️ Gravação finalizada.', '#5865F2');
+    }
+    
+    function recordClick(event) {
+        if (!isRecording) return;
+        event.stopPropagation();
+        let target = event.target;
+        let selector = getUniqueSelector(target);
+        addAction('click', { selector: selector });
+    }
+    
+    function recordTouch(event) {
+        if (!isRecording) return;
+        event.stopPropagation();
+        let target = event.target;
+        let selector = getUniqueSelector(target);
+        addAction('click', { selector: selector });
+    }
+    
+    function getUniqueSelector(element) {
+        if (!element) return 'body';
+        if (element.id) return `#${element.id}`;
+        if (element.className && typeof element.className === 'string') {
+            const classes = element.className.split(' ').filter(c => c).join('.');
+            if (classes) return `${element.tagName.toLowerCase()}.${classes}`;
+        }
+        let parent = element.parentElement;
+        if (parent) {
+            const siblings = Array.from(parent.children);
+            const index = siblings.indexOf(element) + 1;
+            return `${getUniqueSelector(parent)} > ${element.tagName.toLowerCase()}:nth-child(${index})`;
+        }
+        return element.tagName.toLowerCase();
+    }
+    
+    // Modo pick element
+    function startPickMode() {
+        pickMode = true;
+        mostrarToast('🎯 Modo seleção ativado! Clique em qualquer elemento da página.', '#faa61a');
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.body.style.cursor = 'crosshair';
+            doc.addEventListener('click', pickElement);
+        }
+    }
+    
+    function pickElement(event) {
+        if (!pickMode) return;
+        event.preventDefault();
+        event.stopPropagation();
+        let target = event.target;
+        let selector = getUniqueSelector(target);
+        selectedSelector = selector;
+        document.getElementById('selectedElement').innerHTML = `
+            <strong>✅ Selecionado:</strong><br>
+            Seletor: <code style="color:#23a55a">${selector}</code><br>
+            Tag: ${target.tagName}<br>
+            Texto: ${target.innerText?.substring(0, 50) || '...'}
+        `;
+        pickMode = false;
+        const iframe = getCurrentIframe();
+        if (iframe) {
+            const doc = iframe.contentDocument;
+            doc.body.style.cursor = '';
+            doc.removeEventListener('click', pickElement);
+        }
+        mostrarToast('✅ Elemento selecionado! Use nas ações de automação.', '#23a55a');
+    }
+    
+    // Explorer DOM
+    function updateDomTree() {
         const doc = getIframeDocument();
-        if (!doc) return;
-        
-        const mode = document.getElementById('afkMode').value;
-        const allowMove = document.getElementById('allowMove').checked;
-        const allowClick = document.getElementById('allowClick').checked;
-        const allowScroll = document.getElementById('allowScroll').checked;
-        const allowType = document.getElementById('allowType').checked;
-        
-        let actionDone = false;
-        
-        // Modo misto: escolhe ação aleatória
-        let availableActions = [];
-        if (allowMove) availableActions.push('move');
-        if (allowClick) availableActions.push('click');
-        if (allowScroll) availableActions.push('scroll');
-        if (allowType) availableActions.push('type');
-        
-        if (availableActions.length === 0) return;
-        
-        let action = availableActions[Math.floor(Math.random() * availableActions.length)];
-        
-        // Ajustar baseado no modo
-        if (mode === 'realistic') {
-            // Priorizar movimentos suaves
-            if (Math.random() < 0.6) action = 'move';
-        } else if (mode === 'aggressive') {
-            if (allowClick && Math.random() < 0.7) action = 'click';
-        } else if (mode === 'subtle') {
-            action = 'move';
+        if (!doc) {
+            document.getElementById('domTree').innerHTML = '<div>Não foi possível acessar o DOM</div>';
+            return;
         }
-        
-        try {
-            if (action === 'move') {
-                // Mover mouse para posição aleatória
-                const randomX = 100 + Math.random() * (iframe.offsetWidth - 200);
-                const randomY = 100 + Math.random() * (iframe.offsetHeight - 200);
-                await realisticMouseMove(randomX, randomY, 300 + Math.random() * 400);
-                actionDone = true;
-            }
-            else if (action === 'click') {
-                const element = getRandomClickableElement(doc);
-                if (element) {
-                    const rect = element.getBoundingClientRect();
-                    const x = rect.left + rect.width/2 + (Math.random() - 0.5) * 10;
-                    const y = rect.top + rect.height/2 + (Math.random() - 0.5) * 10;
-                    await realisticMouseMove(x, y, 200 + Math.random() * 300);
-                    await realisticClick(element, x, y);
-                    actionDone = true;
-                }
-            }
-            else if (action === 'scroll') {
-                const scrollable = doc.querySelector('body, .scrollable, [overflow="auto"]');
-                if (scrollable) {
-                    const delta = (Math.random() - 0.5) * 200;
-                    await realisticScroll(scrollable, delta);
-                    actionDone = true;
-                }
-            }
-            else if (action === 'type') {
-                const input = doc.querySelector('input, textarea');
-                if (input) {
-                    const texts = ['test', 'hello', '123', 'click', 'afk', 'auto'];
-                    const randomText = texts[Math.floor(Math.random() * texts.length)];
-                    await realisticType(input, randomText);
-                    actionDone = true;
-                }
-            }
-        } catch(e) {
-            console.log('AFK action error:', e);
-        }
-        
-        if (actionDone) {
-            actionCounter++;
-            document.getElementById('actionCount').innerText = actionCounter;
-        }
+        const tree = generateDomTree(doc.body, 0);
+        document.getElementById('domTree').innerHTML = tree;
     }
     
-    // Iniciar AFK
-    function startAfk() {
-        if (afkInterval) clearInterval(afkInterval);
-        
-        const interval = parseInt(document.getElementById('afkInterval').value);
-        isAfkRunning = true;
-        afkStartTime = Date.now();
-        
-        afkInterval = setInterval(() => {
-            if (isAfkRunning) {
-                executeAfkAction();
-            }
-        }, interval);
-        
-        afkTimerInterval = setInterval(() => {
-            if (afkStartTime) {
-                const elapsed = Math.floor((Date.now() - afkStartTime) / 1000);
-                const hours = Math.floor(elapsed / 3600);
-                const minutes = Math.floor((elapsed % 3600) / 60);
-                const seconds = elapsed % 60;
-                document.getElementById('afkTime').innerText = 
-                    `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-            }
-        }, 1000);
-        
-        document.getElementById('afkStatus').innerText = 'Executando';
-        document.getElementById('startAfkBtn').disabled = true;
-        document.getElementById('stopAfkBtn').disabled = false;
-        document.getElementById('startAfkBtn').classList.remove('active');
-        document.getElementById('stopAfkBtn').classList.add('active');
-        
-        mostrarToast('✅ Modo AFK iniciado! Ações sendo executadas em segundo plano.', '#eb459e');
+    function generateDomTree(element, level) {
+        if (!element || element.nodeType !== 1) return '';
+        let html = `<div class="dom-node" style="margin-left:${level*15}px" onclick="selectFromTree('${getUniqueSelector(element)}')">`;
+        html += `<span class="dom-tag">&lt;${element.tagName.toLowerCase()}</span>`;
+        if (element.id) html += `<span class="dom-attr"> id="${element.id}"</span>`;
+        if (element.className && typeof element.className === 'string' && element.className) {
+            html += `<span class="dom-attr"> class="${element.className}"</span>`;
+        }
+        html += `<span class="dom-tag">&gt;</span>`;
+        if (element.children.length === 0 && element.innerText?.length < 50) {
+            html += ` ${element.innerText?.substring(0, 30)}`;
+        }
+        html += `</div>`;
+        for (let child of element.children) {
+            html += generateDomTree(child, level + 1);
+        }
+        return html;
     }
     
-    function stopAfk() {
-        if (afkInterval) {
-            clearInterval(afkInterval);
-            afkInterval = null;
-        }
-        if (afkTimerInterval) {
-            clearInterval(afkTimerInterval);
-            afkTimerInterval = null;
-        }
-        
-        isAfkRunning = false;
-        document.getElementById('afkStatus').innerText = 'Parado';
-        document.getElementById('startAfkBtn').disabled = false;
-        document.getElementById('stopAfkBtn').disabled = true;
-        document.getElementById('startAfkBtn').classList.add('active');
-        document.getElementById('stopAfkBtn').classList.remove('active');
-        
-        // Esconder cursor virtual
-        document.getElementById('virtualCursor').classList.remove('active');
-        
-        mostrarToast('⏹️ Modo AFK parado.', '#5865F2');
+    function selectFromTree(selector) {
+        selectedSelector = selector;
+        document.getElementById('selectedElement').innerHTML = `
+            <strong>✅ Selecionado do Explorer:</strong><br>
+            Seletor: <code style="color:#23a55a">${selector}</code>
+        `;
+        mostrarToast('Elemento selecionado do DOM Explorer', '#23a55a');
     }
     
     // ==================== FUNÇÕES DO BROWSER ====================
@@ -869,21 +882,41 @@
         setTimeout(() => toast.remove(), 2500);
     }
     
-    function updateTargetTabSelect() {
-        const select = document.getElementById('targetTabSelect');
-        select.innerHTML = '';
-        browsers.forEach(browser => {
-            const option = document.createElement('option');
-            option.value = browser.id;
+    function aplicarDPI() {
+        document.body.style.zoom = settings.dpi + '%';
+        document.getElementById('dpiValue').innerText = settings.dpi + '%';
+        document.getElementById('dpiSlider').value = settings.dpi;
+    }
+    
+    function aplicarZoomNoBrowser(browserId) {
+        const browser = browsers.find(b => b.id === browserId);
+        if (browser) {
             const iframe = document.getElementById(browser.iframeId);
-            try {
-                const url = iframe.contentWindow.location.href;
-                option.textContent = url.substring(0, 50);
-            } catch(e) {
-                option.textContent = browser.id;
+            if (iframe) {
+                iframe.style.transform = `scale(${settings.zoom / 100})`;
+                iframe.style.transformOrigin = '0 0';
+                iframe.style.width = `${100 * 100 / settings.zoom}%`;
+                iframe.style.height = `${100 * 100 / settings.zoom}%`;
             }
-            select.appendChild(option);
-        });
+        }
+    }
+    
+    function aplicarZoomGlobal() {
+        browsers.forEach(b => aplicarZoomNoBrowser(b.id));
+        document.getElementById('zoomValue').innerText = settings.zoom + '%';
+        document.getElementById('zoomSlider').value = settings.zoom;
+    }
+    
+    function aplicarModoNoturno() {
+        if (settings.nightMode === 'on') {
+            const style = document.createElement('style');
+            style.id = 'nightModeStyle';
+            style.textContent = 'iframe { filter: invert(1) hue-rotate(180deg); }';
+            if (!document.getElementById('nightModeStyle')) document.head.appendChild(style);
+        } else {
+            const style = document.getElementById('nightModeStyle');
+            if (style) style.remove();
+        }
     }
     
     function criarNovaBrowser(url = null) {
@@ -928,6 +961,7 @@
         tabDiv.addEventListener('click', (e) => {
             if (e.target.classList.contains('close-tab')) return;
             ativarBrowser(browserId);
+            setTimeout(() => updateDomTree(), 500);
         });
         
         const closeBtn = tabDiv.querySelector('.close-tab');
@@ -955,12 +989,12 @@
             const b = browsers.find(b => b.id === browserId);
             if (b) b.url = newUrl;
             try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
-            setTimeout(() => updateTargetTabSelect(), 1000);
+            setTimeout(() => updateDomTree(), 1000);
         });
         
-        backBtn.addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) {} });
-        forwardBtn.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) {} });
-        reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; });
+        backBtn.addEventListener('click', () => { try { iframe.contentWindow.history.back(); setTimeout(() => updateDomTree(), 500); } catch(e) {} });
+        forwardBtn.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); setTimeout(() => updateDomTree(), 500); } catch(e) {} });
+        reloadBtn.addEventListener('click', () => { iframe.src = iframe.src; setTimeout(() => updateDomTree(), 1000); });
         
         urlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') goBtn.click(); });
         
@@ -971,12 +1005,14 @@
                 const b = browsers.find(b => b.id === browserId);
                 if (b) b.url = currentUrl;
                 try { tabDiv.querySelector('span').textContent = new URL(currentUrl).hostname; } catch(e) {}
+                setTimeout(() => updateDomTree(), 500);
             } catch(e) {}
-            setTimeout(() => updateTargetTabSelect(), 500);
+            aplicarZoomNoBrowser(browserId);
         });
         
         ativarBrowser(browserId);
-        updateTargetTabSelect();
+        aplicarZoomNoBrowser(browserId);
+        setTimeout(() => updateDomTree(), 1000);
         return browserId;
     }
     
@@ -1002,6 +1038,7 @@
             } catch(e) {
                 document.getElementById('globalUrlInput').value = browser.url;
             }
+            setTimeout(() => updateDomTree(), 500);
         }
     }
     
@@ -1022,12 +1059,6 @@
             const nextIndex = index > 0 ? index - 1 : 0;
             ativarBrowser(browsers[nextIndex].id);
         }
-        updateTargetTabSelect();
-        
-        // Se a aba AFK foi fechada, parar automação
-        if (isAfkRunning && document.getElementById('targetTabSelect').value === browserId) {
-            stopAfk();
-        }
     }
     
     function acaoGlobal(tipo) {
@@ -1035,56 +1066,31 @@
         const browser = browsers.find(b => b.id === activeBrowserId);
         if (!browser) return;
         const iframe = document.getElementById(browser.iframeId);
-        if (tipo === 'back') { try { iframe.contentWindow.history.back(); } catch(e) {} }
-        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); } catch(e) {} }
-        else if (tipo === 'reload') { iframe.src = iframe.src; }
+        if (tipo === 'back') { try { iframe.contentWindow.history.back(); setTimeout(() => updateDomTree(), 500); } catch(e) {} }
+        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); setTimeout(() => updateDomTree(), 500); } catch(e) {} }
+        else if (tipo === 'reload') { iframe.src = iframe.src; setTimeout(() => updateDomTree(), 1000); }
     }
     
     // ==================== INICIALIZAÇÃO ====================
     
-    function openAfkPanel() {
-        document.getElementById('afkPanel').classList.add('open');
-        updateTargetTabSelect();
+    function openAutomationPanel() {
+        document.getElementById('automationPanel').classList.add('open');
     }
     
-    function closeAfkPanel() {
-        document.getElementById('afkPanel').classList.remove('open');
+    function closeAutomationPanel() {
+        document.getElementById('automationPanel').classList.remove('open');
+        if (isRecording) stopRecording();
+        if (pickMode) pickMode = false;
     }
     
-    // Teclado Virtual
-    function toggleVirtualKeyboard() {
-        const keyboard = document.getElementById('virtualKeyboard');
-        keyboard.classList.toggle('open');
+    function openDomExplorer() {
+        document.getElementById('domExplorer').classList.add('open');
+        updateDomTree();
     }
     
-    function sendKeyToActiveIframe(key) {
-        const browser = browsers.find(b => b.id === activeBrowserId);
-        if (!browser) return;
-        
-        const iframe = document.getElementById(browser.iframeId);
-        const doc = getIframeDocument();
-        if (!doc) return;
-        
-        // Enviar evento de tecla para o iframe
-        const activeElement = doc.activeElement;
-        if (activeElement) {
-            const keyDownEvent = new KeyboardEvent('keydown', { key: key, bubbles: true });
-            activeElement.dispatchEvent(keyDownEvent);
-            
-            if (key.length === 1) {
-                const keyPressEvent = new KeyboardEvent('keypress', { key: key, bubbles: true });
-                activeElement.dispatchEvent(keyPressEvent);
-                
-                if (activeElement.value !== undefined) {
-                    activeElement.value += key;
-                    const inputEvent = new Event('input', { bubbles: true });
-                    activeElement.dispatchEvent(inputEvent);
-                }
-            }
-            
-            const keyUpEvent = new KeyboardEvent('keyup', { key: key, bubbles: true });
-            activeElement.dispatchEvent(keyUpEvent);
-        }
+    function closeDomExplorer() {
+        document.getElementById('domExplorer').classList.remove('open');
+        if (pickMode) pickMode = false;
     }
     
     // Event Listeners
@@ -1102,6 +1108,7 @@
             browser.url = url;
             const tab = document.getElementById(browser.tabId);
             try { tab.querySelector('span').textContent = new URL(url).hostname; } catch(e) {}
+            setTimeout(() => updateDomTree(), 1000);
         }
     });
     
@@ -1113,40 +1120,80 @@
     document.getElementById('globalForwardBtn').addEventListener('click', () => acaoGlobal('forward'));
     document.getElementById('globalReloadBtn').addEventListener('click', () => acaoGlobal('reload'));
     document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser('https://www.google.com/webhp?igu=1'));
-    document.getElementById('afkPanelBtn').addEventListener('click', openAfkPanel);
-    document.getElementById('virtualKeyboardBtn').addEventListener('click', toggleVirtualKeyboard);
-    document.getElementById('startAfkBtn').addEventListener('click', startAfk);
-    document.getElementById('stopAfkBtn').addEventListener('click', stopAfk);
+    document.getElementById('automationPanelBtn').addEventListener('click', openAutomationPanel);
+    document.getElementById('domExplorerBtn').addEventListener('click', openDomExplorer);
     
-    // Teclas do teclado virtual
-    document.querySelectorAll('.key').forEach(keyBtn => {
-        keyBtn.addEventListener('click', () => {
-            const key = keyBtn.getAttribute('data-key');
-            if (key === 'Space') {
-                sendKeyToActiveIframe(' ');
-            } else if (key === 'Enter') {
-                sendKeyToActiveIframe('Enter');
-            } else if (key === 'Backspace') {
-                // Lógica especial para backspace
+    // Automação botões
+    document.getElementById('recordBtn').addEventListener('click', startRecording);
+    document.getElementById('stopRecordBtn').addEventListener('click', stopRecording);
+    document.getElementById('playSequenceBtn').addEventListener('click', executeSequence);
+    document.getElementById('clearSequenceBtn').addEventListener('click', clearSequence);
+    document.getElementById('addClickBtn').addEventListener('click', () => addAction('click'));
+    document.getElementById('addHoldBtn').addEventListener('click', () => addAction('hold'));
+    document.getElementById('addTypeBtn').addEventListener('click', () => addAction('type'));
+    document.getElementById('addWaitBtn').addEventListener('click', () => addAction('wait'));
+    document.getElementById('pickElementBtn').addEventListener('click', startPickMode);
+    
+    document.querySelectorAll('.shortcuts button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const url = btn.getAttribute('data-url');
+            if (url && activeBrowserId) {
                 const browser = browsers.find(b => b.id === activeBrowserId);
                 if (browser) {
-                    const doc = getIframeDocument();
-                    const activeElement = doc.activeElement;
-                    if (activeElement && activeElement.value) {
-                        activeElement.value = activeElement.value.slice(0, -1);
-                        const inputEvent = new Event('input', { bubbles: true });
-                        activeElement.dispatchEvent(inputEvent);
-                    }
+                    const iframe = document.getElementById(browser.iframeId);
+                    iframe.src = url;
+                    browser.url = url;
+                    setTimeout(() => updateDomTree(), 1000);
                 }
-            } else {
-                sendKeyToActiveIframe(key);
             }
         });
     });
     
+    // Modal Configurações
+    const modal = document.getElementById('settingsModal');
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('dpiSlider').value = settings.dpi;
+        document.getElementById('zoomSlider').value = settings.zoom;
+        document.getElementById('nightMode').value = settings.nightMode;
+        modal.style.display = 'flex';
+    });
+    
+    document.getElementById('closeModalBtn').addEventListener('click', () => { modal.style.display = 'none'; });
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        settings.dpi = parseInt(document.getElementById('dpiSlider').value);
+        settings.zoom = parseInt(document.getElementById('zoomSlider').value);
+        settings.nightMode = document.getElementById('nightMode').value;
+        aplicarDPI();
+        aplicarZoomGlobal();
+        aplicarModoNoturno();
+        mostrarToast('✅ Configurações salvas!', '#23a55a');
+        modal.style.display = 'none';
+    });
+    
+    document.getElementById('dpiSlider').addEventListener('input', (e) => {
+        document.getElementById('dpiValue').innerText = e.target.value + '%';
+    });
+    document.getElementById('zoomSlider').addEventListener('input', (e) => {
+        document.getElementById('zoomValue').innerText = e.target.value + '%';
+    });
+    
+    // Carregar configurações salvas
+    const saved = localStorage.getItem('browser_settings');
+    if (saved) {
+        try {
+            const s = JSON.parse(saved);
+            settings.dpi = s.dpi || 100;
+            settings.zoom = s.zoom || 100;
+            settings.nightMode = s.nightMode || 'off';
+        } catch(e) {}
+    }
+    aplicarDPI();
+    aplicarZoomGlobal();
+    aplicarModoNoturno();
+    
     // Iniciar
     criarNovaBrowser('https://www.google.com/webhp?igu=1');
-    mostrarToast('✅ Sistema AFK Avançado + Simulação Realista ativado!', '#eb459e');
+    mostrarToast('✅ Sistema de Automação + Explorer DOM ativado! Grave cliques e execute sequências.', '#eb459e');
 </script>
 </body>
 </html>
