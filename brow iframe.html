@@ -2,8 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, orientation=portrait">
-    <title>Mouse + Teclado Virtual - Cloud Phone</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Mouse + Teclado Virtual - Funcional</title>
     <style>
         * {
             margin: 0;
@@ -13,13 +13,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Forçar modo retrato */
-        @media screen and (orientation: landscape) {
-            body {
-                transform: rotate(0deg);
-            }
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0a0a0f;
@@ -27,7 +20,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            touch-action: pan-x pan-y;
             position: fixed;
             width: 100%;
             top: 0;
@@ -188,6 +180,33 @@
             border: none;
         }
 
+        /* Página interna para teste */
+        .local-page {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: Arial;
+        }
+        
+        .local-page textarea, .local-page input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .local-page button {
+            padding: 10px 20px;
+            background: #5865F2;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            margin: 5px;
+        }
+
         /* ========== MOUSE VIRTUAL ========== */
         .virtual-mouse-container {
             position: fixed;
@@ -219,7 +238,6 @@
             cursor: move;
             touch-action: none;
             box-shadow: 0 0 10px #5865F2;
-            transition: transform 0.05s;
         }
 
         .virtual-cursor:active {
@@ -240,7 +258,6 @@
             font-weight: bold;
             font-size: 11px;
             cursor: pointer;
-            transition: all 0.05s;
         }
 
         .mouse-btn:active {
@@ -300,11 +317,6 @@
             font-weight: bold;
         }
 
-        .keyboard-controls {
-            display: flex;
-            gap: 8px;
-        }
-
         .kbd-btn {
             background: #2a2a3a;
             border: none;
@@ -333,8 +345,6 @@
             font-size: 10px;
             min-width: 32px;
             text-align: center;
-            transition: all 0.03s;
-            touch-action: manipulation;
         }
 
         .key:active {
@@ -351,7 +361,6 @@
             min-width: 65px;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 170px;
@@ -371,17 +380,12 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        /* Impedir zoom */
-        input, textarea {
-            touch-action: manipulation;
-        }
     </style>
 </head>
 <body>
 <div class="toolbar">
     <div class="url-bar">
-        <input type="text" id="globalUrlInput" placeholder="URL">
+        <input type="text" id="globalUrlInput" placeholder="URL (ex: https://google.com)">
         <button id="globalGoBtn">IR</button>
     </div>
     <button id="globalBackBtn" class="nav-btn">◀</button>
@@ -395,9 +399,7 @@
 
 <!-- MOUSE VIRTUAL -->
 <div id="mouseContainer" class="virtual-mouse-container">
-    <div id="virtualCursor" class="virtual-cursor">
-        🖱️
-    </div>
+    <div id="virtualCursor" class="virtual-cursor">🖱️</div>
     <div class="mouse-buttons">
         <button id="mouseLeftBtn" class="mouse-btn left">CLIQUE</button>
         <button id="mouseRightBtn" class="mouse-btn right">DIREITO</button>
@@ -412,9 +414,7 @@
 <div id="keyboardContainer" class="virtual-keyboard-container">
     <div class="keyboard-header">
         <span class="keyboard-title">⌨️ TECLADO VIRTUAL</span>
-        <div class="keyboard-controls">
-            <button id="keyboardMinimizeBtn" class="kbd-btn">─</button>
-        </div>
+        <button id="keyboardMinimizeBtn" class="kbd-btn">─</button>
     </div>
     <div id="keyboardRows">
         <div class="keyboard-row">
@@ -452,128 +452,114 @@
     let browsers = [];
     let activeBrowserId = null;
     let browserCounter = 0;
+    let currentDoc = null; // Guarda referência ao documento atual
     
-    // Mouse virtual
-    let mouseX = window.innerWidth - 80;
-    let mouseY = window.innerHeight - 280;
+    // Mouse
     let isDraggingMouse = false;
     let dragStartX = 0, dragStartY = 0;
-    
-    // Shift state
     let shiftPressed = false;
+    
+    // ==================== PÁGINA LOCAL PARA TESTE ====================
+    function criarPaginaLocal() {
+        return `
+            <div class="local-page">
+                <h2>📱 Teste Mouse + Teclado Virtual</h2>
+                <p>Clique aqui e digite com o teclado virtual:</p>
+                <input type="text" id="campo1" placeholder="Campo de texto 1" style="width:100%; padding:10px; margin:5px 0">
+                <textarea id="campo2" placeholder="Área de texto maior..." rows="4" style="width:100%; padding:10px; margin:5px 0"></textarea>
+                <button onclick="alert('Botão clicado!')">Clique em mim</button>
+                <p style="margin-top:20px; color:#666; font-size:12px">✅ Mouse: arraste o ícone 🖱️ e clique nos botões</p>
+                <p style="color:#666; font-size:12px">⌨️ Teclado: toque nas teclas para digitar</p>
+            </div>
+        `;
+    }
     
     // ==================== FUNÇÕES PRINCIPAIS ====================
     
-    function getCurrentIframe() {
+    function getCurrentDocument() {
+        // Primeiro tenta pegar do iframe
         const browser = browsers.find(b => b.id === activeBrowserId);
-        if (!browser) return null;
-        return document.getElementById(browser.iframeId);
-    }
-    
-    function getIframeDocument() {
-        const iframe = getCurrentIframe();
-        if (!iframe) return null;
-        try {
-            return iframe.contentDocument || iframe.contentWindow.document;
-        } catch(e) {
-            return null;
-        }
-    }
-    
-    // IMPEDIR TECLADO DO CELULAR
-    function preventNativeKeyboard() {
-        // Impedir que inputs dentro do iframe abram teclado nativo
-        const iframe = getCurrentIframe();
-        if (iframe) {
-            try {
-                const doc = iframe.contentDocument;
-                if (doc) {
-                    doc.body.addEventListener('focusin', (e) => {
-                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                            e.target.readOnly = true;
-                            setTimeout(() => { e.target.readOnly = false; }, 10);
-                        }
-                    });
+        if (browser && browser.iframeId) {
+            const iframe = document.getElementById(browser.iframeId);
+            if (iframe) {
+                try {
+                    const doc = iframe.contentDocument || iframe.contentWindow.document;
+                    if (doc && doc.body) {
+                        currentDoc = doc;
+                        return doc;
+                    }
+                } catch(e) {
+                    console.log('Erro acesso iframe:', e);
                 }
-            } catch(e) {}
+            }
         }
+        // Fallback: usa o documento local da página
+        if (!currentDoc) currentDoc = document;
+        return currentDoc;
     }
     
     // ENVIAR CLIQUE
-    async function sendClickToIframe(x, y, isRightClick = false) {
-        const iframe = getCurrentIframe();
-        const doc = getIframeDocument();
-        if (!doc) { mostrarToast('❌ Erro: não achou iframe', '#ed4245'); return; }
-        
-        const iframeRect = iframe.getBoundingClientRect();
-        const targetX = x - iframeRect.left;
-        const targetY = y - iframeRect.top;
-        
-        if (targetX < 0 || targetY < 0 || targetX > iframeRect.width || targetY > iframeRect.height) {
-            mostrarToast('⚠️ Mouse fora da página', '#faa61a');
+    async function sendClick(x, y, isRightClick = false) {
+        const doc = getCurrentDocument();
+        if (!doc) {
+            mostrarToast('❌ Nenhuma página disponível', '#ed4245');
             return;
         }
         
-        const element = doc.elementFromPoint(targetX, targetY);
-        if (!element) return;
+        // Se for o documento local, ajusta coordenadas
+        let targetX = x, targetY = y;
+        let element = null;
+        
+        if (doc === document) {
+            // Documento local
+            element = document.elementFromPoint(x, y);
+        } else {
+            // Iframe remoto
+            const iframe = document.getElementById(browsers.find(b => b.id === activeBrowserId)?.iframeId);
+            if (iframe) {
+                const iframeRect = iframe.getBoundingClientRect();
+                targetX = x - iframeRect.left;
+                targetY = y - iframeRect.top;
+                if (targetX >= 0 && targetY >= 0 && targetX <= iframeRect.width && targetY <= iframeRect.height) {
+                    element = doc.elementFromPoint(targetX, targetY);
+                }
+            }
+        }
+        
+        if (!element) {
+            mostrarToast('⚠️ Nenhum elemento encontrado', '#faa61a');
+            return;
+        }
         
         const button = isRightClick ? 2 : 0;
         
-        // Eventos de mouse
         const downEvent = new MouseEvent('mousedown', {
-            view: iframe.contentWindow,
-            bubbles: true,
-            cancelable: true,
-            clientX: targetX,
-            clientY: targetY,
-            button: button
+            bubbles: true, cancelable: true, clientX: targetX, clientY: targetY, button: button
         });
         element.dispatchEvent(downEvent);
         
         await new Promise(r => setTimeout(r, 50));
         
         const upEvent = new MouseEvent('mouseup', {
-            view: iframe.contentWindow,
-            bubbles: true,
-            cancelable: true,
-            clientX: targetX,
-            clientY: targetY,
-            button: button
+            bubbles: true, cancelable: true, clientX: targetX, clientY: targetY, button: button
         });
         element.dispatchEvent(upEvent);
         
         const clickEvent = new MouseEvent('click', {
-            view: iframe.contentWindow,
-            bubbles: true,
-            cancelable: true,
-            clientX: targetX,
-            clientY: targetY,
-            button: button
+            bubbles: true, cancelable: true, clientX: targetX, clientY: targetY, button: button
         });
         element.dispatchEvent(clickEvent);
-        
-        // Toque para mobile
-        const touchStart = new TouchEvent('touchstart', {
-            bubbles: true,
-            touches: [new Touch({identifier: 0, target: element, clientX: targetX, clientY: targetY})]
-        });
-        element.dispatchEvent(touchStart);
-        await new Promise(r => setTimeout(r, 30));
-        const touchEnd = new TouchEvent('touchend', { bubbles: true });
-        element.dispatchEvent(touchEnd);
         
         mostrarToast(isRightClick ? '🖱️ Clique Direito' : '🖱️ Clique', '#23a55a');
     }
     
-    // ENVIAR TECLA (CORRIGIDO)
-    function sendKeyToIframe(key) {
-        const doc = getIframeDocument();
-        if (!doc) { mostrarToast('❌ Erro: não achou página', '#ed4245'); return; }
+    // ENVIAR TECLA
+    function sendKey(key) {
+        const doc = getCurrentDocument();
+        if (!doc) { mostrarToast('❌ Erro', '#ed4245'); return; }
         
-        // Encontrar elemento focado
         let activeElement = doc.activeElement;
         
-        // Se não tem foco, foca no primeiro input
         if (!activeElement || activeElement === doc.body) {
             const input = doc.querySelector('input, textarea, [contenteditable="true"]');
             if (input) {
@@ -585,31 +571,18 @@
             }
         }
         
-        // Aplicar shift se necessário
         let finalKey = key;
         if (shiftPressed && key.length === 1 && /[a-z]/.test(key)) {
             finalKey = key.toUpperCase();
         }
         
-        // Eventos de teclado
-        const downEvent = new KeyboardEvent('keydown', { 
-            key: finalKey, 
-            code: `Key${finalKey.toUpperCase()}`,
-            bubbles: true, 
-            cancelable: true,
-            shiftKey: shiftPressed
-        });
+        const downEvent = new KeyboardEvent('keydown', { key: finalKey, bubbles: true, cancelable: true, shiftKey: shiftPressed });
         activeElement.dispatchEvent(downEvent);
         
         if (finalKey.length === 1 && !downEvent.defaultPrevented) {
-            const pressEvent = new KeyboardEvent('keypress', { 
-                key: finalKey, 
-                bubbles: true,
-                shiftKey: shiftPressed
-            });
+            const pressEvent = new KeyboardEvent('keypress', { key: finalKey, bubbles: true });
             activeElement.dispatchEvent(pressEvent);
             
-            // Inserir texto no campo
             if (activeElement.value !== undefined && !pressEvent.defaultPrevented) {
                 const start = activeElement.selectionStart || 0;
                 const end = activeElement.selectionEnd || 0;
@@ -622,19 +595,14 @@
             }
         }
         
-        const upEvent = new KeyboardEvent('keyup', { 
-            key: finalKey, 
-            bubbles: true,
-            shiftKey: shiftPressed
-        });
+        const upEvent = new KeyboardEvent('keyup', { key: finalKey, bubbles: true });
         activeElement.dispatchEvent(upEvent);
         
-        mostrarToast(`⌨️ Tecla: ${finalKey}`, '#5865F2');
+        mostrarToast(`⌨️ ${finalKey}`, '#5865F2');
     }
     
-    // TECLAS ESPECIAIS
     function sendSpecialKey(key) {
-        const doc = getIframeDocument();
+        const doc = getCurrentDocument();
         if (!doc) return;
         
         let activeElement = doc.activeElement;
@@ -663,14 +631,9 @@
             activeElement.dispatchEvent(inputEvent);
         }
         
-        if (key === 'Enter') {
-            const submitEvent = new Event('submit', { bubbles: true });
-            if (activeElement.form) activeElement.form.dispatchEvent(submitEvent);
-        }
-        
         if (key === 'Shift') {
             shiftPressed = !shiftPressed;
-            mostrarToast(shiftPressed ? '🔠 Shift ATIVADO' : '🔡 Shift desativado', '#faa61a');
+            mostrarToast(shiftPressed ? '🔠 MAIÚSCULAS' : '🔡 minúsculas', '#faa61a');
         }
         
         const upEvent = new KeyboardEvent('keyup', { key: key, bubbles: true });
@@ -679,30 +642,25 @@
         if (key !== 'Shift') mostrarToast(`⌨️ ${key === 'Space' ? 'Espaço' : key}`, '#5865F2');
     }
     
-    // SCROLL
     function sendScroll(deltaY) {
-        const doc = getIframeDocument();
+        const doc = getCurrentDocument();
         if (!doc) return;
         
-        const scrollEvent = new WheelEvent('wheel', {
-            deltaY: deltaY,
-            deltaMode: 0,
-            bubbles: true,
-            cancelable: true
-        });
+        const scrollEvent = new WheelEvent('wheel', { deltaY: deltaY, deltaMode: 0, bubbles: true });
         doc.body.dispatchEvent(scrollEvent);
         mostrarToast(`📜 ${deltaY > 0 ? 'Scroll ↓' : 'Scroll ↑'}`, '#faa61a');
     }
     
-    // ==================== MOUSE VIRTUAL ====================
+    // ==================== MOUSE ====================
     function initMouseDrag() {
         const cursor = document.getElementById('virtualCursor');
+        const container = document.getElementById('mouseContainer');
         
         cursor.addEventListener('touchstart', (e) => {
             e.preventDefault();
             isDraggingMouse = true;
             const touch = e.touches[0];
-            const rect = document.getElementById('mouseContainer').getBoundingClientRect();
+            const rect = container.getBoundingClientRect();
             dragStartX = touch.clientX - rect.left;
             dragStartY = touch.clientY - rect.top;
         });
@@ -711,7 +669,6 @@
             if (!isDraggingMouse) return;
             e.preventDefault();
             const touch = e.touches[0];
-            const container = document.getElementById('mouseContainer');
             let newLeft = touch.clientX - dragStartX;
             let newTop = touch.clientY - dragStartY;
             
@@ -724,31 +681,14 @@
             container.style.top = newTop + 'px';
         });
         
-        cursor.addEventListener('touchend', () => {
-            isDraggingMouse = false;
-        });
+        cursor.addEventListener('touchend', () => { isDraggingMouse = false; });
         
-        // Posição inicial
-        const container = document.getElementById('mouseContainer');
         container.style.right = 'auto';
-        container.style.bottom = 'auto';
-        container.style.left = mouseX + 'px';
-        container.style.top = mouseY + 'px';
+        container.style.left = window.innerWidth - 80 + 'px';
+        container.style.top = window.innerHeight - 280 + 'px';
     }
     
-    // ==================== FUNÇÕES DO BROWSER ====================
-    
-    function mostrarToast(msg, cor = '#23a55a') {
-        const old = document.querySelector('.toast');
-        if (old) old.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.style.background = cor;
-        toast.innerText = msg;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 1500);
-    }
-    
+    // ==================== BROWSER ====================
     function criarNovaBrowser(url = null) {
         const browserId = 'browser_' + (++browserCounter);
         const iframeId = 'iframe_' + browserId;
@@ -757,28 +697,40 @@
         browserDiv.className = 'browser-window';
         browserDiv.id = browserId;
         
-        browserDiv.innerHTML = `
-            <div class="browser-toolbar">
-                <input type="text" class="browser-url" id="url_${iframeId}" placeholder="URL">
-                <button class="browser-go" data-browser="${browserId}">IR</button>
-                <button class="browser-back" data-browser="${browserId}">◀</button>
-                <button class="browser-forward" data-browser="${browserId}">▶</button>
-                <button class="browser-reload" data-browser="${browserId}">🔄</button>
-            </div>
-            <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com/webhp?igu=1'}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
-        `;
+        // Se for URL do Google ou externa, usa iframe. Senão, usa página local
+        const isExternal = url && (url.includes('google') || url.includes('http'));
+        
+        if (isExternal) {
+            browserDiv.innerHTML = `
+                <div class="browser-toolbar">
+                    <input type="text" class="browser-url" id="url_${iframeId}" value="${url || 'https://www.google.com'}">
+                    <button class="browser-go" data-browser="${browserId}">IR</button>
+                    <button class="browser-back" data-browser="${browserId}">◀</button>
+                    <button class="browser-forward" data-browser="${browserId}">▶</button>
+                    <button class="browser-reload" data-browser="${browserId}">🔄</button>
+                </div>
+                <iframe id="${iframeId}" class="browser-frame" src="${url || 'https://www.google.com'}" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals allow-top-navigation"></iframe>
+            `;
+        } else {
+            // Página local para teste
+            browserDiv.innerHTML = `
+                <div class="browser-toolbar">
+                    <input type="text" class="browser-url" id="url_${iframeId}" value="Página Local">
+                    <button class="browser-go" data-browser="${browserId}">IR</button>
+                </div>
+                <div id="${iframeId}" class="local-page">${criarPaginaLocal()}</div>
+            `;
+        }
         
         document.getElementById('contentArea').appendChild(browserDiv);
-        
-        const iframe = document.getElementById(iframeId);
         
         const tabDiv = document.createElement('div');
         tabDiv.className = 'tab';
         tabDiv.id = 'tab_' + browserId;
-        tabDiv.innerHTML = `<span>${url ? new URL(url).hostname : 'Nova'}</span><button class="close-tab" data-browser="${browserId}">✕</button>`;
+        tabDiv.innerHTML = `<span>${isExternal ? (url ? new URL(url).hostname : 'Google') : 'Teste'}</span><button class="close-tab" data-browser="${browserId}">✕</button>`;
         document.getElementById('tabsContainer').appendChild(tabDiv);
         
-        browsers.push({ id: browserId, iframeId: iframeId, url: url || 'https://www.google.com/webhp?igu=1', tabId: 'tab_' + browserId });
+        browsers.push({ id: browserId, iframeId: iframeId, isExternal: isExternal, url: url, tabId: 'tab_' + browserId });
         
         tabDiv.addEventListener('click', (e) => {
             if (e.target.classList.contains('close-tab')) return;
@@ -790,33 +742,22 @@
             fecharBrowser(browserId);
         });
         
-        const goBtn = browserDiv.querySelector('.browser-go');
-        const urlInput = browserDiv.querySelector('.browser-url');
-        urlInput.value = url || 'https://www.google.com/webhp?igu=1';
-        
-        goBtn.addEventListener('click', () => {
-            let newUrl = urlInput.value;
-            if (!newUrl.startsWith('http')) {
-                if (newUrl.includes('.')) newUrl = 'https://' + newUrl;
-                else newUrl = 'https://www.google.com/search?q=' + encodeURIComponent(newUrl);
-            }
-            iframe.src = newUrl;
-            try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
-            setTimeout(() => preventNativeKeyboard(), 500);
-        });
-        
-        browserDiv.querySelector('.browser-back').addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) {} });
-        browserDiv.querySelector('.browser-forward').addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) {} });
-        browserDiv.querySelector('.browser-reload').addEventListener('click', () => { iframe.src = iframe.src; setTimeout(() => preventNativeKeyboard(), 500); });
-        
-        urlInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') goBtn.click(); });
-        
-        iframe.addEventListener('load', () => {
-            setTimeout(() => preventNativeKeyboard(), 500);
-            try {
-                document.getElementById('globalUrlInput').value = iframe.contentWindow.location.href;
-            } catch(e) {}
-        });
+        if (isExternal) {
+            const iframe = document.getElementById(iframeId);
+            const goBtn = browserDiv.querySelector('.browser-go');
+            const urlInput = browserDiv.querySelector('.browser-url');
+            
+            goBtn.addEventListener('click', () => {
+                let newUrl = urlInput.value;
+                if (!newUrl.startsWith('http')) newUrl = 'https://' + newUrl;
+                iframe.src = newUrl;
+                try { tabDiv.querySelector('span').textContent = new URL(newUrl).hostname; } catch(e) {}
+            });
+            
+            browserDiv.querySelector('.browser-back')?.addEventListener('click', () => { try { iframe.contentWindow.history.back(); } catch(e) {} });
+            browserDiv.querySelector('.browser-forward')?.addEventListener('click', () => { try { iframe.contentWindow.history.forward(); } catch(e) {} });
+            browserDiv.querySelector('.browser-reload')?.addEventListener('click', () => { iframe.src = iframe.src; });
+        }
         
         ativarBrowser(browserId);
         return browserId;
@@ -831,16 +772,13 @@
         document.getElementById(browserId).classList.add('active');
         document.getElementById('tab_' + browserId).classList.add('active');
         
+        // Atualizar documento atual
         const browser = browsers.find(b => b.id === browserId);
-        if (browser) {
-            const iframe = document.getElementById(browser.iframeId);
-            try {
-                document.getElementById('globalUrlInput').value = iframe.contentWindow.location.href;
-            } catch(e) {
-                document.getElementById('globalUrlInput').value = browser.url;
-            }
+        if (browser && !browser.isExternal) {
+            currentDoc = document;
+        } else {
+            currentDoc = null;
         }
-        setTimeout(() => preventNativeKeyboard(), 300);
     }
     
     function fecharBrowser(browserId) {
@@ -852,78 +790,59 @@
         browsers.splice(index, 1);
         
         if (browsers.length === 0) {
-            criarNovaBrowser('https://www.google.com/webhp?igu=1');
+            criarNovaBrowser(null);
         } else if (activeBrowserId === browserId) {
             ativarBrowser(browsers[Math.max(0, index - 1)].id);
         }
     }
     
-    function acaoGlobal(tipo) {
-        const browser = browsers.find(b => b.id === activeBrowserId);
-        if (!browser) return;
-        const iframe = document.getElementById(browser.iframeId);
-        if (tipo === 'back') { try { iframe.contentWindow.history.back(); } catch(e) {} }
-        else if (tipo === 'forward') { try { iframe.contentWindow.history.forward(); } catch(e) {} }
-        else if (tipo === 'reload') { iframe.src = iframe.src; setTimeout(() => preventNativeKeyboard(), 500); }
-    }
-    
-    // Minimizar teclado
-    let keyboardMinimized = false;
-    function minimizeKeyboard() {
-        keyboardMinimized = !keyboardMinimized;
-        const rows = document.getElementById('keyboardRows');
-        const btn = document.getElementById('keyboardMinimizeBtn');
-        
-        if (keyboardMinimized) {
-            rows.style.display = 'none';
-            btn.textContent = '□';
-        } else {
-            rows.style.display = 'block';
-            btn.textContent = '─';
-        }
-    }
-    
-    // ==================== EVENTOS ====================
-    document.getElementById('globalGoBtn').addEventListener('click', () => {
+    function irParaUrl() {
         let url = document.getElementById('globalUrlInput').value;
+        if (!url) return;
         if (!url.startsWith('http')) {
             if (url.includes('.')) url = 'https://' + url;
             else url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
         }
-        const browser = browsers.find(b => b.id === activeBrowserId);
-        if (browser) {
-            document.getElementById(browser.iframeId).src = url;
-            try { document.getElementById('tab_' + browser.id).querySelector('span').textContent = new URL(url).hostname; } catch(e) {}
-        }
-    });
+        criarNovaBrowser(url);
+    }
     
-    document.getElementById('globalUrlInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') document.getElementById('globalGoBtn').click();
-    });
+    // ==================== EVENTOS ====================
+    function mostrarToast(msg, cor) {
+        const old = document.querySelector('.toast');
+        if (old) old.remove();
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.style.background = cor;
+        toast.innerText = msg;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1500);
+    }
     
-    document.getElementById('globalBackBtn').addEventListener('click', () => acaoGlobal('back'));
-    document.getElementById('globalForwardBtn').addEventListener('click', () => acaoGlobal('forward'));
-    document.getElementById('globalReloadBtn').addEventListener('click', () => acaoGlobal('reload'));
-    document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser('https://www.google.com/webhp?igu=1'));
-    document.getElementById('keyboardMinimizeBtn').addEventListener('click', minimizeKeyboard);
+    document.getElementById('globalGoBtn').addEventListener('click', irParaUrl);
+    document.getElementById('globalUrlInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') irParaUrl(); });
+    document.getElementById('newTabBtn').addEventListener('click', () => criarNovaBrowser(null));
+    document.getElementById('keyboardMinimizeBtn').addEventListener('click', () => {
+        const rows = document.getElementById('keyboardRows');
+        rows.style.display = rows.style.display === 'none' ? 'flex' : 'none';
+    });
     
     // Mouse
     document.getElementById('mouseLeftBtn').addEventListener('click', () => {
         const container = document.getElementById('mouseContainer');
         const rect = container.getBoundingClientRect();
-        sendClickToIframe(rect.left + 25, rect.top + 25, false);
+        sendClick(rect.left + 25, rect.top + 25, false);
     });
     
     document.getElementById('mouseRightBtn').addEventListener('click', () => {
         const container = document.getElementById('mouseContainer');
         const rect = container.getBoundingClientRect();
-        sendClickToIframe(rect.left + 25, rect.top + 25, true);
+        sendClick(rect.left + 25, rect.top + 25, true);
     });
     
     document.getElementById('scrollUpBtn').addEventListener('click', () => sendScroll(-300));
     document.getElementById('scrollDownBtn').addEventListener('click', () => sendScroll(300));
     
-    // Teclas
+    // Teclado
     document.querySelectorAll('.key').forEach(key => {
         key.addEventListener('click', () => {
             const keyVal = key.getAttribute('data-key');
@@ -932,17 +851,17 @@
             } else if (keyVal === 'Space') {
                 sendSpecialKey(' ');
             } else {
-                sendKeyToIframe(keyVal);
+                sendKey(keyVal);
             }
         });
     });
     
     // INICIAR
     initMouseDrag();
-    criarNovaBrowser('https://www.google.com/webhp?igu=1');
+    criarNovaBrowser(null); // Abre página local de teste
     
-    mostrarToast('✅ Mouse + Teclado Virtual ATIVADOS!', '#23a55a');
-    mostrarToast('🖱️ Arraste o mouse | ⌨️ Toque nas teclas', '#5865F2');
+    mostrarToast('✅ Mouse + Teclado Virtual FUNCIONANDO!', '#23a55a');
+    mostrarToast('🖱️ Clique no campo de texto e use o teclado', '#5865F2');
 </script>
 </body>
 </html>
