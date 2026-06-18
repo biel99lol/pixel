@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudFone — Telefone na Nuvem</title>
+
+<!-- ══ REAL GOOGLE ADSENSE — substitua ca-pub-XXXXXXXXXXXXXXXX pelo seu Publisher ID ══ -->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+
+:root {
+  --bg:       #060A12;
+  --surface:  #0C1220;
+  --card:     #111827;
+  --border:   #1E2D40;
+  --blue:     #2563EB;
+  --cyan:     #06B6D4;
+  --green:    #10B981;
+  --amber:    #F59E0B;
+  --red:      #EF4444;
+  --purple:   #8B5CF6;
+  --text:     #F1F5F9;
+  --sub:      #94A3B8;
+  --glow-c:   rgba(6,182,212,.3);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* grid bg */
+body::before {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(6,182,212,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(6,182,212,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+
+/* ── SCREENS ── */
+.screen { display:none; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; }
+
+/* ════════════════════════════════════
+   AUTH SCREEN
+════════════════════════════════════ */
+#authScreen {
+  align-items:center; justify-content:center;
+  padding:24px;
+}
+
+.auth-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius:24px;
+  padding:40px 36px;
+  width:100%; max-width:420px;
+  box-shadow: 0 0 60px rgba(6,182,212,.08);
+}
+
+.brand {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:32px; justify-content:center;
+}
+.brand-icon {
+  width:44px; height:44px; border-radius:12px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:grid; place-items:center; font-size:22px;
+}
+.brand-name { font-size:1.5rem; font-weight:800; letter-spacing:-.03em; }
+.brand-name span { color:var(--cyan); }
+
+.auth-tabs {
+  display:flex; background:var(--bg); border-radius:12px;
+  padding:4px; margin-bottom:28px;
+}
+.auth-tab {
+  flex:1; padding:10px; border:none; background:none;
+  color:var(--sub); font-family:inherit; font-size:.9rem;
+  font-weight:500; border-radius:10px; cursor:pointer;
+  transition:all .2s;
+}
+.auth-tab.active {
+  background:var(--card); color:var(--text);
+  box-shadow:0 2px 8px rgba(0,0,0,.3);
+}
+
+.auth-form { display:flex; flex-direction:column; gap:14px; }
+.field label { display:block; font-size:.8rem; font-weight:500; color:var(--sub); margin-bottom:6px; }
+.field input {
+  width:100%; padding:12px 16px;
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:10px; color:var(--text); font-family:inherit; font-size:.95rem;
+  transition:border-color .2s, box-shadow .2s;
+  outline:none;
+}
+.field input:focus { border-color:var(--cyan); box-shadow:0 0 0 3px rgba(6,182,212,.15); }
+
+.btn-auth {
+  margin-top:8px; padding:14px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border:none; border-radius:12px; color:#fff;
+  font-family:inherit; font-size:1rem; font-weight:600;
+  cursor:pointer; transition:opacity .2s, transform .1s;
+}
+.btn-auth:hover { opacity:.9; }
+.btn-auth:active { transform:scale(.98); }
+
+.auth-note {
+  margin-top:20px; text-align:center;
+  font-size:.8rem; color:var(--sub);
+}
+.auth-error {
+  background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3);
+  color:#FCA5A5; border-radius:8px; padding:10px 14px; font-size:.85rem;
+  display:none;
+}
+
+/* ════════════════════════════════════
+   MAIN APP
+════════════════════════════════════ */
+#appScreen { flex-direction:row; }
+
+/* SIDEBAR */
+.sidebar {
+  width:240px; flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  padding:20px 0; position:sticky; top:0; height:100vh;
+}
+.sidebar .brand { padding:0 20px 24px; justify-content:flex-start; }
+.nav-items { flex:1; display:flex; flex-direction:column; gap:2px; padding:0 12px; }
+.nav-item {
+  display:flex; align-items:center; gap:12px;
+  padding:11px 14px; border-radius:10px;
+  font-size:.9rem; font-weight:500; cursor:pointer;
+  color:var(--sub); transition:all .2s; border:none; background:none;
+  font-family:inherit; text-align:left; width:100%;
+}
+.nav-item:hover { background:var(--card); color:var(--text); }
+.nav-item.active { background:rgba(6,182,212,.12); color:var(--cyan); }
+.nav-item .ni { font-size:16px; width:20px; text-align:center; }
+
+.sidebar-footer { padding:16px 20px; border-top:1px solid var(--border); }
+.user-pill {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; background:var(--card); border-radius:10px;
+}
+.user-avatar {
+  width:32px; height:32px; border-radius:8px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:grid; place-items:center; font-size:14px; font-weight:700; flex-shrink:0;
+}
+.user-info { flex:1; min-width:0; }
+.user-name { font-size:.85rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.user-plan { font-size:.72rem; color:var(--sub); }
+.user-plan.pro { color:var(--amber); }
+.btn-logout {
+  background:none; border:none; color:var(--sub); cursor:pointer; font-size:16px;
+  padding:4px; transition:color .2s;
+}
+.btn-logout:hover { color:var(--red); }
+
+/* MAIN CONTENT */
+.main-content { flex:1; overflow-y:auto; }
+
+/* PAGES */
+.page { display:none; padding:32px; max-width:900px; }
+.page.active { display:block; }
+
+.page-title { font-size:1.4rem; font-weight:700; letter-spacing:-.02em; margin-bottom:4px; }
+.page-sub { color:var(--sub); font-size:.9rem; margin-bottom:28px; }
+
+/* CARDS */
+.card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:24px;
+  margin-bottom:16px;
+}
+.card-row { display:flex; gap:16px; margin-bottom:16px; }
+.card-row .card { flex:1; margin-bottom:0; }
+
+/* STATS ROW */
+.stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+.stat-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:20px 24px;
+}
+.stat-label { font-size:.78rem; color:var(--sub); font-weight:500; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px; }
+.stat-value {
+  font-family:'JetBrains Mono',monospace;
+  font-size:1.8rem; font-weight:700; color:var(--cyan);
+  letter-spacing:-.02em; line-height:1;
+}
+.stat-note { font-size:.78rem; color:var(--sub); margin-top:4px; }
+
+/* PLAN BANNER */
+.plan-banner {
+  background: linear-gradient(135deg,rgba(37,99,235,.2),rgba(6,182,212,.1));
+  border:1px solid rgba(6,182,212,.25);
+  border-radius:16px; padding:20px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; gap:16px; flex-wrap:wrap;
+}
+.plan-info h3 { font-size:1rem; font-weight:700; }
+.plan-info p { color:var(--sub); font-size:.85rem; margin-top:2px; }
+.btn-upgrade {
+  padding:10px 20px;
+  background:linear-gradient(135deg,var(--amber),#F97316);
+  border:none; border-radius:10px; color:#000;
+  font-family:inherit; font-size:.85rem; font-weight:700;
+  cursor:pointer; white-space:nowrap;
+  transition:opacity .2s;
+}
+.btn-upgrade:hover { opacity:.9; }
+
+/* ── AD SECTION ── */
+.ad-section-title {
+  font-size:.8rem; font-weight:600; text-transform:uppercase;
+  letter-spacing:.08em; color:var(--sub); margin-bottom:12px;
+}
+
+/* Real AdSense slot */
+.adsense-slot {
+  background:var(--card); border:1px dashed var(--border);
+  border-radius:12px; min-height:120px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:16px; overflow:hidden; position:relative;
+}
+.adsense-placeholder {
+  text-align:center; color:var(--sub); font-size:.85rem;
+  padding:20px;
+}
+.adsense-placeholder strong { display:block; margin-bottom:4px; color:var(--text); }
+
+/* Reward ad (video-style) */
+.reward-ad-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:16px; padding:20px;
+  display:flex; align-items:center; gap:16px;
+  cursor:pointer; transition:border-color .2s, transform .15s;
+  margin-bottom:12px;
+}
+.reward-ad-card:hover { border-color:rgba(6,182,212,.4); transform:translateY(-2px); }
+.reward-ad-card.watched { border-color:rgba(16,185,129,.3); opacity:.6; pointer-events:none; }
+.rad-icon {
+  width:48px; height:48px; border-radius:12px;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  display:grid; place-items:center; font-size:22px; flex-shrink:0;
+}
+.rad-info { flex:1; }
+.rad-info h4 { font-size:.95rem; font-weight:600; }
+.rad-info p { color:var(--sub); font-size:.82rem; margin-top:2px; }
+.rad-reward {
+  background:rgba(6,182,212,.1); border:1px solid rgba(6,182,212,.25);
+  color:var(--cyan); padding:6px 14px; border-radius:8px;
+  font-family:'JetBrains Mono',monospace; font-size:.85rem; font-weight:600;
+  white-space:nowrap;
+}
+.rad-reward.done { background:rgba(16,185,129,.1); border-color:rgba(16,185,129,.25); color:var(--green); }
+
+/* ── CLOUD PHONE ── */
+.phone-frame-wrap {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; overflow:hidden;
+  position:relative;
+}
+.phone-header {
+  padding:16px 20px; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.phone-status { display:flex; align-items:center; gap:8px; font-size:.85rem; }
+.status-dot { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px var(--green); }
+.phone-timer-display {
+  font-family:'JetBrains Mono',monospace; font-size:.9rem;
+  color:var(--cyan); background:rgba(6,182,212,.1);
+  padding:4px 12px; border-radius:8px;
+}
+.phone-iframe-container { position:relative; }
+.phone-iframe-container iframe {
+  width:100%; height:520px; border:none; display:block;
+}
+.phone-locked-overlay {
+  position:absolute; inset:0;
+  background:rgba(6,10,18,.92); backdrop-filter:blur(12px);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  text-align:center; padding:32px;
+}
+.phone-locked-overlay.hidden { display:none; }
+.lock-icon { font-size:48px; }
+.lock-title { font-size:1.2rem; font-weight:700; }
+.lock-sub { color:var(--sub); font-size:.9rem; max-width:300px; }
+.lock-progress {
+  width:100%; max-width:280px;
+  height:8px; background:var(--border); border-radius:4px; overflow:hidden;
+}
+.lock-fill {
+  height:100%; border-radius:4px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  transition:width .5s ease;
+  box-shadow:0 0 10px var(--glow-c);
+}
+.lock-label { font-size:.82rem; color:var(--sub); }
+
+/* ── PLANS ── */
+.plans-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:24px; }
+.plan-card {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:20px; padding:28px 24px;
+  display:flex; flex-direction:column; gap:16px;
+  position:relative; transition:border-color .2s;
+}
+.plan-card.featured {
+  border-color:var(--cyan);
+  box-shadow:0 0 32px rgba(6,182,212,.12);
+}
+.plan-badge {
+  position:absolute; top:-12px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  color:#fff; font-size:.72rem; font-weight:700; text-transform:uppercase;
+  letter-spacing:.08em; padding:4px 14px; border-radius:20px; white-space:nowrap;
+}
+.plan-name { font-size:1.1rem; font-weight:700; }
+.plan-price { font-family:'JetBrains Mono',monospace; }
+.plan-price .amount { font-size:2rem; font-weight:700; color:var(--cyan); }
+.plan-price .period { color:var(--sub); font-size:.85rem; }
+.plan-features { display:flex; flex-direction:column; gap:8px; }
+.plan-feat { display:flex; align-items:center; gap:8px; font-size:.88rem; }
+.plan-feat .ok { color:var(--green); }
+.plan-feat .no { color:var(--sub); text-decoration:line-through; }
+.btn-plan {
+  padding:12px; border-radius:10px; font-family:inherit;
+  font-size:.9rem; font-weight:600; cursor:pointer; border:none;
+  transition:opacity .2s;
+}
+.btn-plan.current { background:var(--border); color:var(--sub); cursor:default; }
+.btn-plan.primary { background:linear-gradient(135deg,var(--blue),var(--cyan)); color:#fff; }
+.btn-plan.premium { background:linear-gradient(135deg,var(--amber),#F97316); color:#000; }
+.btn-plan:not(.current):hover { opacity:.85; }
+
+/* ── HISTORY ── */
+.history-item {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.history-item:last-child { border-bottom:none; }
+.hi-left { display:flex; align-items:center; gap:12px; }
+.hi-icon { font-size:18px; }
+.hi-desc { font-size:.88rem; }
+.hi-time { font-size:.78rem; color:var(--sub); }
+.hi-amount { font-family:'JetBrains Mono',monospace; font-size:.88rem; font-weight:600; }
+.hi-amount.plus { color:var(--green); }
+.hi-amount.minus { color:var(--red); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position:fixed; inset:0; z-index:500;
+  background:rgba(0,0,0,.8); backdrop-filter:blur(10px);
+  display:none; place-items:center; padding:20px;
+}
+.modal-overlay.open { display:grid; }
+.modal {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:24px; padding:36px; width:100%; max-width:440px;
+  text-align:center; position:relative;
+  box-shadow:0 0 60px rgba(6,182,212,.15);
+}
+.modal h3 { font-size:1.2rem; font-weight:700; margin-bottom:6px; }
+.modal .modal-sub { color:var(--sub); font-size:.88rem; margin-bottom:24px; }
+
+/* video ad simulation */
+.video-ad-box {
+  background:var(--bg); border:1px solid var(--border);
+  border-radius:14px; height:200px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:8px; margin-bottom:20px; position:relative; overflow:hidden;
+}
+.vad-brand { font-size:42px; }
+.vad-name { font-weight:600; font-size:.95rem; }
+.vad-label { color:var(--sub); font-size:.78rem; }
+.vad-progress {
+  position:absolute; bottom:0; left:0; height:4px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  width:0%; transition:width linear;
+  box-shadow:0 0 10px var(--glow-c);
+}
+
+.countdown-big {
+  font-family:'JetBrains Mono',monospace;
+  font-size:3rem; font-weight:700; color:var(--cyan);
+  text-shadow:0 0 24px var(--glow-c);
+  margin-bottom:16px; line-height:1;
+}
+
+.btn-collect {
+  width:100%; padding:14px;
+  background:linear-gradient(135deg,var(--green),#059669);
+  border:none; border-radius:12px; color:#fff;
+  font-family:inherit; font-size:1rem; font-weight:600;
+  cursor:pointer; transition:opacity .2s;
+}
+.btn-collect:disabled { opacity:.35; cursor:not-allowed; }
+.btn-collect:not(:disabled):hover { opacity:.9; }
+
+.btn-close-modal {
+  position:absolute; top:14px; right:14px;
+  background:var(--card); border:1px solid var(--border);
+  color:var(--sub); border-radius:8px; width:32px; height:32px;
+  cursor:pointer; font-size:1rem;
+}
+
+/* ── UPGRADE MODAL ── */
+.upgrade-modal {
+  background:var(--surface); border:1px solid var(--amber);
+  border-radius:24px; padding:36px; width:100%; max-width:420px;
+  text-align:center; position:relative;
+  box-shadow:0 0 60px rgba(245,158,11,.15);
+}
+.upgrade-modal h3 { font-size:1.3rem; font-weight:800; margin-bottom:6px; }
+.upgrade-modal .modal-sub { color:var(--sub); margin-bottom:24px; }
+.price-display { margin:20px 0; }
+.price-display .big { font-size:3rem; font-weight:800; color:var(--amber); font-family:'JetBrains Mono',monospace; }
+.price-display .per { color:var(--sub); font-size:.9rem; }
+.features-list { text-align:left; margin-bottom:24px; display:flex; flex-direction:column; gap:10px; }
+.feat-item { display:flex; align-items:center; gap:10px; font-size:.9rem; }
+.feat-item .ok { color:var(--green); font-size:1rem; }
+.btn-pay {
+  width:100%; padding:14px;
+  background:linear-gradient(135deg,var(--amber),#F97316);
+  border:none; border-radius:12px; color:#000;
+  font-family:inherit; font-size:1rem; font-weight:700;
+  cursor:pointer; margin-bottom:12px;
+  transition:opacity .2s;
+}
+.btn-pay:hover { opacity:.9; }
+.btn-cancel-upgrade {
+  background:none; border:none; color:var(--sub);
+  font-family:inherit; font-size:.85rem; cursor:pointer;
+}
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:28px; left:50%;
+  transform:translateX(-50%) translateY(120px);
+  background:var(--card); border-radius:12px; padding:13px 22px;
+  display:flex; align-items:center; gap:10px; font-size:.9rem; font-weight:500;
+  z-index:600; white-space:nowrap;
+  transition:transform .4s cubic-bezier(.175,.885,.32,1.275);
+  pointer-events:none;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+.toast.success { border:1px solid var(--green); box-shadow:0 0 20px rgba(16,185,129,.2); }
+.toast.error   { border:1px solid var(--red);   box-shadow:0 0 20px rgba(239,68,68,.2); }
+.toast.info    { border:1px solid var(--cyan);  box-shadow:0 0 20px rgba(6,182,212,.2); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  #appScreen { flex-direction:column; }
+  .sidebar { width:100%; height:auto; flex-direction:row; padding:12px 16px; position:fixed; bottom:0; top:auto; z-index:100; border-top:1px solid var(--border); border-right:none; }
+  .sidebar .brand { display:none; }
+  .sidebar-footer { display:none; }
+  .nav-items { flex-direction:row; padding:0; gap:0; justify-content:space-around; }
+  .nav-item { flex-direction:column; gap:4px; font-size:.7rem; padding:8px 12px; }
+  .nav-item .ni { width:auto; }
+  .main-content { padding-bottom:80px; }
+  .page { padding:20px 16px; }
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .card-row { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     AUTH SCREEN
+══════════════════════════════════════ -->
+<div class="screen active" id="authScreen">
+  <div class="auth-box">
+    <div class="brand">
+      <div class="brand-icon">☁️</div>
+      <div class="brand-name">Cloud<span>Fone</span></div>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchTab('register')">Criar conta</button>
+    </div>
+
+    <div class="auth-error" id="authError"></div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="auth-form">
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Senha</label>
+        <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-auth" onclick="doLogin()">Entrar</button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" class="auth-form" style="display:none">
+      <div class="field">
+        <label>Nome</label>
+        <input type="text" id="regName" placeholder="Seu nome">
+      </div>
+      <div class="field">
+        <label>E-mail</label>
+        <input type="email" id="regEmail" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Senha (mín. 6 caracteres)</label>
+        <input type="password" id="regPass" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <button class="btn-auth" onclick="doRegister()">Criar conta grátis</button>
+    </div>
+
+    <p class="auth-note">Plano Free · 30 min/dia · Sem cartão de crédito</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     APP SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="appScreen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">☁️</div>
+      <div class="brand-name">Cloud<span>Fone</span></div>
+    </div>
+
+    <nav class="nav-items">
+      <button class="nav-item active" onclick="goPage('dashboard')" id="nav-dashboard">
+        <span class="ni">🏠</span> Dashboard
+      </button>
+      <button class="nav-item" onclick="goPage('phone')" id="nav-phone">
+        <span class="ni">📱</span> Telefone
+      </button>
+      <button class="nav-item" onclick="goPage('earn')" id="nav-earn">
+        <span class="ni">📺</span> Ganhar Tempo
+      </button>
+      <button class="nav-item" onclick="goPage('plans')" id="nav-plans">
+        <span class="ni">⭐</span> Planos
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="user-avatar" id="userAvatar">U</div>
+        <div class="user-info">
+          <div class="user-name" id="userName">Usuário</div>
+          <div class="user-plan" id="userPlan">Free</div>
+        </div>
+        <button class="btn-logout" onclick="doLogout()" title="Sair">↩</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub" id="dashGreet">Bem-vindo de volta!</div>
+
+      <div class="plan-banner" id="planBanner">
+        <div class="plan-info">
+          <h3 id="planBannerTitle">Plano Free</h3>
+          <p id="planBannerDesc">30 min grátis/dia · Assista anúncios para ganhar mais</p>
+        </div>
+        <button class="btn-upgrade" onclick="goPage('plans')">Upgrade Pro →</button>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Tempo disponível</div>
+          <div class="stat-value" id="statTime">00:00</div>
+          <div class="stat-note">hh:mm</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Anúncios hoje</div>
+          <div class="stat-value" id="statAds">0</div>
+          <div class="stat-note">assistidos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total ganho</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-note">minutos</div>
+        </div>
+      </div>
+
+      <!-- Display ad (real AdSense banner) -->
+      <div class="ad-section-title">ANÚNCIOS PARCEIROS</div>
+      <div class="adsense-slot">
+        <!-- Cole aqui o seu bloco de anúncio do Google AdSense -->
+        <!-- Exemplo:
+        <ins class="adsbygoogle"
+          style="display:block"
+          data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+          data-ad-slot="XXXXXXXXXX"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        -->
+        <div class="adsense-placeholder">
+          <strong>📢 Espaço de Anúncio</strong>
+          Configure seu Google AdSense aqui para monetização real
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ad-section-title">ÚLTIMAS ATIVIDADES</div>
+        <div id="dashHistory">
+          <div style="color:var(--sub);font-size:.88rem;padding:8px 0;">Nenhuma atividade ainda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PHONE PAGE ── -->
+    <div class="page" id="page-phone">
+      <div class="page-title">Telefone na Nuvem</div>
+      <div class="page-sub">Use seu tempo acumulado para acessar o Android na nuvem</div>
+
+      <div class="card-row">
+        <div class="card" style="flex:0 0 auto; min-width:200px;">
+          <div class="stat-label">Tempo disponível</div>
+          <div class="stat-value" id="phoneTimeDisplay">00:00</div>
+          <div class="stat-note" style="margin-top:8px;">
+            <button onclick="goPage('earn')" style="background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);color:var(--cyan);padding:6px 14px;border-radius:8px;font-family:inherit;font-size:.8rem;cursor:pointer;margin-top:8px;">+ Ganhar tempo</button>
+          </div>
+        </div>
+        <div class="card" style="flex:1;">
+          <div class="stat-label">Sessão ativa</div>
+          <div class="stat-value" id="sessionTimer">--:--</div>
+          <div class="stat-note">tempo restante nesta sessão</div>
+        </div>
+      </div>
+
+      <!-- THE CLOUD PHONE -->
+      <div class="phone-frame-wrap">
+        <div class="phone-header">
+          <div class="phone-status">
+            <div class="status-dot" id="phoneStatusDot" style="background:var(--sub);box-shadow:none;"></div>
+            <span id="phoneStatusText">Desconectado</span>
+          </div>
+          <div class="phone-timer-display" id="phoneHeaderTimer">—</div>
+          <button onclick="startSession()" id="btnStartSession"
+            style="background:linear-gradient(135deg,var(--blue),var(--cyan));border:none;border-radius:8px;color:#fff;padding:8px 16px;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;">
+            Iniciar sessão
+          </button>
+        </div>
+
+        <div class="phone-iframe-container">
+          <!-- 
+            REAL CLOUD PHONE OPTIONS:
+            1. Redfinger Cloud Phone: https://www.redfinger.net  (API disponível)
+            2. Nox Cloud: embed via iframe
+            3. Seu próprio servidor com QEMU/KVM + noVNC
+            4. Genymotion Cloud (SaaS)
+            
+            Substitua o src abaixo pela URL do seu cloud phone provider.
+            Para testes, usamos um Android web emulator público.
+          -->
+          <iframe
+            id="cloudPhoneIframe"
+            src="about:blank"
+            allowfullscreen
+            allow="microphone; camera; clipboard-read; clipboard-write"
+            title="Cloud Phone">
+          </iframe>
+
+          <!-- LOCK OVERLAY -->
+          <div class="phone-locked-overlay" id="phoneLockOverlay">
+            <div class="lock-icon">🔒</div>
+            <div class="lock-title">Sessão não iniciada</div>
+            <div class="lock-sub">Você precisa de pelo menos <strong>10 minutos</strong> no banco para iniciar uma sessão</div>
+            <div class="lock-progress">
+              <div class="lock-fill" id="lockProgressFill" style="width:0%"></div>
+            </div>
+            <div class="lock-label" id="lockProgressLabel">0 / 10 min para desbloquear</div>
+            <button onclick="goPage('earn')"
+              style="margin-top:8px;background:linear-gradient(135deg,var(--blue),var(--cyan));border:none;border-radius:10px;color:#fff;padding:10px 24px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;">
+              📺 Assistir anúncios
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="ad-section-title">ANÚNCIO — SUPORTE AO SERVIÇO GRATUITO</div>
+        <div class="adsense-slot" style="min-height:90px;">
+          <!-- Banner AdSense 728x90 ou responsivo -->
+          <div class="adsense-placeholder">
+            <strong>📢 Espaço de Anúncio</strong>
+            Google AdSense — Banner lateral
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EARN TIME ── -->
+    <div class="page" id="page-earn">
+      <div class="page-title">Ganhar Tempo</div>
+      <div class="page-sub">Assista anúncios e acumule minutos de cloud phone — recarrega a cada 24h</div>
+
+      <div class="stats-row" style="grid-template-columns:1fr 1fr;">
+        <div class="stat-card">
+          <div class="stat-label">Banco de tempo</div>
+          <div class="stat-value" id="earnTimeDisplay">00:00</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Anúncios restantes hoje</div>
+          <div class="stat-value" id="earnAdsLeft">6</div>
+          <div class="stat-note" id="earnResetLabel">Renova em 24h</div>
+        </div>
+      </div>
+
+      <!-- Reward ads -->
+      <div class="ad-section-title" style="margin-top:8px;">ANÚNCIOS COM RECOMPENSA (+10 min cada)</div>
+      <div id="rewardAdsList"></div>
+
+      <!-- Display ad -->
+      <div class="ad-section-title" style="margin-top:8px;">ANÚNCIO DISPLAY</div>
+      <div class="adsense-slot">
+        <!-- AdSense retângulo médio 300x250 -->
+        <div class="adsense-placeholder">
+          <strong>📢 Espaço de Anúncio</strong>
+          Google AdSense — Retângulo médio
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ad-section-title">HISTÓRICO DE GANHOS</div>
+        <div id="earnHistory">
+          <div style="color:var(--sub);font-size:.88rem;padding:8px 0;">Nenhum ganho ainda hoje.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLANS ── -->
+    <div class="page" id="page-plans">
+      <div class="page-title">Planos</div>
+      <div class="page-sub">Escolha o plano ideal para você</div>
+
+      <div class="plans-grid">
+        <!-- FREE -->
+        <div class="plan-card">
+          <div class="plan-name">🆓 Free</div>
+          <div class="plan-price">
+            <span class="amount">R$0</span>
+            <span class="period">/mês</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feat"><span class="ok">✓</span> 30 min grátis por dia</div>
+            <div class="plan-feat"><span class="ok">✓</span> Até 6 anúncios/dia (+10min cada)</div>
+            <div class="plan-feat"><span class="ok">✓</span> Acesso ao cloud phone</div>
+            <div class="plan-feat"><span class="no">✗</span> Sem anúncios durante o uso</div>
+            <div class="plan-feat"><span class="no">✗</span> Sessão máx. 30 min</div>
+          </div>
+          <button class="btn-plan current" id="planBtnFree">Plano atual</button>
+        </div>
+
+        <!-- PRO -->
+        <div class="plan-card featured">
+          <div class="plan-badge">MAIS POPULAR</div>
+          <div class="plan-name">⚡ Pro</div>
+          <div class="plan-price">
+            <span class="amount">R$19</span>
+            <span class="period">/mês</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feat"><span class="ok">✓</span> 5 horas de cloud phone/dia</div>
+            <div class="plan-feat"><span class="ok">✓</span> Anúncios ilimitados para acumular</div>
+            <div class="plan-feat"><span class="ok">✓</span> Sessões de até 2h seguidas</div>
+            <div class="plan-feat"><span class="ok">✓</span> Sem anúncios durante o uso</div>
+            <div class="plan-feat"><span class="ok">✓</span> Suporte prioritário</div>
+          </div>
+          <button class="btn-plan primary" onclick="openUpgrade('Pro','R$19')">Assinar Pro</button>
+        </div>
+
+        <!-- UNLIMITED -->
+        <div class="plan-card">
+          <div class="plan-name">🚀 Ilimitado</div>
+          <div class="plan-price">
+            <span class="amount">R$39</span>
+            <span class="period">/mês</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feat"><span class="ok">✓</span> Uso ilimitado 24/7</div>
+            <div class="plan-feat"><span class="ok">✓</span> Múltiplos dispositivos</div>
+            <div class="plan-feat"><span class="ok">✓</span> Sessões sem interrupção</div>
+            <div class="plan-feat"><span class="ok">✓</span> Zero anúncios</div>
+            <div class="plan-feat"><span class="ok">✓</span> API de integração</div>
+          </div>
+          <button class="btn-plan premium" onclick="openUpgrade('Ilimitado','R$39')">Assinar Ilimitado</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px;text-align:center;">
+        <div style="font-size:.85rem;color:var(--sub);">
+          💳 Pagamento seguro · Cancele a qualquer momento · Sem fidelidade<br>
+          Para pagamento real, integre <strong>Stripe</strong>, <strong>Mercado Pago</strong> ou <strong>PagSeguro</strong>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════
+     AD WATCH MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="adModal">
+  <div class="modal">
+    <button class="btn-close-modal" onclick="closeAdModal()">✕</button>
+    <h3>📺 Anúncio em exibição</h3>
+    <p class="modal-sub" id="adModalSub">Assista até o fim para ganhar seus minutos</p>
+
+    <div class="video-ad-box" id="adVideoBox">
+      <div class="vad-brand" id="adVadBrand">🛍️</div>
+      <div class="vad-name" id="adVadName">Parceiro CloudFone</div>
+      <div class="vad-label">Anúncio patrocinado</div>
+      <div class="vad-progress" id="adVadProgress"></div>
+    </div>
+
+    <div class="countdown-big" id="adCountdown">30</div>
+
+    <button class="btn-collect" id="adCollectBtn" disabled onclick="collectAd()">
+      Aguardando — <span id="adCollectCountdown">30</span>s
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     UPGRADE MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="upgradeModal">
+  <div class="upgrade-modal">
+    <button class="btn-close-modal" onclick="closeUpgradeModal()" style="border-color:var(--amber);">✕</button>
+    <h3>⭐ Upgrade para <span id="upgradePlanName">Pro</span></h3>
+    <p class="modal-sub">Desbloqueie o máximo do CloudFone</p>
+
+    <div class="price-display">
+      <div class="big" id="upgradePlanPrice">R$19</div>
+      <div class="per">por mês · cancele quando quiser</div>
+    </div>
+
+    <div class="features-list">
+      <div class="feat-item"><span class="ok">✓</span> Horas de cloud phone sem limite diário</div>
+      <div class="feat-item"><span class="ok">✓</span> Sessões longas sem interrupção</div>
+      <div class="feat-item"><span class="ok">✓</span> Experiência sem anúncios durante o uso</div>
+      <div class="feat-item"><span class="ok">✓</span> Suporte por e-mail prioritário</div>
+    </div>
+
+    <!-- 
+      INTEGRAÇÃO DE PAGAMENTO REAL:
+      Substitua este botão pela integração do seu gateway:
+      - Stripe: https://stripe.com/docs/checkout
+      - Mercado Pago: https://www.mercadopago.com.br/developers
+      - PagSeguro: https://dev.pagseguro.uol.com.br
+    -->
+    <button class="btn-pay" onclick="simulatePayment()">
+      💳 Pagar com cartão — <span id="upgradePayBtn">R$19</span>/mês
+    </button>
+    <button class="btn-cancel-upgrade" onclick="closeUpgradeModal()">Agora não</button>
+
+    <div style="margin-top:16px;font-size:.75rem;color:var(--sub);">
+      🔒 Pagamento seguro via SSL · Integre Stripe/Mercado Pago para produção
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastEmoji">✅</span>
+  <span id="toastMsg">Mensagem</span>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT — LÓGICA COMPLETA
+══════════════════════════════════════ -->
+<script>
+// ═══════════════════════════════════════
+// DB — localStorage persistente
+// ═══════════════════════════════════════
+const DB = {
+  get(k) { try { return JSON.parse(localStorage.getItem('cf_'+k)); } catch{ return null; } },
+  set(k,v) { localStorage.setItem('cf_'+k, JSON.stringify(v)); },
+  del(k)   { localStorage.removeItem('cf_'+k); }
+};
+
+// ═══════════════════════════════════════
+// USERS — auth local
+// ═══════════════════════════════════════
+function getUsers() { return DB.get('users') || {}; }
+function saveUsers(u) { DB.set('users', u); }
+function currentUser() { return DB.get('session'); }
+
+// ═══════════════════════════════════════
+// ADS CATALOG
+// ═══════════════════════════════════════
+const AD_CATALOG = [
+  { id:'a1', icon:'🛒', name:'MegaStore', desc:'Ofertas do dia com até 60% OFF' },
+  { id:'a2', icon:'🎮', name:'GameZone Pro', desc:'Os melhores jogos mobile de 2026' },
+  { id:'a3', icon:'🏦', name:'BancoFlex Digital', desc:'Conta sem tarifas, cartão grátis' },
+  { id:'a4', icon:'🍕', name:'FoodExpress', desc:'Delivery rápido — 1ª entrega grátis' },
+  { id:'a5', icon:'✈️', name:'VoeJá Viagens', desc:'Passagens a partir de R$199' },
+  { id:'a6', icon:'📱', name:'NetMóvel 5G', desc:'50GB por R$29 — portabilidade fácil' },
+];
+
+const DAILY_LIMIT = 6; // Free: 6 ads/dia = 60 min max
+const REWARD_MINUTES = 10;
+const FREE_DAILY_MINUTES = 30;
+const MIN_TO_START = 10;
+
+// ═══════════════════════════════════════
+// USER DATA helpers
+// ═══════════════════════════════════════
+function getUserData(email) {
+  const users = getUsers();
+  if (!users[email]) {
+    users[email] = {
+      name: '', plan: 'free',
+      minutes: FREE_DAILY_MINUTES,
+      adsWatchedToday: [],
+      totalMinutesEarned: FREE_DAILY_MINUTES,
+      history: [],
+      lastReset: todayStr(),
+      totalAdsAllTime: 0,
+    };
+    saveUsers(users);
+  }
+  return users[email];
+}
+
+function saveUserData(email, data) {
+  const users = getUsers();
+  users[email] = data;
+  saveUsers(users);
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function resetDailyIfNeeded(data) {
+  if (data.lastReset !== todayStr()) {
+    data.adsWatchedToday = [];
+    data.lastReset = todayStr();
+    // Free plan gets 30 min daily refill
+    if (data.plan === 'free') {
+      data.minutes = Math.max(data.minutes, FREE_DAILY_MINUTES);
+    }
+  }
+  return data;
+}
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+  document.getElementById('authError').style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg; el.style.display = 'block';
+}
+
+function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('loginPass').value;
+  if (!email || !pass) return showAuthError('Preencha todos os campos.');
+  const users = getUsers();
+  if (!users[email]) return showAuthError('E-mail não cadastrado.');
+  if (users[email]._pass !== btoa(pass)) return showAuthError('Senha incorreta.');
+  DB.set('session', email);
+  enterApp();
+}
+
+function doRegister() {
+  const name  = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
+  const pass  = document.getElementById('regPass').value;
+  if (!name || !email || !pass) return showAuthError('Preencha todos os campos.');
+  if (pass.length < 6) return showAuthError('Senha deve ter ao menos 6 caracteres.');
+  const users = getUsers();
+  if (users[email]) return showAuthError('E-mail já cadastrado. Faça login.');
+  users[email] = {
+    _pass: btoa(pass), name,
+    plan: 'free',
+    minutes: FREE_DAILY_MINUTES,
+    adsWatchedToday: [],
+    totalMinutesEarned: FREE_DAILY_MINUTES,
+    history: [],
+    lastReset: todayStr(),
+    totalAdsAllTime: 0,
+  };
+  saveUsers(users);
+  DB.set('session', email);
+  enterApp();
+}
+
+function doLogout() {
+  stopSession();
+  DB.del('session');
+  document.getElementById('appScreen').classList.remove('active');
+  document.getElementById('authScreen').classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════
+function enterApp() {
+  document.getElementById('authScreen').classList.remove('active');
+  document.getElementById('appScreen').classList.add('active');
+  refreshApp();
+  goPage('dashboard');
+}
+
+function refreshApp() {
+  const email = currentUser();
+  if (!email) return;
+  let data = getUserData(email);
+  data = resetDailyIfNeeded(data);
+  saveUserData(email, data);
+
+  // Sidebar user info
+  const initial = (data.name || email)[0].toUpperCase();
+  document.getElementById('userAvatar').textContent = initial;
+  document.getElementById('userName').textContent = data.name || email.split('@')[0];
+  const planEl = document.getElementById('userPlan');
+  planEl.textContent = data.plan === 'free' ? 'Free' : data.plan === 'pro' ? '⚡ Pro' : '🚀 Ilimitado';
+  planEl.className = 'user-plan' + (data.plan !== 'free' ? ' pro' : '');
+
+  // Stats
+  const hh = String(Math.floor(data.minutes/60)).padStart(2,'0');
+  const mm = String(data.minutes%60).padStart(2,'0');
+  const timeStr = `${hh}:${mm}`;
+  document.getElementById('statTime').textContent = timeStr;
+  document.getElementById('statAds').textContent = data.adsWatchedToday.length;
+  document.getElementById('statTotal').textContent = data.totalMinutesEarned;
+
+  // Dashboard
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite';
+  document.getElementById('dashGreet').textContent = `${greet}, ${data.name || email.split('@')[0]}! ☁️`;
+
+  // Plan banner
+  if (data.plan !== 'free') {
+    document.getElementById('planBannerTitle').textContent =
+      data.plan === 'pro' ? '⚡ Plano Pro' : '🚀 Plano Ilimitado';
+    document.getElementById('planBannerDesc').textContent = 'Obrigado por apoiar o CloudFone!';
+    document.querySelector('.btn-upgrade').style.display = 'none';
+  }
+
+  // Phone page
+  document.getElementById('phoneTimeDisplay').textContent = timeStr;
+  document.getElementById('earnTimeDisplay').textContent = timeStr;
+
+  const adsLeft = Math.max(0, DAILY_LIMIT - data.adsWatchedToday.length);
+  document.getElementById('earnAdsLeft').textContent = adsLeft;
+
+  // Lock overlay
+  const lockFill = document.getElementById('lockProgressFill');
+  const lockLabel = document.getElementById('lockProgressLabel');
+  const pct = Math.min(data.minutes / MIN_TO_START * 100, 100);
+  lockFill.style.width = pct + '%';
+  lockLabel.textContent = `${data.minutes} / ${MIN_TO_START} min para desbloquear`;
+
+  // Render reward ads
+  renderRewardAds(data);
+
+  // History
+  renderHistory(data);
+}
+
+// ═══════════════════════════════════════
+// REWARD ADS
+// ═══════════════════════════════════════
+function renderRewardAds(data) {
+  const container = document.getElementById('rewardAdsList');
+  container.innerHTML = AD_CATALOG.map(ad => {
+    const watched = data.adsWatchedToday.includes(ad.id);
+    return `
+    <div class="reward-ad-card ${watched ? 'watched' : ''}" onclick="${watched ? '' : `watchAd('${ad.id}')`}">
+      <div class="rad-icon">${ad.icon}</div>
+      <div class="rad-info">
+        <h4>${ad.name}</h4>
+        <p>${ad.desc}</p>
+      </div>
+      <div class="rad-reward ${watched ? 'done' : ''}">
+        ${watched ? '✓ Assistido' : `+${REWARD_MINUTES} min`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderHistory(data) {
+  const items = (data.history || []).slice(0,8);
+  const html = items.length ? items.map(h => `
+    <div class="history-item">
+      <div class="hi-left">
+        <div class="hi-icon">${h.icon}</div>
+        <div><div class="hi-desc">${h.desc}</div><div class="hi-time">${h.time}</div></div>
+      </div>
+      <div class="hi-amount ${h.amount > 0 ? 'plus' : 'minus'}">${h.amount > 0 ? '+' : ''}${h.amount} min</div>
+    </div>`) .join('')
+    : '<div style="color:var(--sub);font-size:.88rem;padding:8px 0;">Nenhuma atividade ainda.</div>';
+  document.getElementById('dashHistory').innerHTML = html;
+  document.getElementById('earnHistory').innerHTML = html;
+}
+
+function addHistory(email, icon, desc, amount) {
+  const data = getUserData(email);
+  data.history = data.history || [];
+  data.history.unshift({
+    icon, desc, amount,
+    time: new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})
+  });
+  data.history = data.history.slice(0,50);
+  saveUserData(email, data);
+}
+
+// ═══════════════════════════════════════
+// AD WATCHING
+// ═══════════════════════════════════════
+let activeAdId = null;
+let adTimerInterval = null;
+let adSeconds = 30;
+
+function watchAd(adId) {
+  const email = currentUser();
+  const data = getUserData(email);
+  if (data.adsWatchedToday.length >= DAILY_LIMIT && data.plan === 'free') {
+    showToast('Limite diário atingido! Volte amanhã ou faça upgrade.', 'error', '⚠️');
+    return;
+  }
+  if (data.adsWatchedToday.includes(adId)) return;
+
+  activeAdId = adId;
+  const ad = AD_CATALOG.find(a => a.id === adId);
+  document.getElementById('adVadBrand').textContent = ad.icon;
+  document.getElementById('adVadName').textContent = ad.name;
+  document.getElementById('adModalSub').textContent = `Assista até o fim para ganhar +${REWARD_MINUTES} minutos`;
+
+  const progress = document.getElementById('adVadProgress');
+  const countdown = document.getElementById('adCountdown');
+  const collectBtn = document.getElementById('adCollectBtn');
+  const collectCountdown = document.getElementById('adCollectCountdown');
+
+  progress.style.transition = 'none';
+  progress.style.width = '0%';
+  collectBtn.disabled = true;
+  adSeconds = 30;
+  countdown.textContent = adSeconds;
+  collectCountdown.textContent = adSeconds;
+
+  document.getElementById('adModal').classList.add('open');
+
+  setTimeout(() => {
+    progress.style.transition = 'width 30s linear';
+    progress.style.width = '100%';
+  }, 80);
+
+  if (adTimerInterval) clearInterval(adTimerInterval);
+  adTimerInterval = setInterval(() => {
+    adSeconds--;
+    countdown.textContent = adSeconds;
+    collectCountdown.textContent = adSeconds;
+    if (adSeconds <= 0) {
+      clearInterval(adTimerInterval);
+      collectBtn.disabled = false;
+      collectBtn.innerHTML = `🎉 Coletar +${REWARD_MINUTES} minutos!`;
+      countdown.textContent = '✓';
+    } else {
+      collectBtn.innerHTML = `Aguardando — <span id="adCollectCountdown">${adSeconds}</span>s`;
+    }
+  }, 1000);
+}
+
+function collectAd() {
+  if (!activeAdId) return;
+  const email = currentUser();
+  let data = getUserData(email);
+
+  data.adsWatchedToday.push(activeAdId);
+  data.minutes += REWARD_MINUTES;
+  data.totalMinutesEarned += REWARD_MINUTES;
+  data.totalAdsAllTime = (data.totalAdsAllTime || 0) + 1;
+  saveUserData(email, data);
+
+  addHistory(email, '📺', `Anúncio: ${AD_CATALOG.find(a=>a.id===activeAdId).name}`, REWARD_MINUTES);
+
+  closeAdModal();
+  refreshApp();
+  showToast(`+${REWARD_MINUTES} minutos adicionados ao seu banco!`, 'success', '⏱️');
+}
+
+function closeAdModal() {
+  if (adTimerInterval) clearInterval(adTimerInterval);
+  document.getElementById('adModal').classList.remove('open');
+  activeAdId = null;
+}
+
+// ═══════════════════════════════════════
+// SESSION — Cloud Phone
+// ═══════════════════════════════════════
+let sessionInterval = null;
+let sessionSecondsLeft = 0;
+
+function startSession() {
+  const email = currentUser();
+  const data = getUserData(email);
+
+  if (data.minutes < MIN_TO_START) {
+    showToast(`Você precisa de pelo menos ${MIN_TO_START} minutos no banco.`, 'error', '⚠️');
+    return;
+  }
+
+  // Load cloud phone iframe
+  const iframe = document.getElementById('cloudPhoneIframe');
+  /*
+    PRODUÇÃO: substitua a URL abaixo pela URL real do seu cloud phone.
+    Exemplos:
+    - iframe.src = 'https://app.redfinger.net/embed?token=SEU_TOKEN';
+    - iframe.src = 'https://seu-servidor.com/novnc/?host=android-vm&port=6080';
+    
+    Para demo, usamos um emulador Android web público:
+  */
+  iframe.src = 'https://www.online-android-emulator.com/';
+
+  document.getElementById('phoneLockOverlay').classList.add('hidden');
+  document.getElementById('phoneStatusDot').style.cssText = 'background:var(--green);box-shadow:0 0 8px var(--green);';
+  document.getElementById('phoneStatusText').textContent = 'Conectado';
+  document.getElementById('btnStartSession').style.display = 'none';
+
+  sessionSecondsLeft = data.minutes * 60;
+  updateSessionTimer();
+
+  if (sessionInterval) clearInterval(sessionInterval);
+  sessionInterval = setInterval(() => {
+    sessionSecondsLeft--;
+    updateSessionTimer();
+
+    // Deduct 1 minute every 60 seconds
+    if (sessionSecondsLeft % 60 === 0) {
+      let d = getUserData(email);
+      d.minutes = Math.max(0, d.minutes - 1);
+      addHistory(email, '📱', 'Sessão cloud phone — 1 min usado', -1);
+      saveUserData(email, d);
+      refreshApp();
+    }
+
+    if (sessionSecondsLeft <= 0) {
+      stopSession();
+      showToast('Tempo esgotado! Assista mais anúncios para continuar.', 'error', '⏰');
+    }
+  }, 1000);
+
+  showToast('Sessão iniciada! Aproveite seu cloud phone.', 'success', '📱');
+  addHistory(email, '🚀', 'Sessão cloud phone iniciada', 0);
+}
+
+function updateSessionTimer() {
+  const h = Math.floor(sessionSecondsLeft / 3600);
+  const m = Math.floor((sessionSecondsLeft % 3600) / 60);
+  const s = sessionSecondsLeft % 60;
+  const str = h > 0
+    ? `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  document.getElementById('sessionTimer').textContent = str;
+  document.getElementById('phoneHeaderTimer').textContent = str;
+}
+
+function stopSession() {
+  if (sessionInterval) { clearInterval(sessionInterval); sessionInterval = null; }
+  const iframe = document.getElementById('cloudPhoneIframe');
+  iframe.src = 'about:blank';
+  document.getElementById('phoneLockOverlay').classList.remove('hidden');
+  document.getElementById('phoneStatusDot').style.cssText = 'background:var(--sub);box-shadow:none;';
+  document.getElementById('phoneStatusText').textContent = 'Desconectado';
+  document.getElementById('btnStartSession').style.display = '';
+  document.getElementById('sessionTimer').textContent = '--:--';
+  document.getElementById('phoneHeaderTimer').textContent = '—';
+}
+
+// ═══════════════════════════════════════
+// PLANS / UPGRADE
+// ═══════════════════════════════════════
+function openUpgrade(planName, price) {
+  document.getElementById('upgradePlanName').textContent = planName;
+  document.getElementById('upgradePlanPrice').textContent = price;
+  document.getElementById('upgradePayBtn').textContent = price;
+  document.getElementById('upgradeModal').classList.add('open');
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgradeModal').classList.remove('open');
+}
+
+function simulatePayment() {
+  /*
+    PRODUÇÃO — Integre aqui o gateway de pagamento:
+
+    STRIPE:
+    const stripe = Stripe('pk_live_SEU_KEY');
+    stripe.redirectToCheckout({ sessionId: await createCheckoutSession(planName) });
+
+    MERCADO PAGO:
+    window.location.href = 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=SEU_ID';
+
+    Por ora, simula aprovação:
+  */
+  const email = currentUser();
+  const planName = document.getElementById('upgradePlanName').textContent.toLowerCase();
+  const plan = planName === 'ilimitado' ? 'unlimited' : 'pro';
+
+  let data = getUserData(email);
+  data.plan = plan;
+  data.minutes += plan === 'pro' ? 300 : 9999;
+  saveUserData(email, data);
+
+  closeUpgradeModal();
+  refreshApp();
+  showToast(`Upgrade realizado! Bem-vindo ao plano ${planName}! 🎉`, 'success', '⭐');
+  addHistory(email, '⭐', `Upgrade para plano ${planName}`, plan === 'pro' ? 300 : 9999);
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function goPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  document.getElementById('nav-'+pageId).classList.add('active');
+  refreshApp();
+}
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastTimeout;
+function showToast(msg, type='success', emoji='✅') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  document.getElementById('toastEmoji').textContent = emoji;
+  t.className = `toast ${type} show`;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const email = currentUser();
+  if (email && getUsers()[email]) {
+    enterApp();
+  }
+});
+</script>
+</body>
+</html>
