@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScreenShare - Compartilhamento de Tela</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: rgba(30, 30, 60, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            width: 95%;
+            margin: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #00d2ff, #7a5cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 14px 35px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(122, 92, 255, 0.5);
+        }
+
+        .primary {
+            background: linear-gradient(90deg, #00d2ff, #7a5cff);
+            color: #fff;
+        }
+
+        .secondary {
+            background: transparent;
+            border: 2px solid #00d2ff;
+            color: #00d2ff;
+        }
+
+        .danger {
+            background: #ff4757;
+            color: #fff;
+        }
+
+        .success {
+            background: #2ed573;
+            color: #fff;
+        }
+
+        .small {
+            padding: 8px 20px;
+            font-size: 0.85rem;
+        }
+
+        .back {
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            margin-top: 15px;
+        }
+
+        .back:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .video-wrapper {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 15px 0;
+            position: relative;
+            aspect-ratio: 16/9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .status.offline {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+        }
+
+        .status.online {
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+        }
+
+        .status.waiting {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa502;
+        }
+
+        .input {
+            padding: 14px 20px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            width: 70%;
+            max-width: 350px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input:focus {
+            border-color: #7a5cff;
+            box-shadow: 0 0 20px rgba(122, 92, 255, 0.2);
+        }
+
+        .input::placeholder {
+            color: #666;
+        }
+
+        .join-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .key-display {
+            background: rgba(122, 92, 255, 0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(122, 92, 255, 0.3);
+        }
+
+        .key-display h2 {
+            font-size: 2rem;
+            font-family: 'Courier New', monospace;
+            color: #7a5cff;
+            letter-spacing: 3px;
+            word-break: break-all;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .info {
+            margin: 20px 0 10px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .info p {
+            color: #777;
+            font-size: 0.85rem;
+            margin: 5px 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.75rem;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .btn {
+                padding: 12px 25px;
+                font-size: 0.9rem;
+            }
+            .input {
+                width: 100%;
+            }
+            .join-form {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- ======== PÁGINA INICIAL ======== -->
+    <div id="pageHome" class="container">
+        <h1>📡 ScreenShare</h1>
+        <p class="subtitle">Compartilhe sua tela com qualquer pessoa em tempo real</p>
+
+        <div class="buttons">
+            <button onclick="showPage('broadcast')" class="btn primary">🎥 Transmitir Tela</button>
+            <button onclick="showPage('viewer')" class="btn secondary">👁️ Assistir Transmissão</button>
+        </div>
+
+        <div class="info">
+            <p>🔹 <strong>PC</strong> pode transmitir e assistir</p>
+            <p>📱 <strong>Celular</strong> pode assistir (transmissão via app ScreenStream)</p>
+            <p>🔑 Sistema de palavra-chave para acesso seguro</p>
+        </div>
+        <p class="footer-note">v1.0 • Funciona em Chrome, Edge, Firefox e Safari</p>
+    </div>
+
+    <!-- ======== PÁGINA DE TRANSMISSÃO ======== -->
+    <div id="pageBroadcast" class="container hidden">
+        <h1>🎥 Transmissão</h1>
+        <p class="subtitle">Compartilhe sua tela com quem tiver a palavra-chave</p>
+
+        <div id="broadcastStatus" class="status offline">🔴 Aguardando início...</div>
+
+        <div class="video-wrapper">
+            <video id="localVideo" autoplay muted></video>
+        </div>
+
+        <div class="controls">
+            <button id="startBroadcastBtn" class="btn primary">▶️ Iniciar Transmissão</button>
+            <button id="stopBroadcastBtn" class="btn danger hidden">⏹️ Parar Transmissão</button>
+        </div>
+
+        <div id="keyDisplay" class="key-display hidden">
+            <p>🔑 Palavra-chave para assistir:</p>
+            <h2 id="roomKey">---</h2>
+            <button onclick="copyKey()" class="btn small primary">📋 Copiar</button>
+        </div>
+
+        <div class="info">
+            <p>⚠️ Funciona em <strong>PC</strong> (Chrome, Edge, Firefox)</p>
+            <p>Compartilhe a palavra-chave com quem vai assistir</p>
+        </div>
+
+        <button onclick="showPage('home')" class="btn back">↩️ Voltar</button>
+        <p class="footer-note">A transmissão é criptografada e ponto a ponto</p>
+    </div>
+
+    <!-- ======== PÁGINA DE VISUALIZAÇÃO ======== -->
+    <div id="pageViewer" class="container hidden">
+        <h1>👁️ Assistir</h1>
+        <p class="subtitle">Digite a palavra-chave para ver a transmissão</p>
+
+        <div class="join-form">
+            <input type="text" id="keyInput" placeholder="Digite a palavra-chave" class="input">
+            <button id="joinBtn" class="btn primary">🔗 Conectar</button>
+        </div>
+
+        <div id="viewerStatus" class="status offline">⏳ Aguardando conexão...</div>
+
+        <div class="video-wrapper">
+            <video id="remoteVideo" autoplay></video>
+        </div>
+
+        <div id="viewerControls" class="hidden">
+            <button onclick="disconnectViewer()" class="btn danger">⏹️ Desconectar</button>
+        </div>
+
+        <div class="info">
+            <p>📱 Funciona em <strong>qualquer dispositivo</strong> (PC, celular, tablet)</p>
+            <p>Peça a palavra-chave para quem está transmitindo</p>
+        </div>
+
+        <button onclick="showPage('home')" class="btn back">↩️ Voltar</button>
+        <p class="footer-note">A conexão é segura e criptografada</p>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // ESTADO GLOBAL
+    // ============================================
+    let peer = null;
+    let currentStream = null;
+    let currentCall = null;
+    let roomKey = '';
+    let isBroadcasting = false;
+
+    // ============================================
+    // NAVEGAÇÃO ENTRE PÁGINAS
+    // ============================================
+    function showPage(page) {
+        document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+        if (page === 'home') document.getElementById('pageHome').classList.remove('hidden');
+        else if (page === 'broadcast') document.getElementById('pageBroadcast').classList.remove('hidden');
+        else if (page === 'viewer') document.getElementById('pageViewer').classList.remove('hidden');
+
+        // Resetar estado ao sair das páginas
+        if (page === 'home') {
+            stopBroadcast();
+            disconnectViewer();
+        }
+    }
+
+    // ============================================
+    // FUNÇÕES DA TRANSMISSÃO (Broadcast)
+    // ============================================
+    document.getElementById('startBroadcastBtn').addEventListener('click', startBroadcast);
+    document.getElementById('stopBroadcastBtn').addEventListener('click', stopBroadcast);
+
+    async function startBroadcast() {
+        const status = document.getElementById('broadcastStatus');
+        const startBtn = document.getElementById('startBroadcastBtn');
+        const stopBtn = document.getElementById('stopBroadcastBtn');
+        const keyDisplay = document.getElementById('keyDisplay');
+
+        try {
+            status.className = 'status waiting';
+            status.textContent = '⏳ Solicitando permissão para capturar tela...';
+
+            // Capturar tela
+            currentStream = await navigator.mediaDevices.getDisplayMedia({
+                video: { cursor: 'always', frameRate: 30 },
+                audio: true
+            });
+
+            // Exibir no vídeo local
+            const video = document.getElementById('localVideo');
+            video.srcObject = currentStream;
+
+            // Criar PeerJS
+            if (peer) peer.destroy();
+            peer = new Peer();
+
+            peer.on('open', (id) => {
+                roomKey = id;
+                document.getElementById('roomKey').textContent = id;
+                keyDisplay.classList.remove('hidden');
+                
+                status.className = 'status online';
+                status.textContent = '🟢 Transmitindo ao vivo!';
+                startBtn.classList.add('hidden');
+                stopBtn.classList.remove('hidden');
+                isBroadcasting = true;
+            });
+
+            peer.on('call', (call) => {
+                call.answer(currentStream);
+                currentCall = call;
+                call.on('close', () => {
+                    status.textContent = '🔴 Visualizador desconectou';
+                });
+            });
+
+            peer.on('error', (err) => {
+                console.error('Erro PeerJS:', err);
+                status.className = 'status offline';
+                status.textContent = '❌ Erro: ' + err.message;
+            });
+
+            // Parar transmissão se o usuário fechar a janela de compartilhamento
+            currentStream.getVideoTracks()[0].onended = () => {
+                stopBroadcast();
+            };
+
+        } catch (err) {
+            console.error('Erro ao iniciar transmissão:', err);
+            status.className = 'status offline';
+            status.textContent = '❌ Erro: ' + err.message;
+            
+            if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                status.textContent = '❌ Você precisa permitir o compartilhamento de tela';
+            }
+        }
+    }
+
+    function stopBroadcast() {
+        if (currentStream) {
+            currentStream.getTracks().forEach(track => track.stop());
+            currentStream = null;
+        }
+        if (currentCall) {
+            currentCall.close();
+            currentCall = null;
+        }
+        if (peer) {
+            peer.destroy();
+            peer = null;
+        }
+
+        isBroadcasting = false;
+        document.getElementById('localVideo').srcObject = null;
+        document.getElementById('broadcastStatus').className = 'status offline';
+        document.getElementById('broadcastStatus').textContent = '🔴 Transmissão encerrada';
+        document.getElementById('startBroadcastBtn').classList.remove('hidden');
+        document.getElementById('stopBroadcastBtn').classList.add('hidden');
+        document.getElementById('keyDisplay').classList.add('hidden');
+    }
+
+    function copyKey() {
+        const key = document.getElementById('roomKey').textContent;
+        navigator.clipboard.writeText(key).then(() => {
+            const btn = document.querySelector('#keyDisplay .btn');
+            const original = btn.textContent;
+            btn.textContent = '✅ Copiado!';
+            setTimeout(() => btn.textContent = original, 2000);
+        }).catch(() => {
+            alert('Palavra-chave: ' + key);
+        });
+    }
+
+    // ============================================
+    // FUNÇÕES DO VISUALIZADOR (Viewer)
+    // ============================================
+    document.getElementById('joinBtn').addEventListener('click', connectViewer);
+    document.getElementById('keyInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') connectViewer();
+    });
+
+    let viewerPeer = null;
+    let viewerCall = null;
+    let viewerStream = null;
+
+    function connectViewer() {
+        const key = document.getElementById('keyInput').value.trim();
+        const status = document.getElementById('viewerStatus');
+        const video = document.getElementById('remoteVideo');
+
+        if (!key) {
+            status.className = 'status offline';
+            status.textContent = '⚠️ Digite a palavra-chave';
+            return;
+        }
+
+        status.className = 'status waiting';
+        status.textContent = '⏳ Conectando ao transmissor...';
+
+        // Limpar conexão anterior
+        disconnectViewer();
+
+        viewerPeer = new Peer();
+
+        viewerPeer.on('open', () => {
+            const call = viewerPeer.call(key, null);
+            viewerCall = call;
+
+            call.on('stream', (remoteStream) => {
+                viewerStream = remoteStream;
+                video.srcObject = remoteStream;
+                status.className = 'status online';
+                status.textContent = '🟢 Assistindo ao vivo!';
+                document.getElementById('viewerControls').classList.remove('hidden');
+                video.play().catch(() => {});
+            });
+
+            call.on('close', () => {
+                status.className = 'status offline';
+                status.textContent = '🔴 Transmissão encerrada';
+                document.getElementById('viewerControls').classList.add('hidden');
+                video.srcObject = null;
+            });
+
+            call.on('error', (err) => {
+                status.className = 'status offline';
+                status.textContent = '❌ Erro: ' + err.message;
+                if (err.message.includes('ID')) {
+                    status.textContent = '❌ Palavra-chave inválida ou transmissão offline';
+                }
+                video.srcObject = null;
+            });
+        });
+
+        viewerPeer.on('error', (err) => {
+            status.className = 'status offline';
+            status.textContent = '❌ Erro: ' + err.message;
+            if (err.type === 'unavailable-id') {
+                status.textContent = '❌ Palavra-chave inválida ou transmissão offline';
+            }
+        });
+    }
+
+    function disconnectViewer() {
+        if (viewerCall) {
+            viewerCall.close();
+            viewerCall = null;
+        }
+        if (viewerStream) {
+            viewerStream.getTracks().forEach(track => track.stop());
+            viewerStream = null;
+        }
+        if (viewerPeer) {
+            viewerPeer.destroy();
+            viewerPeer = null;
+        }
+
+        document.getElementById('remoteVideo').srcObject = null;
+        document.getElementById('viewerStatus').className = 'status offline';
+        document.getElementById('viewerStatus').textContent = '⏳ Aguardando conexão...';
+        document.getElementById('viewerControls').classList.add('hidden');
+    }
+
+    // ============================================
+    // LIMPEZA AO FECHAR A PÁGINA
+    // ============================================
+    window.addEventListener('beforeunload', () => {
+        stopBroadcast();
+        disconnectViewer();
+    });
+
+    console.log('🔑 ScreenShare carregado!');
+    console.log('📡 Compartilhe sua tela ou assista com palavra-chave');
+</script>
+
+</body>
+</html>
